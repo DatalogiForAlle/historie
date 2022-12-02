@@ -102,5 +102,8 @@ class SearchResultsListView(ListView):
 
     def get_queryset(self):
         q1 = self.request.GET.get("navn")
+        f = self.request.GET.get("female")
+        m = self.request.GET.get("male")
+        genders = [value for value in [f, m] if value is not None]
 
-        return Person.objects.filter(Q(navn__icontains=q1))
+        return Person.objects.filter(Q(navn__icontains=q1) & Q(køn__in=genders))
