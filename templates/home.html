@@ -3,5 +3,13 @@
 {% block title %}Home{% endblock title %}
 
 {% block content %}
-<h1>Stay tuned for awesome stuff.</h1>
+<h1>Search in the database.</h1>
+
+<div>
+    <form class="d-inline-flex p-2 flex-column" action="{% url 'search_results' %}" method="get">
+        <input class="form-control me-2" type="search" name="navn" placeholder="Navn" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Filter</button>
+    </form>
+</div>
+
 {% endblock content %}

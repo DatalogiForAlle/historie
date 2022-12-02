@@ -1,5 +1,5 @@
-# from django.db.models import Q
-# from django.views.generic import ListView
+from django.db.models import Q
+from django.views.generic import ListView
 
 from .models import Person
 
@@ -85,3 +85,22 @@ class CustomCSVViews(FormView):
             # self.process_item(item)
 
         return super().form_valid(form)
+
+
+class SearchResultsListView(ListView):
+    paginate_by = 100
+    model = Person
+    context_object_name = "person_list"
+    template_name = "search_results.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        get_copy = self.request.GET.copy()
+        parameters = get_copy.pop("page", True) and get_copy.urlencode()
+        context["parameters"] = parameters
+        return context
+
+    def get_queryset(self):
+        q1 = self.request.GET.get("navn")
+
+        return Person.objects.filter(Q(navn__icontains=q1))

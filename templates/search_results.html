@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock title %}
+
+{% block content %}
+
+<h1>Search Results</h1>
+
+{% for person in person_list %}
+<div>
+    <h3>{{ person.pa_id }} {{ person.navn }} {{ person.alder}} {{ person.køn }}</h3>
+</div>
+{% endfor %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+        <a href="?{{ parameters }}&page=1">&laquo;
+            first</a>
+        <a href="?{{ parameters }}&page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+        <a href="?{{ parameters }}&page={{ page_obj.next_page_number }}">next</a>
+        <a href="?{{ parameters }}&page={{ page_obj.paginator.num_pages }}">last
+            &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+<!-- <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+        <a href="?city={{ city }}&job={{ job }}&female={{ female }}&male={{ male }}&dabomb={{ dabomb }}&page=1">&laquo;
+            first</a>
+        <a
+            href="?city={{ city }}&job={{ job }}&female={{ female }}&male={{ male }}&dabomb={{ dabomb }}&page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+        <a
+            href="?city={{ city }}&job={{ job }}&female={{ female }}&male={{ male }}&dabomb={{ dabomb }}&page={{ page_obj.next_page_number }}">next</a>
+        <a
+            href="?city={{ city }}&job={{ job }}&female={{ female }}&male={{ male }}&dabomb={{ dabomb }}&page={{ page_obj.paginator.num_pages }}">last
+            &raquo;</a>
+        {% endif %}
+    </span>
+</div> -->
+{% endblock content %}
