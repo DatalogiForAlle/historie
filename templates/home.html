@@ -9,6 +9,7 @@
     <form class="d-inline-flex p-2 flex-column" action="{% url 'search_results' %}" method="get">
         <input class="form-control me-2" type="search" name="navn" placeholder="Navn" aria-label="navn">
         <!--sets checkboxes inline-->
+        <b>Vælg køn</b>
         <div style="display:flex">
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="checkbox" name="female" id="inlineCheckbox1" value="f" checked>
@@ -19,20 +20,52 @@
                 <label class="form-check-label" for="inlineCheckbox2">Male</label>
             </div>
         </div>
-        <!-- ages between
-        <input class="form-control me-2" type="search" name="" placeholder="Navn" aria-label="navn">
-        and
-        <input class="form-control me-2" type="search" name="" placeholder="Navn" aria-label="navn"> -->
-        <!-- <select class="select" multiple>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-            <option value="4">Four</option>
-            <option value="5">Five</option>
-            <option value="6">Six</option>
-            <option value="7">Seven</option>
-            <option value="8">Eight</option>
-        </select> -->
+        <b>Vælg bostedstype</b>
+        <div style="display:flex">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="land" id="bosted1" value="land" checked>
+                <label class="form-check-label" for="bosted1">Land</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="by" id="bosted2" value="by" checked>
+                <label class="form-check-label" for="bosted2">By</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="københavn" id="bosted3" value="københavn" checked>
+                <label class="form-check-label" for="bosted3">København</label>
+            </div>
+        </div>
+        <b>Vælg ægteskabelig status</b>
+        <div style="display:flex">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="gift" id="status1" value="gift" checked>
+                <label class="form-check-label" for="status1">Gift</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="ugift" id="status2" value="ugift" checked>
+                <label class="form-check-label" for="status2">Ugift</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="enke" id="status3" value="enke" checked>
+                <label class="form-check-label" for="status3">Enke</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="skilt" id="status4" value="skilt" checked>
+                <label class="form-check-label" for="status4">Skilt</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="ukendt" id="status5" value="ukendt" checked>
+                <label class="form-check-label" for="status5">Ukendt</label>
+            </div>
+        </div>
+        <b>Vælg aldersspænd (i år)</b>
+        <div style="display:flex">
+            <input class="form-control me-2" type="number" min="0" name="min_alder" id="min_alder" value="0"
+                placeholder="Min alder" onchange="document.getElementById('max_alder').min=this.value"
+                aria-label="min_alder">
+            <input required_id="" class="form-control me-2" type="number" max="100" name="max_alder" id="max_alder"
+                value="100" placeholder="Max alder" aria-label="max_alder">
+        </div>
         <button class="btn btn-outline-success" type="submit">Filter</button>
     </form>
 

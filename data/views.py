@@ -102,8 +102,41 @@ class SearchResultsListView(ListView):
 
     def get_queryset(self):
         q1 = self.request.GET.get("navn")
-        f = self.request.GET.get("female")
-        m = self.request.GET.get("male")
-        genders = [value for value in [f, m] if value is not None]
+        genders = [
+            value
+            for value in [
+                self.request.GET.get("female"),
+                self.request.GET.get("male"),
+            ]
+            if value is not None
+        ]
+        bosteder = [
+            value
+            for value in [
+                self.request.GET.get("land"),
+                self.request.GET.get("by"),
+                self.request.GET.get("københavn"),
+            ]
+            if value is not None
+        ]
+        marriage_statuses = [
+            value
+            for value in [
+                self.request.GET.get("gift"),
+                self.request.GET.get("ugift"),
+                self.request.GET.get("enke"),
+                self.request.GET.get("skilt"),
+                self.request.GET.get("ukendt"),
+            ]
+            if value is not None
+        ]
+        min_age = self.request.GET.get("min_alder")
+        max_age = self.request.GET.get("max_alder")
 
-        return Person.objects.filter(Q(navn__icontains=q1) & Q(køn__in=genders))
+        return Person.objects.filter(
+            Q(navn__icontains=q1)
+            & Q(køn__in=genders)
+            & Q(alder__gte=min_age, alder__lte=max_age)
+            & Q(bostedstype__in=bosteder)
+            & Q(ægteskabelig_stilling__in=marriage_statuses)
+        )

@@ -8,7 +8,9 @@
 
 {% for person in person_list %}
 <div>
-    <h3>{{ person.pa_id }} {{ person.navn }} {{ person.alder}} {{ person.køn }}</h3>
+    <h3>{{ person.pa_id }} {{ person.navn }} {{ person.alder}} {{ person.køn }} {{ person.bostedstype }}
+        {{ person.ægteskabelig_stilling }} {{ person.stilling_i_husstanden_standardiseret }}
+    </h3>
 </div>
 {% endfor %}
 
