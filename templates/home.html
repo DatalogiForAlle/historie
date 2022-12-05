@@ -1,15 +1,20 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Home{% endblock title %}
 
 {% block content %}
-<h1>Search in the database.</h1>
+<h1>Søg i databasen.</h1>
 
 <div>
     <form class="d-inline-flex p-2 flex-column" action="{% url 'search_results' %}" method="get">
+        <input class="form-control me-2" type="search" inputmode="numeric" pattern="\d*" name="pa_id"
+            placeholder="Pa_id" aria-label="pa_id">
+        <input class="form-control me-2" type="search" inputmode="numeric" pattern="\d*" name="husstands_id"
+            placeholder="Husstands_id" aria-label="husstands_id">
         <input class="form-control me-2" type="search" name="navn" placeholder="Navn" aria-label="navn">
-        <!--sets checkboxes inline-->
         <b>Vælg køn</b>
+        <!--sets checkboxes inline-->
         <div style="display:flex">
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="checkbox" name="female" id="inlineCheckbox1" value="f" checked>

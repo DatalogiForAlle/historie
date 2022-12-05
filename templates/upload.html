@@ -1,6 +1,15 @@
-<h5> Indtil videre er det kun datasæt fra folketællingsåret 1850 der kan uploades</h5>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Upload{% endblock title %}
+
+{% block content %}
+
+<h5> Lige nu er det kun datasæt fra folketællingsårene 1850 og 1901 der kan uploades</h5>
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form }}
     <button type="submit">Process CSV</button>
 </form>
+
+{% endblock content %}

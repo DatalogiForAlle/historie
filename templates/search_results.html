@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Search{% endblock title %}
 
@@ -6,13 +7,57 @@
 
 <h1>Search Results</h1>
 
-{% for person in person_list %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm">
+            <h5>Pa_id</h5>
+        </div>
+        <div class="col-sm">
+            <h5>Husstands_id</h5>
+        </div>
+        <div class="col-sm">
+            <h5>Navn</h5>
+        </div>
+        <div class="col-sm">
+            <h5>Køn</h5>
+        </div>
+        <div class="col-sm">
+            <h5>Alder</h5>
+        </div>
+        <div class="col-sm">
+            <h5>Status</h5>
+        </div>
+        <div class="col-sm">
+            <h5>Sogn_by</h5>
+        </div>
+        <div class="col-sm">
+            <h5>Bostedstype</h5>
+        </div>
+
+    </div>
+
+    {% for person in person_list %}
+    <div class="row">
+        <div class="col-sm"> {{ person.pa_id }} </div>
+        <div class="col-sm"> {{ person.husstands_id }} </div>
+        <div class="col-sm"> {{ person.navn }} </div>
+        <div class="col-sm"> {{ person.køn }} </div>
+        <div class="col-sm"> {{ person.alder }} </div>
+        <div class="col-sm"> {{ person.ægteskabelig_stilling }} </div>
+        <div class="col-sm"> {{ person.sogn_by }} </div>
+        <div class="col-sm"> {{ person.bostedstype }} </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+<!-- {% for person in person_list %}
 <div>
     <h3>{{ person.pa_id }} {{ person.navn }} {{ person.alder}} {{ person.køn }} {{ person.bostedstype }}
-        {{ person.ægteskabelig_stilling }} {{ person.stilling_i_husstanden_standardiseret }}
+        {{ person.ægteskabelig_stilling }} {{ person.sogn_by }} {{ person.stilling_i_husstanden_standardiseret }}
     </h3>
 </div>
-{% endfor %}
+{% endfor %} -->
 
 <div class="pagination">
     <span class="step-links">

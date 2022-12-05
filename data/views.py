@@ -12,6 +12,8 @@ from .forms import CSVUploadForm
 
 from django.urls import reverse_lazy
 
+from functools import reduce
+
 # Create your views here.
 
 
@@ -63,6 +65,7 @@ class CustomCSVViews(FormView):
                 køn=item["køn"],
                 alder=item["alder"],
                 ægteskabelig_stilling=item["ægteskabelig_stilling"],
+                sogn_by=item["sogn_by"],
                 herred=item["herred"],
                 amt=item["amt"],
                 bostedstype=item["bostedstype"],
@@ -101,7 +104,9 @@ class SearchResultsListView(ListView):
         return context
 
     def get_queryset(self):
-        q1 = self.request.GET.get("navn")
+        p = self.request.GET.get("pa_id")
+        h = self.request.GET.get("husstands_id")
+        n = self.request.GET.get("navn")
         genders = [
             value
             for value in [
@@ -133,10 +138,17 @@ class SearchResultsListView(ListView):
         min_age = self.request.GET.get("min_alder")
         max_age = self.request.GET.get("max_alder")
 
-        return Person.objects.filter(
-            Q(navn__icontains=q1)
+        q = (
+            Q(navn__icontains=n)
             & Q(køn__in=genders)
             & Q(alder__gte=min_age, alder__lte=max_age)
             & Q(bostedstype__in=bosteder)
             & Q(ægteskabelig_stilling__in=marriage_statuses)
         )
+
+        if p:
+            q.add(Q(pa_id__exact=p), Q.AND)
+        if h:
+            q.add(Q(husstands_id__exact=h), Q.AND)
+
+        return Person.objects.filter(q)
