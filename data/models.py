@@ -60,5 +60,8 @@ class Person(models.Model):
         default="indfødt",
     )
 
+    class Meta:
+        db_table = "person"
+
     def __str__(self):
         return str(self.pa_id)

@@ -1,7 +1,11 @@
 from django.db.models import Q
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.template import loader
 
 from .models import Person
+from .forms import SqlForm
 
 
 # for uploading csv
@@ -80,7 +84,7 @@ class CustomCSVViews(FormView):
 
             data.append(new_person)
 
-            if len(data) > 5000:
+            if len(data) > 500:
                 Person.objects.bulk_create(data)
                 data = []
         if data:
@@ -152,3 +156,47 @@ class SearchResultsListView(ListView):
             q.add(Q(husstands_id__exact=h), Q.AND)
 
         return Person.objects.filter(q)
+
+
+class SqlSearchResultsListView(ListView):
+
+    paginate_by = 100
+    model = Person
+    context_object_name = "sql_person_list"
+
+    def get(self, request):
+
+        form = SqlForm(initial={"sql": "SELECT * FROM person LIMIT 100"})
+        context = {"form": form}
+        return render(request, "sql_search.html", context=context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        get_copy = self.request.GET.copy()
+        parameters = get_copy.pop("page", True) and get_copy.urlencode()
+        context["parameters"] = parameters
+        return context
+
+    def post(self, request):
+        context = {}
+        form = SqlForm(request.POST)
+        if form.is_valid():
+            sql = form.cleaned_data["sql"]
+            print("this is the request: ", sql)
+            print(type(sql))
+            context["sql_success"] = True
+            results = Person.objects.raw(sql)
+            context["results"] = results
+
+        context["form"] = form
+
+        t = loader.get_template("sql_search.html")
+
+        try:
+            response = HttpResponse(t.render(context, request))
+            return response
+        except:
+            response = HttpResponse(
+                t.render({"sql_error": True, "form": form}, request)
+            )
+            return response
