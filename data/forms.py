@@ -54,6 +54,11 @@ class SqlForm(forms.Form):
                 "Du har ikke tilladelse til at udføre INSERT-operationer"
             )
 
+        if "truncate" in sql.lower():
+            raise forms.ValidationError(
+                "Du har ikke tilladelse til at udføre TRUNCATE-operationer"
+            )
+
         if sql.lower()[:6].lower() != "select":
             raise forms.ValidationError("Din forespørgsel skal starte med 'SELECT'")
 

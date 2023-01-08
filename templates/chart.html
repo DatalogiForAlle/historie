@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Chart{% endblock title %}
+
+{% block content %}
+
+<h1>Chart</h1>
+
+<div style="display: none" id="jsonLabels" labels-json="{{ labels }}"></div>
+<div style="display: none" id="jsonData" data-json="{{ data }}"></div>
+
+<div>
+    <canvas id="myChart" style="width:400px;height:400px"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+
+    var labels = JSON.parse(document.querySelector('#jsonLabels').getAttribute('labels-json'));
+    var data = JSON.parse(document.querySelector('#jsonData').getAttribute('data-json'));
+
+    const ctx = document.getElementById('myChart');
+
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'bostedDistribution',
+                data: data,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            scales: {
+            }
+        }
+    }
+    );
+</script>
+
+
+{% endblock content %}
