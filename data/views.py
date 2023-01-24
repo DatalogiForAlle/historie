@@ -28,6 +28,7 @@ class CustomCSVViews(FormView):
 
     def form_valid(self, form):
         csv_file = form.cleaned_data["file"]
+
         f = TextIOWrapper(csv_file.file)
         dict_reader = csv.DictReader(f, delimiter="$")
 
@@ -58,9 +59,19 @@ class CustomCSVViews(FormView):
                     f"A required column is missing from the uploaded CSV: '{req_col}'"
                 )
 
+        print("The file name should be printed below")
+        print(csv_file.name)
+        if "1850" in csv_file.name:
+            årstal = 1850
+        elif "1901" in csv_file.name:
+            årstal = 1901
+            print("årstal er: ", årstal)
+        else:
+            raise Exception("Either 1850 or 1901 should appear in the file name")
         data = []
         for row, item in enumerate(dict_reader, start=1):
             new_person = Person(
+                år=årstal,
                 pa_id=item["pa_id"],
                 husstands_id=item["husstands_id"],
                 fem_års_aldersgrupper=item["5års_aldersgrupper"],

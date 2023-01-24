@@ -10,6 +10,9 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm">
+            <h5>År</h5>
+        </div>
+        <div class="col-sm">
             <h5>Pa_id</h5>
         </div>
         <div class="col-sm">
@@ -38,6 +41,7 @@
 
     {% for person in person_list %}
     <div class="row">
+        <div class="col-sm"> {{ person.år }} </div>
         <div class="col-sm"> {{ person.pa_id }} </div>
         <div class="col-sm"> {{ person.husstands_id }} </div>
         <div class="col-sm"> {{ person.navn }} </div>

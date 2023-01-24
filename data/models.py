@@ -5,6 +5,7 @@ from django.db import models
 
 class Person(models.Model):
 
+    år = models.PositiveIntegerField(default=None)
     pa_id = models.PositiveIntegerField()
     husstands_id = models.PositiveIntegerField()
     fem_års_aldersgrupper = models.CharField(max_length=200)
@@ -28,9 +29,7 @@ class Person(models.Model):
         ("skilt", "skilt"),
     ]
     ægteskabelig_stilling = models.CharField(
-        max_length=100,
-        choices=STATUS_CHOICES,
-        default="gift",
+        max_length=100, choices=STATUS_CHOICES, default="gift", db_index=True
     )
     sogn_by = models.CharField(max_length=200)
     herred = models.CharField(max_length=200)
@@ -62,6 +61,7 @@ class Person(models.Model):
 
     class Meta:
         db_table = "person"
+        # indexes = [models.Index(fields=["ægteskabelig_stilling"])]
 
     def __str__(self):
         return str(self.pa_id)

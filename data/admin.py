@@ -7,6 +7,7 @@ from .models import Person
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = (
+        "år",
         "pa_id",
         "husstands_id",
         "fem_års_aldersgrupper",

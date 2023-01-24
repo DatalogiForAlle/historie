@@ -3,15 +3,55 @@
 
 {% block title %}Chart{% endblock title %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chart.css' %}">
+{% endblock extra_css %}
+
 {% block content %}
 
-<h1>Chart</h1>
+<h1>Charts</h1>
+
 
 <div style="display: none" id="jsonLabels" labels-json="{{ labels }}"></div>
-<div style="display: none" id="jsonData" data-json="{{ data }}"></div>
+<div style="display: none" id="jsonData1" data-json-1="{{ data1 }}"></div>
+<div style="display: none" id="jsonData2" data-json-2="{{ data2 }}"></div>
+
+
+<div style="display: none" id="jsonLabels2" labels2-json="{{ labels2 }}"></div>
+<div style="display: none" id="jsonData1850" data1850-json="{{ data1850 }}"></div>
+<div style="display: none" id="jsonData1901" data1901-json="{{ data1901 }}"></div>
+
+
+<div class="float-container">
+    <div class="float-child">
+        <canvas id="bosted1850" style="width:350px;height:350px;"></canvas>
+    </div>
+    <div class="float-child">
+        <canvas id="bosted1901" style="width:350px;height:350px;"></canvas>
+    </div>
+</div>
+<!-- <div class="container">
+    <div class="row">
+        <div class="col-xs-6">
+            <canvas id="bosted1850"></canvas>
+        </div>
+
+        <div class="col-xs-6">
+            <canvas id="bosted1901"></canvas>
+        </div>
+    </div>
+</div> -->
+<!-- <div>
+    <canvas id="bosted1850" style="width:400px;height:400px;float:left;"></canvas>
+    <canvas id="bosted1901" style="width:400px;height:400px;float:right;"></canvas>
+</div> -->
+
+<!-- <div>
+    <canvas id="bosted1901" style="width:400px;height:400px"></canvas>
+</div> -->
 
 <div>
-    <canvas id="myChart" style="width:400px;height:400px"></canvas>
+    <canvas id="marriageChart" style="width:800px;height:600px"><canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,28 +60,191 @@
 
 
     var labels = JSON.parse(document.querySelector('#jsonLabels').getAttribute('labels-json'));
-    var data = JSON.parse(document.querySelector('#jsonData').getAttribute('data-json'));
+    var data1 = JSON.parse(document.querySelector('#jsonData1').getAttribute('data-json-1'));
+    var data2 = JSON.parse(document.querySelector('#jsonData2').getAttribute('data-json-2'));
 
-    const ctx = document.getElementById('myChart');
+    const ctx1850 = document.getElementById('bosted1850');
+    const ctx1901 = document.getElementById('bosted1901');
 
-
-    new Chart(ctx, {
+    new Chart(ctx1850, {
         type: 'pie',
         data: {
             labels: labels,
             datasets: [{
-                label: 'bostedDistribution',
-                data: data,
+                label: 'bostedDist1850',
+                data: data1,
                 borderWidth: 1
             }]
         },
         options: {
             responsive: false,
             scales: {
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: '1850'
+                }
             }
         }
     }
     );
+
+    new Chart(ctx1901, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'bostedDist1901',
+                data: data2,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            scales: {
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: '1901'
+                }
+            }
+        }
+    }
+    );
+
+    var labels2 = JSON.parse(document.querySelector('#jsonLabels2').getAttribute('labels2-json'));
+    var data1850 = JSON.parse(document.querySelector('#jsonData1850').getAttribute('data1850-json'));
+    var data1901 = JSON.parse(document.querySelector('#jsonData1901').getAttribute('data1901-json'));
+
+    console.log("from chart.html")
+    console.log(data1901)
+    console.log(labels2)
+
+    var barChartData = {
+        labels: labels2,
+        datasets: [{
+            label: 'Gift',
+            stack: 'Stack 0',
+            backgroundColor: 'green',
+            data: data1850[0]
+        }, {
+            label: 'Ugift',
+            stack: 'Stack 0',
+            backgroundColor: 'blue',
+            data: data1850[1]
+        }, {
+            label: 'Skilt',
+            stack: 'Stack 0',
+            backgroundColor: 'red',
+            data: data1850[2]
+        }, {
+            label: 'Enke',
+            stack: 'Stack 0',
+            backgroundColor: 'yellow',
+            data: data1850[3]
+        }, {
+            label: 'Ukendt',
+            stack: 'Stack 0',
+            backgroundColor: 'orange',
+            data: data1850[4]
+        }, {
+            label: 'dummyGift',
+            stack: 'Stack 1',
+            backgroundColor: 'green',
+            data: data1901[0]
+        }, {
+            label: 'dummyUgift',
+            stack: 'Stack 1',
+            backgroundColor: 'blue',
+            data: data1901[1]
+        }, {
+            label: 'dummySkilt',
+            stack: 'Stack 1',
+            backgroundColor: 'red',
+            data: data1901[2]
+        }, {
+            label: 'dummyEnke',
+            stack: 'Stack 1',
+            backgroundColor: 'yellow',
+            data: data1901[3]
+        }, {
+            label: 'dummyUkendt',
+            stack: 'Stack 1',
+            backgroundColor: 'orange',
+            data: data1901[4]
+        }]
+    }
+    const ctx2 = document.getElementById("marriageChart");
+
+    new Chart(ctx2, {
+        type: 'bar',
+        data: barChartData,
+        // options: {
+        //     responsive: false,
+        //     scales: {
+        //         // xAxes: [{
+        //         //     stacked: true
+        //         // }],
+        //         // yAxes: [{
+        //         //     labels: ['1850', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1805', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1805', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1805', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1805', '1901']
+        //         // },
+        //         // {
+        //         //     id: 'yAxis1',
+        //         //     type: 'category',
+        //         //     offset: true,
+        //         //     gridLines: {
+        //         //         offsetGridLines: true
+        //         //     }
+        //         // }],
+
+
+        //     }
+        // },
+        options: {
+            responsive: false,
+            scales: {
+                x: [{
+                    stacked: true,
+                    position: 'top'
+                },
+                {
+                    gridLines: {
+                        display: false
+                    },
+                    type: 'category',
+                    offset: true,
+                    labels: [['1850', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1805', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1805', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1805', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1850', '1901', '1805', '1901']
+                    ]
+                }],
+                y: [{
+                    stacked: true,
+                }]
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Ægteskabelig status i befolkningen i hhv. 1850 og 1901, fordelt i 5-års aldersgrupper'
+                },
+                legend: {
+                    labels: {
+                        filter: function (item, chart) {
+                            const goodLabels = ["Ugift", "Skilt", "Enke", "Ukendt", "Gift"];
+                            if (goodLabels.includes(item.text)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+
+
+
+
+
 </script>
 
 

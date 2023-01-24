@@ -29,7 +29,6 @@ class SqlForm(forms.Form):
         sql = self.cleaned_data["sql"]
 
         if "delete" in sql.lower():
-            print("IT HAPPENED")
             raise forms.ValidationError(
                 "Du har ikke tilladelse til at udføre DELETE-operationer"
             )
@@ -61,5 +60,9 @@ class SqlForm(forms.Form):
 
         if sql.lower()[:6].lower() != "select":
             raise forms.ValidationError("Din forespørgsel skal starte med 'SELECT'")
+
+        # a quickfix for lack of pagination:
+        if "limit" not in sql.lower():
+            sql += " limit 100"
 
         return sql
