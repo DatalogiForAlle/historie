@@ -1,6 +1,6 @@
 function displayFieldCheckboxes(elmID) {
     elm = document.getElementById(elmID)
-    elm.innerHTML = `
+    elm.insertAdjacentHTML('beforeend', `
     <b>Vælg hvilke felter du vil se</b>
             <div style="display:flex">
                 <div class="form-check form-check-inline">
@@ -16,7 +16,7 @@ function displayFieldCheckboxes(elmID) {
                     <label class="form-check-label" for="migrant">Migranttype</label>
                 </div>
             </div>
-        `
+        `)
 }
 
 
@@ -47,21 +47,25 @@ function keepUserInput(query, year, search_category) {
     var value = $('input:radio[name=search_category]:checked').map(function() {
       return this.value
     }).get();
-    document.getElementById("id_q").removeAttribute('readonly')
+    q = document.getElementById("id_q")
+    q.removeAttribute('readonly')
     if (value=='age'){
       console.log("inside age")
-      document.getElementById("id_q").type = "number";
-      document.getElementById("id_q").placeholder = "0";
-      document.getElementById("id_q").min = "0";
-      document.getElementById("id_q").max = "100";
+      q.type = "number";
+      q.placeholder = "0";
+      q.min = "0";
+      q.max = "100";
     }
     else if (value=='city'){
       console.log("inside byer")
-      document.getElementById("id_q").type = "text";
-      //remove value as well? to avoid the number user input to stay
-      document.getElementById("id_q").placeholder = "Indtast en by"
-      document.getElementById("id_q").removeAttribute('min')
-      document.getElementById("id_q").removeAttribute('max')
+      q.type = "text";
+      //setting value to empty string to let the placeholder take over. In the opposite case (value=='age'), since a number field does not accept text, the value is removed automatically, I suppose
+      q.value = ""
+      q.placeholder = "Indtast en by"
+      console.log("placeholder is: ", q.placeholder)
+      console.log("but values is: ", q.value)
+      q.removeAttribute('min')
+      q.removeAttribute('max')
     }
     
 
@@ -187,99 +191,9 @@ function showResults(booleans) {
       }})
 }
 
-
-
-
-
-//for loading
-
-
-
-// function updateFieldBooleans() {
-//     var fieldBooleans = {pa_id: true, name: true, age: true, gender: true, status: true, migrant: true}
-    
-//     $('#gender').change(function() {
-//         if ($(this).is(':checked')) {
-//             // console.log("gender checkbox was checked");
-//             fieldBooleans.gender = true
-//         }
-//         else {
-
-//             fieldBooleans.gender = false
-//             // console.log("gender checkbox was unchecked");
-//         }
-//         showResults(fieldBooleans)
-//         })
-
-//     $('#status').change(function() {
-//         if ($(this).is(':checked')) {
-//             // console.log("status checkbox was checked");
-//             fieldBooleans.status = true
-//         }
-//         else {
-//             fieldBooleans.status = false
-//             // console.log("status checkbox was unchecked");
-//         }
-//         showResults(fieldBooleans)
-//         })
-
-//     $('#migrant').change(function() {
-//         if ($(this).is(':checked')) {
-//             // console.log("migrant checkbox was checked");
-//             fieldBooleans.migrant = true
-//         }
-//         else {
-//             fieldBooleans.migrant = false
-//             // console.log("migrant checkbox was unchecked");
-//         }
-//         showResults(fieldBooleans)
-//         })
-// }
-
-// function showResults(booleans){
-    
-//     var res = document.getElementById("results")
-//     res.innerHTML = ""
-//     var startFor = document.createTextNode("{% for item in page_obj %}")
-//     res.appendChild(startFor)
-
-//     var card = document.createElement('div')
-//     card.classList.add("card")
-//     card.classList.add("mb-1")
-
-//     var cardBody = document.createElement('div')
-//     cardBody.classList.add("card-body")
-
-//     var col = document.createElement('div')
-//     col.classList.add("col")
-
-//     var row = document.createElement('div')
-//     row.classList.add("row")
-//     var resRow = document.getElementById("resRow")
-
-//     function create_paragraph(input, elm) {
-//       var p = document.createElement('p')
-//       p.classList.add("card-title")
-//       p.classList.add("col-2")
-//       p.innerHTML = input
-//       // console.log("p input is: ", input)
-//       elm.appendChild(p)
-    
-//     }
-//     var fields = ["pa_id", "name", "age", "gender", "status", "migrant"]
-//     var fieldDict = {pa_id: "{{ item.pa_id }}", name: "{{ item.navn }}", age : "{{ item.alder }}", gender: "{{ item.køn }}", status: "{{ item.ægteskabelig_stilling }}", migrant: "{{ item.migrant_type }}"}
-    
-//     fields.forEach(field => {
-//       // console.log("fieldsdict: ", fieldDict.name)
-//       if (booleans[field]) {
-//         create_paragraph(fieldDict[field], resRow)
-//       }
-
-      
-//     });
-
-//     res.appendChild(card).appendChild(cardBody).appendChild(col).appendChild(row)
-//     var endFor = document.createTextNode("{% endfor %}")
-//     res.appendChild(endFor)
-     
-//   }
+function getToolTipList() {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  return tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+}

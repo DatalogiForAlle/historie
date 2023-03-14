@@ -5,7 +5,7 @@ from .views import (
     SearchResultsListView,
     SqlSearchResultsListView,
     # SearchView,
-    index,
+    search,
     # FinalSearch,
 )
 
@@ -15,6 +15,6 @@ urlpatterns = [
     path("sql/", SqlSearchResultsListView.as_view(), name="sql_search_results"),
     # path("search/", SearchView.as_view(), name="search"),
     # path("search/", SearchView.as_view(), name="search"),
-    path("search/", index, name="index"),
+    path("search/", search, name="search"),
     # path("search/", FinalSearch.as_view(), name="final_search"),
 ]
