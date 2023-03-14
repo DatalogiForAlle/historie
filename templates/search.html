@@ -1,0 +1,407 @@
+{% extends "base.html" %} 
+{% load static %} 
+{% load crispy_forms_tags %}
+{% load data_tags %} 
+{% block title %}Search{% endblock title %} 
+{% block content %}
+
+<script src="{% static 'js/search.js' %}"></script>
+
+
+<div class="container">
+<div class="row">
+  <div class="col-9">
+    <form method="get">
+      <div class="row">
+        <div class="col-sm">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="year" id="1850" value="1850" required>
+            <label class="form-check-label" for="1850">
+              1850
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="year" id="1901" value="1901">
+            <label class="form-check-label" for="1901">
+              1901
+            </label>
+          </div>
+        </div>
+        <div class="col-sm">
+          <input class="form-control" name="q" id="id_q" readonly>
+        </div>
+        <div class="col-sm">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="search_category" id="age" value="age">
+            <label class="form-check-label" for="age" data-bs-toggle="tooltip" data-bs-placement="right" title="Explain something here">
+              Alder
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="search_category" id="city" value="city">
+            <label class="form-check-label" for="city" data-bs-toggle="tooltip" data-bs-placement="right" title="Explain something here">
+              By
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="row">
+      <div class="col-9" id="field-checkboxes">
+        {% if page_obj %} 
+
+          <script>
+            displayFieldCheckboxes("field-checkboxes")
+          </script>
+
+        {% else %} 
+
+          <script>
+            sessionStorage.clear()
+          </script>
+
+        {% endif %}
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-12" id="results">
+        {% if page_obj %}
+          <div class="card border-0">
+            <div class="card-body">
+              <div class="row">
+                <h6 class="card-title col-2" name="show-pa-id"> Pa ID</h6>
+                <h6 class="card-title col-3" name="show-name">Navn</h6>
+                <h6 class="card-title col-1" name="show-age">Alder</h6>
+                <h6 class="card-title col-1" name="show-gender">Køn</h6>
+                <h6 class="card-title col-3" name="show-status">Ægteskabelig Stilling</h6>
+                <h6 class="card-title col-2" name="show-migrant">Migrant-type</h6>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+        {% for item in page_obj %}
+          <div class="card mb-1">
+            <div class="card-body">
+              <div class="row">
+                  <p class="card-title col-2" name="show-pa-id">{{ item.pa_id }}</p>
+                  <p class="card-title col-3" name="show-name">{{ item.navn }}</p>
+                  <p class="card-title col-1" name="show-age">{{ item.alder }}</p>
+                  <p class="card-title col-1" name="show-gender">{{ item.køn }}</p>
+                  <p class="card-title col-3" name="show-status">{{ item.ægteskabelig_stilling }}</p>
+                  <p class="card-title col-2" name="show-migrant">{{ item.migrant_type }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <!-- pagination starts here -->
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?{{ parameters }}&page=1">
+              First</a></li>
+          <li class="page-item"><a class="page-link" href="?{{ parameters }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% endif %}
+    
+        {% if page_obj %}
+          <li class="page-item"><button class="page-link">
+              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</button>
+          </li>
+        {% endif %}
+    
+        {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?{{ parameters }}&page={{ page_obj.next_page_number }}">Next</a></li>
+          <li class="page-item"><a class="page-link" href="?{{ parameters }}&page={{ page_obj.paginator.num_pages }}">Last</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    <!-- pagination ends here -->
+    <!-- <div class="row border">
+      <div class="col">
+        <button class="button btn-success btn-lg">
+            Pie Chart
+        </button>
+
+      </div>
+      <div class="col">
+        <button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top, explain what to do here">
+          Tooltip on top
+        </button>
+
+      </div>
+      <div class="col">
+
+      </div>
+    </div> -->
+  </div>
+    <!-- first col-9 ends here -->
+  
+  <!-- Guide on how to use the page -->  
+  <div class="col-3">
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">Guide</h5>
+        <p class="card-text">Explain something here</p>
+        <p class="card-text">Explain something more here</p>
+        <br>
+        <br>
+        <br>
+        <p class="card-text">Keep explaining</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script type="text/javascript">
+  
+  keepUserInput("{{query}}", "{{year}}", "{{search_category}}");
+  
+  updateFieldBooleans();
+
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+
+  
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+<!-- 
+  {% for item in page_obj %}
+      <div class="card mb-1">
+          <div class="card-body">
+            <div class="col">
+              <div class="row">
+                  <p class="card-title col-4">{{ item.navn }}</p>
+                  <p class="card-title col-4">{{ item.alder }}</p>
+                  <p class="card-title col-4" id="{{ item.pa_id }}"></p>
+              </div>
+            </div>
+        </div>
+      </div>
+      <script>
+      function isField(checkbox_id, it) {
+        console.log("it is: ", it)
+      if (document.getElementById(checkbox_id).checked){
+        console.log("the field checkbox was checked")
+        document.getElementById("{{ item.pa_id }}").innerHTML= it
+      }
+    }
+      isField('gender', "{{ item.køn }}")</script>
+  {% endfor %} -->
+
+  <!-- <script>
+    function isField(checkbox_id, item) {
+      if (document.getElementById(checkbox_id).checked){
+        console.log("the field checkbox was checked")
+        document.getElementById("display_status").innerHTML= "{{ item.ægteskabelig_status }}"
+      }
+    }
+  </script> -->
+
+  
+
+<!-- FILTERED Pagination -->
+<!-- <div class="d-flex flex-column m-auto pagination mt-5">
+  <nav aria-label="Page navigation">
+  <ul class="pagination pg-grey justify-content-center">
+    {% if blog_posts.has_previous %}
+          <li class="page-item">
+        <a class="page-link" href="?{% if query %}q={{query}}&{% endif %}page={{ blog_posts.previous_page_number }}">&laquo; Previous</a>
+      </li>
+      {% endif %}
+  
+    {% for i in blog_posts.paginator.page_range %}
+      {% if blog_posts.number == i %}
+        <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+      {% else %}
+        <li class="page-item" ><a class="page-link" href="?{% if query %}q={{query}}&{% endif %}page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+      
+      {% if blog_posts.has_next %}
+        <li class="page-item">
+        <a class="page-link" href="?{% if query %}q={{query}}&{% endif %}page={{ blog_posts.next_page_number }}">Next</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link"  href="?{% if query %}q={{query}}&{% endif %}page={{ blog_posts.paginator.num_pages }}">Last &raquo;</a>
+      </li>
+      {% endif %}
+  </ul>
+  </nav>
+  </div> -->
+  <!-- end pagination-->
+
+
+
+
+
+
+<!-- <form class="row g-3">
+  <div class="col-auto">
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="year" id="flexRadioDefault1" required>
+        <label class="form-check-label" for="flexRadioDefault1">
+          1850
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="year" id="flexRadioDefault2">
+        <label class="form-check-label" for="flexRadioDefault2">
+          1901
+        </label>
+      </div>
+  </div>
+  <div class="col-auto">
+    <label for="inputPassword2" class="visually-hidden">Password</label>
+    <input type="password" class="form-control" id="inputPassword2" placeholder="Search term">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary mb-3">Search</button>
+  </div>
+</form> -->
+
+<!--This one works but with some drawbacks-->
+<!-- <form action="" method="post" class="mb-5">{% csrf_token %}
+    {{ form|crispy }}
+    <div class="d-flex justify-content-center">
+        <button class="btn btn-primary">Send</button>
+    </div>
+</form> -->
+
+
+<!-- {% if page_obj %}
+    {% for item in page_obj %}
+        <div class="card mb-1">
+            <div class="card-body">
+              <p class="card-title">{{ item.navn }}</p>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if page_obj.has_other_pages %}
+    <div class="btn-group" role="group" aria-label="Item pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a>
+        {% endif %}
+
+        {% for page_number in result.paginator.page_range %}
+            {% if result.number == page_number %}
+                <button class="btn btn-outline-primary active">
+                    <span>{{ page_number }} <span class="sr-only">(current)</span></span>
+                </button>
+            {% else %}
+                <a href="?{{ parameters }}&page={{ page_number }}" class="btn btn-outline-primary">
+                    {{ page_number }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if result.has_next %}
+            <a href="?{{ parameters }}&page={{ items_page.next_page_number }}" class="btn btn-outline-primary">&raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+{% else %}
+    <p>No items found.</p>
+{% endif %} -->
+
+
+
+
+<!-- this one works, but with some drawbacks-->
+<!-- {% if page_obj %}
+  {% for item in page_obj %}
+      <div class="card mb-1">
+          <div class="card-body">
+            <p class="card-title">{{ item.navn }}</p>
+          </div>
+      </div>
+  {% endfor %}
+<div class="pagination">
+  <span class="step-links">
+      {% if page_obj.has_previous %}
+          <a href="?page=1">&laquo; first</a>
+          <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
+
+      <span class="current">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      </span>
+
+      {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">next</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+  {% endif %}
+  </span>
+</div> -->
+
+
+<!-- <div class="pagination">
+  <span class="step-links">
+    {% if page_obj.has_previous %}
+    <a href="?{{ parameters }}&page=1">&laquo; first</a>
+    <a href="?{{ parameters }}&page={{ page_obj.previous_page_number }}"
+      >previous</a
+    >
+    {% endif %}
+
+    <span class="current">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+
+    {% if page_obj.has_next %}
+    <a href="?{{ parameters }}&page={{ page_obj.next_page_number }}">next</a>
+    <a href="?{{ parameters }}&page={{ page_obj.paginator.num_pages }}"
+      >last &raquo;</a
+    >
+    {% endif %}
+  </span>
+</div> -->
+<!-- 
+{% if results %}
+<h6>Resultatet af din forespørgsel</h6>
+
+<div class="table-responsive">
+    <table class="table table-sm table-striped">
+        <table class="table">
+            <thead>
+                <tr>
+                    {% for field in default_display_fields %}
+                    <th>{{ field }}</th>
+                    {% endfor %}
+                </tr>
+                {% for person in results %}
+                <tr>
+                    {% for key, value in person.items %}
+                        <td> {{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+
+            </thead>
+        </table>
+</div>
+{% endif %}  -->
+
+
+{% endblock content %}

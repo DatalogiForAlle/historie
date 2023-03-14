@@ -66,3 +66,17 @@ class SqlForm(forms.Form):
             sql += " limit 100"
 
         return sql
+
+
+class SearchForm(forms.Form):
+    YEARS = [
+        (1850, 1850),
+        (1901, 1901),
+    ]
+    year = forms.ChoiceField(choices=YEARS, widget=forms.RadioSelect())
+
+    # CRITERIA = [
+    #     ("Byer", "Byer"),
+    #     ("Alder", "Alder")
+    # ]
+    # search_criterium = forms.ChoiceField(choices=CRITERIA, widget=forms.RadioSelect())

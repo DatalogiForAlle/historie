@@ -61,6 +61,7 @@ class Person(models.Model):
 
     class Meta:
         db_table = "person"
+        ordering = ['-id']
         # indexes = [models.Index(fields=["ægteskabelig_stilling"])]
 
     def __str__(self):
