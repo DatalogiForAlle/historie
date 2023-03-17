@@ -50,20 +50,20 @@ function keepUserInput(query, year, search_category) {
     q = document.getElementById("id_q")
     q.removeAttribute('readonly')
     if (value=='age'){
-      console.log("inside age")
+      // console.log("inside age")
       q.type = "number";
       q.placeholder = "0";
       q.min = "0";
       q.max = "100";
     }
     else if (value=='city'){
-      console.log("inside byer")
+      // console.log("inside byer")
       q.type = "text";
       //setting value to empty string to let the placeholder take over. In the opposite case (value=='age'), since a number field does not accept text, the value is removed automatically, I suppose
       q.value = ""
       q.placeholder = "Indtast en by"
-      console.log("placeholder is: ", q.placeholder)
-      console.log("but values is: ", q.value)
+      // console.log("placeholder is: ", q.placeholder)
+      // console.log("but values is: ", q.value)
       q.removeAttribute('min')
       q.removeAttribute('max')
     }
@@ -79,17 +79,17 @@ function keepUserInput(query, year, search_category) {
   var migrantChecked = JSON.parse(sessionStorage.getItem("migrantChecked"));
   
   if (genderChecked != null) {
-    console.log("check was set")
+    // console.log("check was set")
     document.getElementById("gender").checked = genderChecked;
   } 
 
   if (statusChecked != null) {
-    console.log("check was set")
+    // console.log("check was set")
     document.getElementById("status").checked = statusChecked;
   } 
 
   if (migrantChecked != null) {
-    console.log("check was set")
+    // console.log("check was set")
     document.getElementById("migrant").checked = migrantChecked;
   } 
   
@@ -124,7 +124,7 @@ function updateFieldBooleans() {
 
     var fieldBooleans = JSON.parse(sessionStorage.getItem("booleans") || JSON.stringify({"show-pa-id": true, "show-name": true, "show-age": true, "show-gender": true, "show-status": true, "show-migrant": true}));
 
-    console.log("fieldbooleans: ", fieldBooleans)
+    // console.log("fieldbooleans: ", fieldBooleans)
 
     saveBooleans(fieldBooleans)
 
@@ -132,13 +132,13 @@ function updateFieldBooleans() {
     
     $('#gender').change(function() {
         if ($(this).is(':checked')) {
-            console.log("gender checkbox was checked");
+            // console.log("gender checkbox was checked");
             fieldBooleans["show-gender"] = true
         }
         else {
 
             fieldBooleans["show-gender"] = false
-            console.log("gender checkbox was unchecked");
+            // console.log("gender checkbox was unchecked");
         }
         saveBooleans(fieldBooleans)
         showResults(fieldBooleans)
@@ -146,12 +146,12 @@ function updateFieldBooleans() {
 
     $('#status').change(function() {
         if ($(this).is(':checked')) {
-            console.log("status checkbox was checked");
+            // console.log("status checkbox was checked");
             fieldBooleans["show-status"] = true
         }
         else {
             fieldBooleans[["show-status"]] = false
-            console.log("status checkbox was unchecked");
+            // console.log("status checkbox was unchecked");
         }
         saveBooleans(fieldBooleans)
         showResults(fieldBooleans)
@@ -159,12 +159,12 @@ function updateFieldBooleans() {
 
     $('#migrant').change(function() {
         if ($(this).is(':checked')) {
-            console.log("migrant checkbox was checked");
+            // console.log("migrant checkbox was checked");
             fieldBooleans["show-migrant"] = true
         }
         else {
             fieldBooleans["show-migrant"] = false
-            console.log("migrant checkbox was unchecked");
+            // console.log("migrant checkbox was unchecked");
         }
         saveBooleans(fieldBooleans)
         showResults(fieldBooleans)
@@ -176,9 +176,9 @@ function showResults(booleans) {
   // var fields = ["gender"]
   fields.forEach(field => {
       // console.log("fieldsdict: ", fieldDict.name)
-      console.log("field is: ", field)
+      // console.log("field is: ", field)
       toHide = document.getElementsByName(field);
-      console.log(toHide[0])
+      // console.log(toHide[0])
       if (booleans[field]) {
         for (elm of toHide) {
           elm.style.display="inline";
@@ -197,3 +197,95 @@ function getToolTipList() {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
 }
+
+
+function updateGraphChoices() {
+  var xAllowances = {y: {gender: false, status: false, migrant: false}, z: {gender: false, status: false, migrant: false}}
+
+  var yAllowances = {z:{gender: false, status: false, migrant: false}}
+
+  // when x changes, should affect both y and z
+  $('input[name=x]').on('change', (function() {
+    var xVal = $(this).val()
+
+    // from x's perspective: making all y buttons available except one
+    Object.keys(xAllowances.y).forEach(item => {
+      if(item != xVal) {
+        xAllowances.y[item] = true   
+      }
+      else {
+        xAllowances.y[item] = false
+        
+      }
+    })
+    
+    
+    // from x's perspective: making all z buttons available except one 
+    Object.keys(xAllowances.z).forEach((item) => {
+      if(item != xVal) {
+        xAllowances.z[item] = true   
+      }
+      else xAllowances.z[item] = false
+     })
+    
+
+    // updating button options for y (x's perspective)
+    $('input[name=y]').each(function(){
+      yBtn = $(this)
+      // making allowed y button available
+      if (xAllowances.y[yBtn.val()]) {
+        yBtn.prop('disabled', false)
+      }  
+      // making disallowed y button disabled and removing potential checkmark
+      else {
+        yBtn.prop('disabled', true)
+        if (yBtn.is(':checked')) {
+          yBtn.prop('checked', false)
+          //update y's z allowances: if y no longer checked, no z buttons are allowed
+          Object.keys(xAllowances.z).forEach(item => {
+            yAllowances.z[item] = false  
+        })}
+      }})
+
+      // updating button options for z (x's AND y's perspective)
+      $('input[name=z]').each(function(){
+        zBtn = $(this)
+        // if z-button allowed by both x and y, enable it 
+        if (xAllowances.z[zBtn.val()] && yAllowances.z[zBtn.val()]) {
+          zBtn.prop('disabled', false)
+        }
+        // if z-button disallowed by either x or y, disable it and remove potential checkmark
+        else {
+          zBtn.prop('disabled', true)
+          zBtn.prop('checked', false)
+        }
+      })
+      
+    })) //first on change func ends here
+
+    // when y changes, should only affect z
+    $('input[name=y]').on('change', (function() {
+
+      var yVal = $(this).val()
+
+      Object.keys(yAllowances.z).forEach((item) => {
+        if(item != yVal) {
+          yAllowances.z[item] = true   
+        }
+        else yAllowances.z[item] = false
+      })
+
+
+      $('input[name=z]').each(function(){
+        zBtn = $(this)
+      if (xAllowances.z[zBtn.val()] && yAllowances.z[zBtn.val()]) {
+        zBtn.prop('disabled', false)
+      }
+      else {
+        zBtn.prop('disabled', true)
+        zBtn.prop('checked', false)
+      }
+
+      })
+    }))
+  }
