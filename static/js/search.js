@@ -116,6 +116,10 @@ function saveBooleans(booleans) {
   sessionStorage.setItem("booleans", JSON.stringify(booleans))
 }
 
+// function saveGraphVariables() {
+//   sessionStorage.setItem("")
+// }
+
 function updateFieldBooleans() {
     // var fieldBooleans = {"show-pa-id": true, "show-name": true, "show-age": true, "show-gender": true, "show-status": true, "show-migrant": true}
 
@@ -199,15 +203,33 @@ function getToolTipList() {
 }
 
 
-function updateGraphChoices() {
-  var xAllowances = {y: {gender: false, status: false, migrant: false}, z: {gender: false, status: false, migrant: false}}
 
-  var yAllowances = {z:{gender: false, status: false, migrant: false}}
+function updateAllowances(allowances, btn, val) {
+  Object.keys(allowances[btn]).forEach((item) => {
+    if(item != val) {
+      allowances[btn][item] = true   
+    }
+    else allowances[btn][item] = false
+   })
+}
+
+
+function updateGraphChoices() {
+  
+  var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, migrant: false, city: false}, z: {gender: false, status: false, migrant: false, city: false}}
+  var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, migrant: false, city: false}}
 
   // when x changes, should affect both y and z
   $('input[name=x]').on('change', (function() {
+
+    //saving the id of the x button that is checked to recall later
+    sessionStorage.setItem("xID", $(this).prop('id'))
+    
+    // the value of the checked button determines what buttons in z and y should be disabled
     var xVal = $(this).val()
 
+    // updateAllowances(xAllowances, "y", xVal)
+    
     // from x's perspective: making all y buttons available except one
     Object.keys(xAllowances.y).forEach(item => {
       if(item != xVal) {
@@ -231,6 +253,7 @@ function updateGraphChoices() {
 
     // updating button options for y (x's perspective)
     $('input[name=y]').each(function(){
+
       yBtn = $(this)
       // making allowed y button available
       if (xAllowances.y[yBtn.val()]) {
@@ -241,9 +264,11 @@ function updateGraphChoices() {
         yBtn.prop('disabled', true)
         if (yBtn.is(':checked')) {
           yBtn.prop('checked', false)
+          sessionStorage.removeItem('yID')
           //update y's z allowances: if y no longer checked, no z buttons are allowed
           Object.keys(xAllowances.z).forEach(item => {
-            yAllowances.z[item] = false  
+            yAllowances.z[item] = false
+          sessionStorage.removeItem('zID')  
         })}
       }})
 
@@ -257,15 +282,27 @@ function updateGraphChoices() {
         // if z-button disallowed by either x or y, disable it and remove potential checkmark
         else {
           zBtn.prop('disabled', true)
-          zBtn.prop('checked', false)
+          if (zBtn.is(':checked')) {
+            zBtn.prop('checked', false)
+            sessionStorage.removeItem('zID')
+          }
+          
         }
       })
+
+      //saving the current graph button states
+      sessionStorage.setItem("xAllowances", JSON.stringify(xAllowances))
+      sessionStorage.setItem("yAllowances", JSON.stringify(yAllowances))
       
     })) //first on change func ends here
 
     // when y changes, should only affect z
     $('input[name=y]').on('change', (function() {
 
+
+
+      sessionStorage.setItem("yID", $(this).prop('id'))
+      
       var yVal = $(this).val()
 
       Object.keys(yAllowances.z).forEach((item) => {
@@ -276,16 +313,111 @@ function updateGraphChoices() {
       })
 
 
+      console.log(xAllowances)
+      console.log(yAllowances)
       $('input[name=z]').each(function(){
         zBtn = $(this)
       if (xAllowances.z[zBtn.val()] && yAllowances.z[zBtn.val()]) {
+        console.log("both x and y allow z btn")
         zBtn.prop('disabled', false)
       }
       else {
         zBtn.prop('disabled', true)
-        zBtn.prop('checked', false)
+        if (zBtn.is(':checked')) {
+          zBtn.prop('checked', false)
+          sessionStorage.removeItem('zID')
+        }
       }
 
       })
+
+      //saving the updated state of yAllowances
+      sessionStorage.setItem("yAllowances", JSON.stringify(yAllowances))
+    }))
+
+    // when z changes, should not affect any options
+    $('input[name=z]').on('change', (function() {
+      sessionStorage.setItem("zID", $(this).prop('id'))
     }))
   }
+
+// function saveGraphInput(){
+//   const xBtns = document.querySelectorAll('input[name=x]')
+//   const yBtns = document.querySelectorAll('input[name=y]')
+//   const zBtns = document.querySelectorAll('input[name=z]')
+//   // console.log(xBtns)
+//   xBtns.forEach((btn) => {
+//     btn.addEventListener('click', function() {
+//       // console.log("x: ", btn.value)
+//       sessionStorage.setItem('xID', btn.id)
+//       // console.log(sessionStorage)
+
+//     })
+//   })
+//   yBtns.forEach((btn) => {
+//     btn.addEventListener('click', function() {
+//       // console.log("y: ", btn.value)
+//       sessionStorage.setItem('yID', btn.id)
+//       // console.log(sessionStorage)
+
+//     })
+//   })
+//   zBtns.forEach((btn) => {
+//     btn.addEventListener('click', function() {
+//       // console.log("z: ", btn.value)
+//       sessionStorage.setItem('zID', btn.id)
+//       // console.log(sessionStorage)
+//     })
+//   })
+  
+// }
+
+function recallGraphInput() {
+  xID = sessionStorage.getItem("xID")
+  yID = sessionStorage.getItem("yID")
+  zID = sessionStorage.getItem("zID")
+
+  if (xID != null) {
+    document.getElementById(xID).checked=true;
+  }
+  if (yID != null) {
+    document.getElementById(yID).checked=true;
+  }
+  if (zID != null) {
+    document.getElementById(zID).checked=true;
+  }}
+
+function recallGraphInputDisabled() {
+  const yBtns = document.querySelectorAll('input[name=y]')
+  const zBtns = document.querySelectorAll('input[name=z]')
+  const xAllowances = JSON.parse(sessionStorage.getItem("xAllowances"))
+  const yAllowances = JSON.parse(sessionStorage.getItem("yAllowances"))
+  console.log("xallow is: ", xAllowances)
+
+
+  if (xAllowances != null) {
+    yBtns.forEach((btn) => {
+      if (!xAllowances['y'][btn.value]) {
+        console.log("btn is: ", btn)
+        btn.disabled = true
+        btn.checked = false
+      }
+      else {
+        btn.disabled = false
+      }
+    })
+  }
+
+  if (xAllowances != null && yAllowances != null) {
+    zBtns.forEach((btn) => {
+      if (yAllowances.z[btn.value] && xAllowances.z[btn.value]) {
+        btn.disabled = false
+      }
+      else {
+        btn.disabled = true
+        btn.checked = false
+      }
+    })}
+}
+
+  //var xAllowances = {y: {gender: false, status: false, migrant: false, city: false}, z: {gender: false, status: false, migrant: false, city: false}}

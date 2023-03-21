@@ -40,7 +40,7 @@
           <div class="form-check">
             <input class="form-check-input" type="radio" name="search_category" id="city" value="city">
             <label class="form-check-label" for="city" data-bs-toggle="tooltip" data-bs-placement="right" title="Explain something here">
-              By
+              Sogn/By
             </label>
           </div>
         </div>
@@ -163,6 +163,10 @@
                     <input class="form-check-input" type="radio" name="x" id="migrant-x" value="migrant">
                     <label class="form-check-label" for="migrant">Migranttype</label>
                 </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="x" id="city-x" value="city">
+                  <label class="form-check-label" for="city-x">Sogn/By</label>
+              </div>
               </div>
             </div>
           </div>
@@ -189,6 +193,10 @@
                     <input class="form-check-input" type="radio" name="y" id="migrant-y" value="migrant" disabled>
                     <label class="form-check-label" for="migrant-y">Migranttype</label>
                 </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="y" id="city-y" value="city" disabled>
+                  <label class="form-check-label" for="city-y">Sogn/By</label>
+                </div>
               </div>
             </div>
           </div>
@@ -214,6 +222,10 @@
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="z" id="migrant-z" value="migrant" disabled>
                     <label class="form-check-label" for="migrant-z">Migranttype</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="z" id="city-z" value="city" disabled>
+                  <label class="form-check-label" for="city-z">Sogn/By</label>
                 </div>
               </div>
             </div>
@@ -253,8 +265,13 @@
   updateFieldBooleans();
 
   var toolTipList = getToolTipList()
-
+  
   updateGraphChoices()
+  recallGraphInput()
+  recallGraphInputDisabled()
+
+  // saveGraphInput()
+  
  
 </script>
 
