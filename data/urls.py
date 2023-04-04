@@ -6,6 +6,7 @@ from .views import (
     SqlSearchResultsListView,
     # SearchView,
     search,
+    pie_chart,
     # FinalSearch,
 )
 
@@ -17,4 +18,5 @@ urlpatterns = [
     # path("search/", SearchView.as_view(), name="search"),
     path("search/", search, name="search"),
     # path("search/", FinalSearch.as_view(), name="final_search"),
+    path("search/pie_chart/", pie_chart, name="pie_chart")
 ]

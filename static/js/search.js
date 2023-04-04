@@ -214,8 +214,9 @@ function updateAllowances(allowances, btn, val) {
 }
 
 
-function updateGraphChoices() {
+function updateGraphInput() {
   
+  // if the allowance objects already exists, we get them, otherwise we create them and set them all to false
   var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, migrant: false, city: false}, z: {gender: false, status: false, migrant: false, city: false}}
   var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, migrant: false, city: false}}
 
@@ -228,27 +229,9 @@ function updateGraphChoices() {
     // the value of the checked button determines what buttons in z and y should be disabled
     var xVal = $(this).val()
 
-    // updateAllowances(xAllowances, "y", xVal)
-    
-    // from x's perspective: making all y buttons available except one
-    Object.keys(xAllowances.y).forEach(item => {
-      if(item != xVal) {
-        xAllowances.y[item] = true   
-      }
-      else {
-        xAllowances.y[item] = false
-        
-      }
-    })
-    
-    
-    // from x's perspective: making all z buttons available except one 
-    Object.keys(xAllowances.z).forEach((item) => {
-      if(item != xVal) {
-        xAllowances.z[item] = true   
-      }
-      else xAllowances.z[item] = false
-     })
+    // updating which y and z buttons should be disabled by choice of x
+    updateAllowances(xAllowances, "y", xVal)
+    updateAllowances(xAllowances, "z", xVal)
     
 
     // updating button options for y (x's perspective)
@@ -294,23 +277,20 @@ function updateGraphChoices() {
       sessionStorage.setItem("xAllowances", JSON.stringify(xAllowances))
       sessionStorage.setItem("yAllowances", JSON.stringify(yAllowances))
       
+      // showing which graphs can be created
+      updateGraphDisplay()
+
     })) //first on change func ends here
 
     // when y changes, should only affect z
     $('input[name=y]').on('change', (function() {
 
-
-
+       
       sessionStorage.setItem("yID", $(this).prop('id'))
       
       var yVal = $(this).val()
 
-      Object.keys(yAllowances.z).forEach((item) => {
-        if(item != yVal) {
-          yAllowances.z[item] = true   
-        }
-        else yAllowances.z[item] = false
-      })
+      updateAllowances(yAllowances, "z", yVal)
 
 
       console.log(xAllowances)
@@ -333,45 +313,21 @@ function updateGraphChoices() {
 
       //saving the updated state of yAllowances
       sessionStorage.setItem("yAllowances", JSON.stringify(yAllowances))
+
+      // showing which graphs can be created
+      updateGraphDisplay() 
     }))
 
-    // when z changes, should not affect any options
+    // when z changes, should not affect any variable button options
     $('input[name=z]').on('change', (function() {
       sessionStorage.setItem("zID", $(this).prop('id'))
+
+      // showing which graphs can be created
+      updateGraphDisplay()
     }))
   }
 
-// function saveGraphInput(){
-//   const xBtns = document.querySelectorAll('input[name=x]')
-//   const yBtns = document.querySelectorAll('input[name=y]')
-//   const zBtns = document.querySelectorAll('input[name=z]')
-//   // console.log(xBtns)
-//   xBtns.forEach((btn) => {
-//     btn.addEventListener('click', function() {
-//       // console.log("x: ", btn.value)
-//       sessionStorage.setItem('xID', btn.id)
-//       // console.log(sessionStorage)
-
-//     })
-//   })
-//   yBtns.forEach((btn) => {
-//     btn.addEventListener('click', function() {
-//       // console.log("y: ", btn.value)
-//       sessionStorage.setItem('yID', btn.id)
-//       // console.log(sessionStorage)
-
-//     })
-//   })
-//   zBtns.forEach((btn) => {
-//     btn.addEventListener('click', function() {
-//       // console.log("z: ", btn.value)
-//       sessionStorage.setItem('zID', btn.id)
-//       // console.log(sessionStorage)
-//     })
-//   })
-  
-// }
-
+// to recal which graph buttons were selected
 function recallGraphInput() {
   xID = sessionStorage.getItem("xID")
   yID = sessionStorage.getItem("yID")
@@ -387,7 +343,8 @@ function recallGraphInput() {
     document.getElementById(zID).checked=true;
   }}
 
-function recallGraphInputDisabled() {
+// to recall which y and z buttons were disabled
+function recallDisabledGraphButtons() {
   const yBtns = document.querySelectorAll('input[name=y]')
   const zBtns = document.querySelectorAll('input[name=z]')
   const xAllowances = JSON.parse(sessionStorage.getItem("xAllowances"))
@@ -398,7 +355,6 @@ function recallGraphInputDisabled() {
   if (xAllowances != null) {
     yBtns.forEach((btn) => {
       if (!xAllowances['y'][btn.value]) {
-        console.log("btn is: ", btn)
         btn.disabled = true
         btn.checked = false
       }
@@ -420,4 +376,48 @@ function recallGraphInputDisabled() {
     })}
 }
 
-  //var xAllowances = {y: {gender: false, status: false, migrant: false, city: false}, z: {gender: false, status: false, migrant: false, city: false}}
+function updateGraphDisplay() {
+  var isX = $('input[name=x]:checked').length > 0
+  var isY = $('input[name=y]:checked').length > 0
+  var isZ = $('input[name=z]:checked').length > 0
+
+  if (isX) {
+    if (!isY) {
+      $('#pie-btn').show()
+      $('#line-btn').hide()
+      $('#bar-btn').hide()
+    }
+    else {
+      $('#pie-btn').hide()
+      $('#line-btn').show()
+      $('#bar-btn').show()
+    } 
+  }
+}
+
+
+
+function showChart() {
+  pieBtn = document.querySelector("#pie-btn")
+  pieBtn.addEventListener("click", function() {
+    // make ajax call
+    xVal = document.querySelector('input[name="x"]:checked').value;
+    year = document.querySelector('input[name="year"]:checked').value;
+    console.log("xVal is: " + xVal)
+    console.log("year is: " + year)
+    fetch(`pie_chart/?x_val=${xVal}&year=${year}`, {
+      method: "GET",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      }
+    })
+    .then(response => response.json())
+    .then(res => {
+      labels = res["labels"]
+      data = res["data"] 
+      console.log(labels);
+      console.log(data)
+    });
+  }); 
+}
+

@@ -1,12 +1,13 @@
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.views.generic import ListView, TemplateView
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.template import loader
 from django.http import JsonResponse
 from django.core import serializers
 
 from .models import Person
+from .utils import translate_field
 from .forms import SqlForm, SearchForm
 from django.core.paginator import (
     Paginator, 
@@ -269,3 +270,27 @@ def search(request):
         context['page_obj'] = page_obj
 
     return render(request, "search.html", context)
+
+
+def pie_chart(request):
+    print("\n\n HEY \n\n")
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    if is_ajax:
+        if request.method == "GET":
+            x_val = translate_field(request.GET.get('x_val'))
+            year = request.GET.get('year')
+            print("x_val: ", x_val)
+
+            # querying the database, returns a list of dicts
+            query_res = list(Person.objects.filter(Q(år=year)).values(x_val).annotate(total=Count("id")).order_by())
+
+            # creating a dict with fieldvalue as key, count as value
+            dict_res = {d[x_val]: d.get("total") for d in query_res}
+
+            labels, data = zip(*dict_res.items())
+            
+            return JsonResponse({"labels": labels, "data": data})
+        return JsonResponse({'status': 'Invalid request'}, status=400)
+    else:
+        return HttpResponseBadRequest('Invalid request')

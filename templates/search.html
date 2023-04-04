@@ -232,7 +232,28 @@
           </div>
         </div>
       </div>
-      <!-- graph interface ends here-->
+      <!-- graph input button ends here-->
+      <div class="card mb-1">
+        <div class="card-body text-center">
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-primary" id="pie-btn" style="display: visibility;">
+                Pie Chart
+              </button>
+            </div>
+            <div class="col">
+              <button type="button" class="btn btn-primary" id="line-btn" style="display: visibility;">
+                Line Chart
+              </button>
+            </div>
+            <div class="col">
+              <button type="button" class="btn btn-primary" id="bar-btn" style="display: visibility;">
+                Bar Chart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     {% endif %}
     <!-- the stuff dependent on there being a search results ends here-->
     
@@ -266,11 +287,10 @@
 
   var toolTipList = getToolTipList()
   
-  updateGraphChoices()
+  updateGraphInput()
   recallGraphInput()
-  recallGraphInputDisabled()
-
-  // saveGraphInput()
+  recallDisabledGraphButtons()
+  showChart()
   
  
 </script>
