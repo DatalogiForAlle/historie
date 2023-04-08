@@ -6,6 +6,7 @@
 {% block content %}
 
 <script src="{% static 'js/search.js' %}"></script>
+<script src="{% static 'js/myCharts.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
@@ -165,7 +166,7 @@
                     <label class="form-check-label" for="migrant">Migranttype</label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="x" id="city-x" value="city">
+                  <input class="form-check-input" type="radio" name="x" id="city-x" value="parish">
                   <label class="form-check-label" for="city-x">Sogn/By</label>
               </div>
               </div>
@@ -238,17 +239,19 @@
         <div class="card-body text-center">
           <div class="row">
             <div class="col">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pie-modal" id="pie-btn" style="display: visibility;">
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#chart-modal" id="pie-btn" style="display: visibility;">
                 Pie Chart
               </button>
             </div>
             <div class="col">
-              <button type="button" class="btn btn-primary" id="line-btn" style="display: visibility;">
+              <button type="button" class="btn btn-primary" 
+              data-bs-toggle="modal" data-bs-target="#chart-modal" id="line-btn" style="display: visibility;">
                 Line Chart
               </button>
             </div>
             <div class="col">
-              <button type="button" class="btn btn-primary" id="bar-btn" style="display: visibility;">
+              <button type="button" class="btn btn-primary"
+              data-bs-toggle="modal" data-bs-target="#chart-modal" id="bar-btn" style="display: visibility;">
                 Bar Chart
               </button>
             </div>
@@ -256,16 +259,17 @@
         </div>
       </div>
 
-      <div class="modal fade" id="pie-modal" tabindex="-1">
+      <!-- popup for showing and downloading pie graph -->
+      <div class="modal fade" id="chart-modal" tabindex="-1">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="pie-modal-label">Pie Chart</h5>
+              <h5 class="modal-title" id="chart-modal-label">Pie Chart</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="pie-modal-body">
-              <canvas id="pie-chart-canvas" style="min-width:100%;min-height:100%;"></canvas>
-              <a id="pie-download" style="visibility:hidden">
+            <div class="modal-body" id="chart-modal-body">
+              <canvas id="chart-canvas" style="min-width:100%;min-height:100%;"></canvas>
+              <a id="chart-download" style="visibility:hidden">
               <button type="button" class="btn btn-primary float-end">Download</button>
             </a>
             </div>
@@ -309,7 +313,7 @@
   updateGraphInput()
   recallGraphInput()
   recallDisabledGraphButtons()
-  showPieChart()
+  showOneInputChart()
   
  
 </script>

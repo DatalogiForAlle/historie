@@ -272,7 +272,7 @@ def search(request):
     return render(request, "search.html", context)
 
 
-def pie_chart(request):
+def one_input_chart(request):
     print("\n\n HEY \n\n")
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
