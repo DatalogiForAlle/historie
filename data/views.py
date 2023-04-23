@@ -309,17 +309,10 @@ def two_input_chart(request):
 
             # querying the database, returns a list of dicts
             query_res = list(Person.objects.filter(Q(år=year)).values(x_val, y_val).annotate(total=Count("id")).order_by())
-            # query_res = list(Person.objects.filter(Q(år=year)).values(x_val, y_val).annotate(total=Case(
-            #     When(Count("id")),
-            #     default=Value(0)
-            # )).order_by())
-                # Count("id")).order_by())
-            # query_res = list(Person.objects.values(x_val, y_val).annotate(total=Count(
-            #     'person',
-            #     filter(Q(person__år=year))
-            # )))
-                
-                # filter(Q(år=year)).values(x_val, y_val).annotate(total=Count("id")).order_by())
+
+            q_amt = list(Person.objects.filter(Q(år=year)).values("amt").annotate(total=Count("id")).order_by())
+            print("q_amt: ", q_amt)
+            print("number of amts: ", len(q_amt))
 
             # removing duplicates while preserving order
             def unique(sequence):
