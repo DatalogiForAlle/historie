@@ -7,6 +7,7 @@ from .views import (
     # SearchView,
     search,
     one_input_chart,
+    two_input_chart,
     # FinalSearch,
 )
 
@@ -18,5 +19,6 @@ urlpatterns = [
     # path("search/", SearchView.as_view(), name="search"),
     path("search/", search, name="search"),
     # path("search/", FinalSearch.as_view(), name="final_search"),
-    path("search/one_input_chart/", one_input_chart, name="one_input_chart")
+    path("search/one_input_chart/", one_input_chart, name="one_input_chart"),
+    path("search/two_input_chart/", two_input_chart, name="two_input_chart")
 ]

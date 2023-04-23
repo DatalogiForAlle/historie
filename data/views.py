@@ -1,4 +1,5 @@
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Value, Case, When
+from django.db.models.functions import Coalesce
 from django.views.generic import ListView, TemplateView
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -273,14 +274,12 @@ def search(request):
 
 
 def one_input_chart(request):
-    print("\n\n HEY \n\n")
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
     if is_ajax:
         if request.method == "GET":
             x_val = translate_field(request.GET.get('x_val'))
             year = request.GET.get('year')
-            print("x_val: ", x_val)
 
             # querying the database, returns a list of dicts
             query_res = list(Person.objects.filter(Q(år=year)).values(x_val).annotate(total=Count("id")).order_by())
@@ -288,9 +287,72 @@ def one_input_chart(request):
             # creating a dict with fieldvalue as key, count as value
             dict_res = {d[x_val]: d.get("total") for d in query_res}
 
+            print("dict res one input: ", dict_res)
+
             labels, data = zip(*dict_res.items())
+            print("one input data: ", data)
+            print("one input data type: ", type(data))
             
-            return JsonResponse({"labels": labels, "data": data})
+            return JsonResponse({"labels": labels, "data": data, "datasetLabel": x_val})
+        return JsonResponse({'status': 'Invalid request'}, status=400)
+    else:
+        return HttpResponseBadRequest('Invalid request')
+    
+def two_input_chart(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    if is_ajax:
+        if request.method == "GET":
+            x_val = translate_field(request.GET.get('x_val'))
+            y_val = translate_field(request.GET.get('y_val'))
+            year = request.GET.get('year')
+
+            # querying the database, returns a list of dicts
+            query_res = list(Person.objects.filter(Q(år=year)).values(x_val, y_val).annotate(total=Count("id")).order_by())
+            # query_res = list(Person.objects.filter(Q(år=year)).values(x_val, y_val).annotate(total=Case(
+            #     When(Count("id")),
+            #     default=Value(0)
+            # )).order_by())
+                # Count("id")).order_by())
+            # query_res = list(Person.objects.values(x_val, y_val).annotate(total=Count(
+            #     'person',
+            #     filter(Q(person__år=year))
+            # )))
+                
+                # filter(Q(år=year)).values(x_val, y_val).annotate(total=Count("id")).order_by())
+
+            # removing duplicates while preserving order
+            def unique(sequence):
+                seen = set()
+                return [x for x in sequence if not (x in seen or seen.add(x))]
+
+            print("queryRes: ", query_res)
+            print("x: ", x_val)
+            print("y: ", y_val)
+            x_labels = unique([ d[x_val] for d in query_res])
+            y_labels = unique([ d[y_val] for d in query_res])
+            print("x_labels: ", x_labels)
+            print("y_labels: ", y_labels)
+
+            # initializing datasets with total=0 for all possible combos, in case some combos do not exist in the query result
+            datasets = []
+            for x_label in x_labels:
+                tempA = {}
+                for y_label in y_labels:
+                    tempA[y_label] = 0
+                datasets.append({"label": x_label, "data": tempA})
+
+            #update datasets with real values from queryset
+            for i in range(len(datasets)):
+                for d in query_res:
+                    if datasets[i]['label'] == d[x_val]:
+                        datasets[i]['data'][d[y_val]] = d['total']
+
+            print("datasets: ", datasets)
+
+
+            return JsonResponse({"labels": y_labels, "datasets": datasets})
+
         return JsonResponse({'status': 'Invalid request'}, status=400)
     else:
         return HttpResponseBadRequest('Invalid request')
