@@ -5,7 +5,11 @@
 
 {% block content %}
 
-<h5> Lige nu er det kun datasæt fra folketællingsårene 1850 og 1901 der kan uploades</h5>
+<h5>Datasæt der kan uploades:</h5>
+<li>ft1801_dataekspeditioner_20230123.csv</li>
+<li>ft1850_dataekspeditioner_20230123.csv</li>
+<li>ft1901_dataekspeditioner_20230123.csv</li>
+<br></br>
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form }}

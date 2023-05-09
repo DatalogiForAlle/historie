@@ -324,16 +324,36 @@ def one_input_chart(request):
                 .order_by()
             )
 
-            print("qfilter is: ", q_filter)
+            if x_val == "fem_års_aldersgrupper":
+                # nødvendigt at sætte aldergrupperner i orden
+                def sorting_key(elem):
+                    five_group = elem.get("fem_års_aldersgrupper")
+                    if "-" in five_group:
+                        return int(five_group.split("-")[0])
+                    elif "+" in five_group:
+                        return int(five_group.split("+")[0])
 
-            # creating a dict with fieldvalue as key, count as value
-            dict_res = {d[x_val]: d.get("total") for d in query_res}
-
-            print("dict res one input: ", dict_res)
+                query_res_sorted = sorted(
+                    [
+                        item
+                        for item in query_res
+                        if item.get("fem_års_aldersgrupper") != "-1"
+                    ],
+                    # key=lambda x: int(x.split("-")[0]),
+                    key=sorting_key,
+                )
+                # creating a dict with fieldvalue as key, count as value
+                print("query_res_sorted", query_res_sorted)
+                dict_res = {d[x_val]: d.get("total") for d in query_res_sorted}
+            else:
+                # creating a dict with fieldvalue as key, count as value
+                print("queryres is: ", query_res)
+                dict_res = {d[x_val]: d.get("total") for d in query_res}
+                print("dict res one input: ", dict_res)
 
             labels, data = zip(*dict_res.items())
-            print("one input data: ", data)
-            print("one input data type: ", type(data))
+            # print("one input data: ", data)
+            # print("one input data type: ", type(data))
 
             return JsonResponse({"labels": labels, "data": data, "datasetLabel": x_val})
         return JsonResponse({"status": "Invalid request"}, status=400)
@@ -363,14 +383,6 @@ def two_input_chart(request):
                 q_filter.add(Q(alder=query), Q.AND)
 
             # querying the database, returns a list of dicts
-            # query_res = list(
-            #     Person.objects.filter(q_filter)
-            #     .values(x_val)
-            #     .annotate(total=Count("id"))
-            #     .order_by()
-            # )
-
-            # querying the database, returns a list of dicts
             query_res = list(
                 Person.objects.filter(q_filter)
                 .values(x_val, y_val)
@@ -378,27 +390,32 @@ def two_input_chart(request):
                 .order_by()
             )
 
-            # q_amt = list(
-            #     Person.objects.filter(Q(år=year))
-            #     .values("amt")
-            #     .annotate(total=Count("id"))
-            #     .order_by()
-            # )
-            # print("q_amt: ", q_amt)
-            # print("number of amts: ", len(q_amt))
-
             # removing duplicates while preserving order
             def unique(sequence):
                 seen = set()
                 return [x for x in sequence if not (x in seen or seen.add(x))]
 
-            print("queryRes: ", query_res)
-            print("x: ", x_val)
-            print("y: ", y_val)
+            # print("queryRes: ", query_res)
+            # print("x: ", x_val)
+            # print("y: ", y_val)
             x_labels = unique([d[x_val] for d in query_res])
             y_labels = unique([d[y_val] for d in query_res])
-            print("x_labels: ", x_labels)
-            print("y_labels: ", y_labels)
+
+            def sort_age_labels(labels):
+                def sorting_key(elem):
+                    if "-" in elem:
+                        return int(elem.split("-")[0])
+                    elif "+" in elem:
+                        return int(elem.split("+")[0])
+
+                age_labels = sorted([l for l in labels if l != "-1"], key=sorting_key)
+                print("agelabels: ", age_labels)
+                return age_labels
+
+            if x_val == "fem_års_aldersgrupper":
+                x_labels = sort_age_labels(x_labels)
+            elif y_val == "fem_års_aldersgrupper":
+                y_labels = sort_age_labels(y_labels)
 
             # initializing datasets with total=0 for all possible combos, in case some combos do not exist in the query result
             datasets = []
@@ -408,6 +425,8 @@ def two_input_chart(request):
                     tempA[y_label] = 0
                 datasets.append({"label": x_label, "data": tempA})
 
+            print("orig dataset: ", datasets)
+
             # update datasets with real values from queryset
             for i in range(len(datasets)):
                 for d in query_res:
@@ -415,6 +434,7 @@ def two_input_chart(request):
                         datasets[i]["data"][d[y_val]] = d["total"]
 
             print("datasets: ", datasets)
+            # print("queryres: ", query_res)
 
             return JsonResponse({"labels": y_labels, "datasets": datasets})
 

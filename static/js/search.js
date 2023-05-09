@@ -233,9 +233,10 @@ function updateGraphInput() {
   updateGraphDisplay()
   
   // if the allowance objects already exists, we get them, otherwise we create them and set them all to false
-  var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, location: false, county: false}, z: {gender: false, status: false, location: false, county: false}}
-  var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, location: false, county: false}}
+  var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, location: false, county: false, five: false}, z: {gender: false, status: false, location: false, county: false, five: false}}
+  var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, location: false, county: false, five: false}}
 
+//   console.log({xAllows: xAllowances})
   // when x changes, should affect both y and z
   $('input[name=x]').on('change', (function() {
 
