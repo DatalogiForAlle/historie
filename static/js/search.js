@@ -20,8 +20,6 @@ function displayFieldCheckboxes(elmID) {
 }
 
 
-
-
 function keepUserInput(query, year, search_category) {
   //keeping the input values in the form throughout pagination/submitting
   sessionStorage.setItem("year", year)
@@ -42,7 +40,7 @@ function keepUserInput(query, year, search_category) {
 
   if (search_category == 'age') {
     document.getElementById("age").checked = true;
-    console.log("input field should now be set to readonly")
+    // console.log("input field should now be set to readonly")
     document.getElementById("id_q").removeAttribute('readonly')
   }
   else if (search_category == 'city') {
@@ -311,12 +309,12 @@ function updateGraphInput() {
       updateAllowances(yAllowances, "z", yVal)
 
 
-      console.log(xAllowances)
-      console.log(yAllowances)
+    //   console.log(xAllowances)
+    //   console.log(yAllowances)
       $('input[name=z]').each(function(){
         zBtn = $(this)
       if (xAllowances.z[zBtn.val()] && yAllowances.z[zBtn.val()]) {
-        console.log("both x and y allow z btn")
+        // console.log("both x and y allow z btn")
         zBtn.prop('disabled', false)
       }
       else {
@@ -355,8 +353,6 @@ function recallGraphInput() {
     document.getElementById(xID).checked=true;
   }
   if (yID != null) {
-    console.log("yID is not null")
-    console.log({yID: yID})
     document.getElementById(yID).checked=true;
   }
   if (zID != null) {
@@ -370,7 +366,7 @@ function recallDisabledGraphButtons() {
 //   console.log({yBtnsChecked: document.querySelectorAll('input[name=z]:checked').length})
   const xAllowances = JSON.parse(sessionStorage.getItem("xAllowances"))
   const yAllowances = JSON.parse(sessionStorage.getItem("yAllowances"))
-  console.log("xallow is: ", xAllowances)
+//   console.log("xallow is: ", xAllowances)
 
 
   if (xAllowances != null) {
@@ -404,17 +400,15 @@ function updateGraphDisplay() {
     var isX = $('input[name=x]:checked').length > 0
     var isY = $('input[name=y]:checked').length > 0
     var isZ = $('input[name=z]:checked').length > 0
-    console.log({isY: isY})
-    console.log({isX: isX})
+    // console.log({isY: isY})
+    // console.log({isX: isX})
 
     if (isX) {
         $('#line-btn').show()
         $('#bar-btn').show()
         if (!isY) {
             $('#pie-btn').show()    
-        }
-    else {
-        console.log("what is going on")
+        } else {
         $('#pie-btn').hide()
         } 
     }
