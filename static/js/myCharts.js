@@ -135,80 +135,27 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
     });
   }
 
-    
-    // if (xSelected) {
-    //     selectedVals.push({xVal: xSelected.value})
-    // }
-    // if (ySelected) {
-    //      selectedVals.push({yVal: ySelected.value})
-    // }
-    // if (zSelected) {
-    //     selectedVals.push({zVal: zSelected.value})
-    // }
-    // return selectedVals
-
-// function buildFetchUrl(year, selectedVals) {
-//     url = `one_input_chart/?year=${year}`
-
-//     url = selectedVals.reduce(
-//         (acc, cur) => acc + `?`
-//     )
-
-//     selectedVals.map
-//     if (xSelected) {
-//         url += `&x_val=${xSelected.value}`
-//         if (ySelected) {
-//             url += `&y_val=${xSelected.value}`
-//         }
-//     }
-// }
-
-// function getSelectedVals() {
-//     xSelected = document.querySelector('input[name="x"]:checked')
-//     ySelected = document.querySelector('input[name="y"]:checked')
-//     zSelected = document.querySelector('input[name="z"]:checked')
-//     url = `one_input_chart/?year=${year}`
-
-//     selectedVals = []
-//     if (xSelected) {
-//         url += `&x_val=${xSelected.value}`
-//         if (ySelected) {
-//             url += `&y_val=${ySelected.value}`
-//         }
-//         else {
-
-//         }
-//     }
-//     else {
-//         console.log("no variables chosen for graph")
-//     }
-
 function getSelectedVals() {
     xSelected = document.querySelector('input[name="x"]:checked')
     ySelected = document.querySelector('input[name="y"]:checked')
     zSelected = document.querySelector('input[name="z"]:checked')
 
-    console.log("x selected: " + xSelected)
     
     var selectedVals = []
     if (xSelected) {
-        console.log("inside xselsected")
         selectedVals.push({varName: "x_val", varValue: xSelected.value})
-        console.log(selectedVals[0])
         if (ySelected) {
-            console.log("insice y selected")
             selectedVals.push({varName: "y_val", varValue: ySelected.value})
             if (zSelected) {
                 selectedVals.push({varName: "z_val", varValue: zSelected.value})
             }
        }
     }
-    console.log(selectedVals[0])
     return selectedVals
 }
 
-function buildFetchUrl(startString, year, selectedVals) {
-    url = `${startString}_input_chart/?year=${year}`
+function buildFetchUrl(startString, year, selectedVals, searchCategory, query) {
+    url = `${startString}_input_chart/?year=${year}&search_category=${searchCategory}&query=${query}`
     selectedVals.forEach(function(item) {
         url += `&${item["varName"]}=${item["varValue"]}`
     })
@@ -224,21 +171,14 @@ function getTwoInputChart(url, chartType) {
     })
     .then(response => response.json())
     .then(res => {
-        console.log("inside getTwoInputChart")
-        // console.log({res: res})
         labels = res["labels"]
         datasets = res["datasets"] 
-        // datasetLabel = res["datasetLabel"]
-        // console.log(labels);
-        // console.log(data)
-        // console.log("number of datapoint: " + labels.length) 
         createTwoInputChart(ctx, labels, datasets, year, chartType) 
       });
        
 }
 
 function getOneInputChart(url, chartType) {
-    console.log("url is: " + url)
     fetch(url, {
         method: "GET",
         headers: {
@@ -250,9 +190,6 @@ function getOneInputChart(url, chartType) {
         labels = res["labels"]
         data = res["data"] 
         datasetLabel = res["datasetLabel"]
-        console.log(labels);
-        console.log(data)
-        console.log("number of datapoint: " + labels.length) 
         createOneInputChart(ctx, labels, data, year, chartType, datasetLabel)  
       });
       
@@ -261,17 +198,24 @@ function getOneInputChart(url, chartType) {
 function getChart(chartType) {
     ctx = replaceChartCanvas()
     selectedVals = getSelectedVals()
-    console.log({selectedVals: selectedVals})
-    year = document.querySelector('input[name="year"]:checked').value;
+    // year = document.querySelector('input[name="year"]:checked').value;
+    year = sessionStorage.getItem("year")
+    searchCategory = sessionStorage.getItem("searchCategory")
+    query = sessionStorage.getItem("query")
     // remember to make check somewhere that at least the x variable has to be chosen in order to get a chart
     if (selectedVals.length === 1) {
-        url = buildFetchUrl("one", year, selectedVals)
+        url = buildFetchUrl("one", year, selectedVals, searchCategory, query)
+        if (chartType == "pie") {
+            document.getElementById("modal-size").classList.remove('modal-xl');
+        } else {
+            document.getElementById("modal-size").classList.add('modal-xl');
+        }
         getOneInputChart(url, chartType)
         
     }
     else if (selectedVals.length === 2) {
-        console.log("we are getting chart with two vars")
-        url = buildFetchUrl("two", year, selectedVals)
+        document.getElementById("modal-size").classList.add('modal-xl');
+        url = buildFetchUrl("two", year, selectedVals, searchCategory, query)
         getTwoInputChart(url, chartType)
     }
 }
@@ -282,69 +226,7 @@ function showChart() {
     lineBtn = document.querySelector("#line-btn")
 
     pieBtn.addEventListener("click", () => getChart('pie'))
-    console.log("pie event lsitener")
     barBtn.addEventListener("click", () => getChart('bar'))
-    console.log("bar event lsitener")
     lineBtn.addEventListener("click", () => getChart('line'))
-    console.log("bar event lsitener")
-}
-
-
-// function oneInputChart(chartType) {
-//     getChart()
-
-//     //to be able to overwrite old previously used canvas
-//     ctx = replaceChartCanvas()
-//     console.log("was replaced")
-
-//     //extracting the choies for x, y, z variables
-//     xVal = document.querySelector('input[name="x"]:checked').value;
-//     // yVal = document.querySelector('input[name="y"]:checked').value;
-//     // zVal = document.querySelector('input[name="z"]:checked').value;
-//     year = document.querySelector('input[name="year"]:checked').value;
-//     console.log("year is: " + year)
-//     // console.log("xVal is: " + xVal)
-//     // console.log("yVal is: " + yVal)
-    
-
-//     // make ajax call to get labels and data
-//     fetch(`one_input_chart/?year=${year}&x_val=${xVal}`, {
-//         method: "GET",
-//         headers: {
-//             "X-Requested-With": "XMLHttpRequest",
-//         }
-//     })
-//     .then(response => response.json())
-//     .then(res => {
-//         labels = res["labels"]
-//         data = res["data"] 
-//         datasetLabel = res["datasetLabel"]
-//         console.log(labels);
-//         console.log(data)
-//         console.log("number of datapoint: " + labels.length)
-    
-//         //creating chart with the previously created canvas and the fetched data  
-//         createOneInputChart(ctx, labels, data, year, chartType, datasetLabel)    
-//       });
-// }
-
-
-// function showOneInputChart() {
-
-//     pieBtn = document.querySelector("#pie-btn")
-//     barBtn = document.querySelector("#bar-btn")
-//     lineBtn = document.querySelector("#line-btn")
-
-//     // pieBtn.outerHTML = pieBtn.outerHTML
-//     // barBtn.outerHTML = barBtn.outerHTML
-//     // lineBtn.outerHTML = lineBtn.outerHTML
-
-//     pieBtn.addEventListener("click", () => oneInputChart('pie'))
-//     console.log("pie event lsitener")
-//     barBtn.addEventListener("click", () => oneInputChart('bar'))
-//     console.log("bar event lsitener")
-//     lineBtn.addEventListener("click", () => oneInputChart('line'))
-//     console.log("bar event lsitener")
-//   }
-  
+}  
   

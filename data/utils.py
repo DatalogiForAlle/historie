@@ -1,4 +1,3 @@
-
 field_dict = {
     "year": "år",
     "pa_id": "pa_id",
@@ -7,18 +6,19 @@ field_dict = {
     "ten": "ti_års_aldersgrupper",
     "name": "navn",
     "gender": "køn",
-    "age":  "alder",
+    "age": "alder",
     "status": "ægteskabelig_stilling",
     "parish": "sogn_by",
     "hundred": "herred",
     "county": "amt",
-    "location_type": "bostedstype",
+    "location": "bostedstype",
     "job_original": "erhverv_original",
-    "household_function_std": "fødesogn_by_standardiseret",
-    "migrant": "migrant_type",
+    "household_function_std": "stilling_i_husstanden_standardiseret",
+    # "fødesogn_by_standardiseret",
+    # "migrant": "migrant_type",
 }
+
 
 def translate_field(field_name):
     print("field_name is: ", field_name)
     return field_dict[field_name]
-

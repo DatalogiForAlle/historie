@@ -11,10 +11,10 @@ from .models import Person
 from .utils import translate_field
 from .forms import SqlForm, SearchForm
 from django.core.paginator import (
-    Paginator, 
-    EmptyPage, 
+    Paginator,
+    EmptyPage,
     PageNotAnInteger,
-    )
+)
 
 
 # for uploading csv
@@ -56,9 +56,9 @@ class CustomCSVViews(FormView):
             "bostedstype",
             "erhverv_original",
             "stilling_i_husstanden_standardiseret",
-            "fødested_original",
-            "fødesogn_by_standardiseret",
-            "migrant_type",
+            # "fødested_original",
+            # "fødesogn_by_standardiseret",
+            # "migrant_type",
         ]
 
         print("dict_reader.fieldnames: \n {}".format(dict_reader.fieldnames))
@@ -70,17 +70,20 @@ class CustomCSVViews(FormView):
 
         print("The file name should be printed below")
         print(csv_file.name)
-        if "1850" in csv_file.name:
-            årstal = 1850
+        if "1801" in csv_file.name:
+            year = 1801
+        elif "1850" in csv_file.name:
+            year = 1850
         elif "1901" in csv_file.name:
-            årstal = 1901
-            print("årstal er: ", årstal)
+            year = 1901
         else:
-            raise Exception("Either 1850 or 1901 should appear in the file name")
+            raise Exception("Either 1801, 1850 or 1901 should appear in the file name")
+        print("year is: ", year)
         data = []
+        invalid_age_count = 0
         for row, item in enumerate(dict_reader, start=1):
             new_person = Person(
-                år=årstal,
+                år=year,
                 pa_id=item["pa_id"],
                 husstands_id=item["husstands_id"],
                 fem_års_aldersgrupper=item["5års_aldersgrupper"],
@@ -97,19 +100,44 @@ class CustomCSVViews(FormView):
                 stilling_i_husstanden_standardiseret=item[
                     "stilling_i_husstanden_standardiseret"
                 ],
-                fødested_original=item["fødested_original"],
-                fødesogn_by_standardiseret=item["fødesogn_by_standardiseret"],
-                migrant_type=item["migrant_type"],
+                # fødested_original=item["fødested_original"],
+                # fødesogn_by_standardiseret=item["fødesogn_by_standardiseret"],
+                # migrant_type=item["migrant_type"],
             )
+            # print("new person alder: ", new_person.alder)
+            # print("new person alder type: ", type(new_person.alder))
 
-            data.append(new_person)
+            if int(new_person.alder) >= 0:
+                data.append(new_person)
+            else:
+                invalid_age_count += 1
+                if invalid_age_count % 100 == 0:
+                    print(
+                        "invalid age count incremented, it is now: ", invalid_age_count
+                    )
 
             if len(data) > 500:
-                Person.objects.bulk_create(data)
+                Person.objects.bulk_create(data, ignore_conflicts=True)
                 data = []
+
         if data:
             Person.objects.bulk_create(data)
             # self.process_item(item)
+        print("invalid age count: ", invalid_age_count)
+
+        # remove duplicates (based on pa_id) (move below if data later)
+        # for row in Person.objects.all().reverse():
+        #     if Person.objects.filter(pa_id=row.pa_id).count() > 1:
+        #         print("removing duplicate")
+        #         row.delete()
+
+        # for duplicates in (
+        #     Person.objects.values("pa_id")
+        #     .annotate(records=Count("pa_id"))
+        #     .filter(records__gt=1)
+        # ):
+        #     for p in Person.objects.filter(pa_id=duplicates["pa_id"])[1:]:
+        #         p.delete()
 
         return super().form_valid(form)
 
@@ -180,13 +208,11 @@ class SearchResultsListView(ListView):
 
 
 class SqlSearchResultsListView(ListView):
-
     paginate_by = 100
     model = Person
     context_object_name = "sql_person_list"
 
     def get(self, request):
-
         form = SqlForm(initial={"sql": "SELECT * FROM person LIMIT 100"})
         context = {"form": form}
         return render(request, "sql_search.html", context=context)
@@ -222,22 +248,23 @@ class SqlSearchResultsListView(ListView):
             )
             return response
 
+
 def search(request):
     persons_per_page = 5
-    
+
     context = {}
 
     # query = ""
     if request.GET:
-        query = request.GET.get('q').lower()
-        year = request.GET.get('year')
-        search_category = request.GET.get('search_category')
+        query = request.GET.get("q").lower()
+        year = request.GET.get("year")
+        search_category = request.GET.get("search_category")
         print("year request is: ", year)
         print("year type is: ", type(year))
-        
-        context['query'] = str(query)
-        context['year'] = str(year)
-        context['search_category'] = str(search_category)
+
+        context["query"] = str(query)
+        context["year"] = str(year)
+        context["search_category"] = str(search_category)
 
         q_filter = Q(år=year)
 
@@ -248,17 +275,14 @@ def search(request):
         elif search_category == "age":
             q_filter.add(Q(alder=query), Q.AND)
 
-       
         page_obj = Person.objects.filter(q_filter)
-
-
+        print("pageobj count: ", page_obj.count())
 
         get_copy = request.GET.copy()
         parameters = get_copy.pop("page", True) and get_copy.urlencode()
         context["parameters"] = parameters
-        
 
-        page = request.GET.get('page', 1)
+        page = request.GET.get("page", 1)
         paginator = Paginator(page_obj, persons_per_page)
 
         try:
@@ -267,22 +291,40 @@ def search(request):
             page_obj = paginator.page(persons_per_page)
         except EmptyPage:
             page_obj = paginator.page(paginator.num_pages)
-        
-        context['page_obj'] = page_obj
+
+        context["page_obj"] = page_obj
 
     return render(request, "search.html", context)
 
 
 def one_input_chart(request):
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
     if is_ajax:
         if request.method == "GET":
-            x_val = translate_field(request.GET.get('x_val'))
-            year = request.GET.get('year')
+            x_val = translate_field(request.GET.get("x_val"))
+            year = request.GET.get("year")
+            search_category = request.GET.get("search_category")
+            query = request.GET.get("query")
+
+            q_filter = Q(år=year)
+
+            print("query is: ", query)
+            print("query type is: ", type(query))
+            if search_category == "city":
+                q_filter.add(Q(sogn_by=query), Q.AND)
+            elif search_category == "age":
+                q_filter.add(Q(alder=query), Q.AND)
 
             # querying the database, returns a list of dicts
-            query_res = list(Person.objects.filter(Q(år=year)).values(x_val).annotate(total=Count("id")).order_by())
+            query_res = list(
+                Person.objects.filter(q_filter)
+                .values(x_val)
+                .annotate(total=Count("id"))
+                .order_by()
+            )
+
+            print("qfilter is: ", q_filter)
 
             # creating a dict with fieldvalue as key, count as value
             dict_res = {d[x_val]: d.get("total") for d in query_res}
@@ -292,27 +334,58 @@ def one_input_chart(request):
             labels, data = zip(*dict_res.items())
             print("one input data: ", data)
             print("one input data type: ", type(data))
-            
+
             return JsonResponse({"labels": labels, "data": data, "datasetLabel": x_val})
-        return JsonResponse({'status': 'Invalid request'}, status=400)
+        return JsonResponse({"status": "Invalid request"}, status=400)
     else:
-        return HttpResponseBadRequest('Invalid request')
-    
+        return HttpResponseBadRequest("Invalid request")
+
+
 def two_input_chart(request):
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
     if is_ajax:
         if request.method == "GET":
-            x_val = translate_field(request.GET.get('x_val'))
-            y_val = translate_field(request.GET.get('y_val'))
-            year = request.GET.get('year')
+            x_val = translate_field(request.GET.get("x_val"))
+            y_val = translate_field(request.GET.get("y_val"))
+            year = request.GET.get("year")
+
+            search_category = request.GET.get("search_category")
+            query = request.GET.get("query")
+
+            q_filter = Q(år=year)
+
+            print("query is: ", query)
+            print("query type is: ", type(query))
+            if search_category == "city":
+                q_filter.add(Q(sogn_by=query), Q.AND)
+            elif search_category == "age":
+                q_filter.add(Q(alder=query), Q.AND)
 
             # querying the database, returns a list of dicts
-            query_res = list(Person.objects.filter(Q(år=year)).values(x_val, y_val).annotate(total=Count("id")).order_by())
+            # query_res = list(
+            #     Person.objects.filter(q_filter)
+            #     .values(x_val)
+            #     .annotate(total=Count("id"))
+            #     .order_by()
+            # )
 
-            q_amt = list(Person.objects.filter(Q(år=year)).values("amt").annotate(total=Count("id")).order_by())
-            print("q_amt: ", q_amt)
-            print("number of amts: ", len(q_amt))
+            # querying the database, returns a list of dicts
+            query_res = list(
+                Person.objects.filter(q_filter)
+                .values(x_val, y_val)
+                .annotate(total=Count("id"))
+                .order_by()
+            )
+
+            # q_amt = list(
+            #     Person.objects.filter(Q(år=year))
+            #     .values("amt")
+            #     .annotate(total=Count("id"))
+            #     .order_by()
+            # )
+            # print("q_amt: ", q_amt)
+            # print("number of amts: ", len(q_amt))
 
             # removing duplicates while preserving order
             def unique(sequence):
@@ -322,8 +395,8 @@ def two_input_chart(request):
             print("queryRes: ", query_res)
             print("x: ", x_val)
             print("y: ", y_val)
-            x_labels = unique([ d[x_val] for d in query_res])
-            y_labels = unique([ d[y_val] for d in query_res])
+            x_labels = unique([d[x_val] for d in query_res])
+            y_labels = unique([d[y_val] for d in query_res])
             print("x_labels: ", x_labels)
             print("y_labels: ", y_labels)
 
@@ -335,17 +408,16 @@ def two_input_chart(request):
                     tempA[y_label] = 0
                 datasets.append({"label": x_label, "data": tempA})
 
-            #update datasets with real values from queryset
+            # update datasets with real values from queryset
             for i in range(len(datasets)):
                 for d in query_res:
-                    if datasets[i]['label'] == d[x_val]:
-                        datasets[i]['data'][d[y_val]] = d['total']
+                    if datasets[i]["label"] == d[x_val]:
+                        datasets[i]["data"][d[y_val]] = d["total"]
 
             print("datasets: ", datasets)
 
-
             return JsonResponse({"labels": y_labels, "datasets": datasets})
 
-        return JsonResponse({'status': 'Invalid request'}, status=400)
+        return JsonResponse({"status": "Invalid request"}, status=400)
     else:
-        return HttpResponseBadRequest('Invalid request')
+        return HttpResponseBadRequest("Invalid request")

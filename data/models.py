@@ -6,7 +6,7 @@ from django.db import models
 class Person(models.Model):
 
     år = models.PositiveIntegerField(default=None)
-    pa_id = models.PositiveIntegerField()
+    pa_id = models.CharField(max_length=100)
     husstands_id = models.PositiveIntegerField()
     fem_års_aldersgrupper = models.CharField(max_length=200)
     ti_års_aldersgrupper = models.CharField(max_length=200)
@@ -20,7 +20,7 @@ class Person(models.Model):
         choices=GENDER_CHOICES,
         default="f",
     )
-    alder = models.FloatField()
+    alder = models.PositiveIntegerField()
     STATUS_CHOICES = [
         ("ugift", "ugift"),
         ("gift", "gift"),
@@ -46,18 +46,18 @@ class Person(models.Model):
     )
     erhverv_original = models.CharField(max_length=200)
     stilling_i_husstanden_standardiseret = models.CharField(max_length=200)
-    fødested_original = models.CharField(max_length=200)
-    fødesogn_by_standardiseret = models.CharField(max_length=200)
-    MIGRANT_CHOICES = [
-        ("migrant", "migrant"),
-        ("indfødt", "indfødt"),
-        ("ukendt", "ukendt"),
-    ]
-    migrant_type = models.CharField(
-        max_length=100,
-        choices=MIGRANT_CHOICES,
-        default="indfødt",
-    )
+    # fødested_original = models.CharField(max_length=200)
+    # fødesogn_by_standardiseret = models.CharField(max_length=200)
+    # MIGRANT_CHOICES = [
+    #     ("migrant", "migrant"),
+    #     ("indfødt", "indfødt"),
+    #     ("ukendt", "ukendt"),
+    # ]
+    # migrant_type = models.CharField(
+    #     max_length=100,
+    #     choices=MIGRANT_CHOICES,
+    #     default="indfødt",
+    # )
 
     class Meta:
         db_table = "person"

@@ -12,8 +12,8 @@ function displayFieldCheckboxes(elmID) {
                     <label class="form-check-label" for="status">Ægteskabelig status</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="migrant" id="migrant" value="migrant_type" onClick=saveMigrant() checked>
-                    <label class="form-check-label" for="migrant">Migranttype</label>
+                    <input class="form-check-input" type="checkbox" name="location" id="location" value="bostedstype" onClick=saveLocation() checked>
+                    <label class="form-check-label" for="location">Bostedstype</label>
                 </div>
             </div>
         `)
@@ -24,23 +24,35 @@ function displayFieldCheckboxes(elmID) {
 
 function keepUserInput(query, year, search_category) {
   //keeping the input values in the form throughout pagination/submitting
-
+  sessionStorage.setItem("year", year)
+  sessionStorage.setItem("searchCategory", search_category)
+  sessionStorage.setItem("query", query)
   document.getElementById("id_q").value = query
-
-  if (year == '1850') {
+//   document.getElementById("modal-size").classList.add('modal-xl');
+  if (year == '1801') {
+    document.getElementById("1801").checked = true;
+  }
+  else if (year == '1850') {
     document.getElementById("1850").checked = true;
   }
   else if (year == '1901') {
     document.getElementById("1901").checked = true;
   }
+  
 
   if (search_category == 'age') {
     document.getElementById("age").checked = true;
+    console.log("input field should now be set to readonly")
     document.getElementById("id_q").removeAttribute('readonly')
   }
   else if (search_category == 'city') {
     document.getElementById("city").checked = true;
     document.getElementById("id_q").removeAttribute('readonly')
+    document.getElementById("id_q").removeAttribute('readonly')
+  }
+  else if (search_category == 'no-query') {
+    document.getElementById("no-query").checked = true;
+    document.getElementById("id_q").setAttribute('readonly', true)
   }
 
   $('input:radio[name=search_category]').click(function() {
@@ -48,13 +60,12 @@ function keepUserInput(query, year, search_category) {
       return this.value
     }).get();
     q = document.getElementById("id_q")
-    q.removeAttribute('readonly')
     if (value=='age'){
-      // console.log("inside age")
       q.type = "number";
       q.placeholder = "0";
       q.min = "0";
       q.max = "100";
+      q.removeAttribute('readonly')
     }
     else if (value=='city'){
       // console.log("inside byer")
@@ -62,10 +73,16 @@ function keepUserInput(query, year, search_category) {
       //setting value to empty string to let the placeholder take over. In the opposite case (value=='age'), since a number field does not accept text, the value is removed automatically, I suppose
       q.value = ""
       q.placeholder = "Indtast en by"
-      // console.log("placeholder is: ", q.placeholder)
-      // console.log("but values is: ", q.value)
+      q.removeAttribute('readonly')
       q.removeAttribute('min')
       q.removeAttribute('max')
+    }
+    else if (value=='no-query') {
+        q.type = "text";
+        q.value = null
+        q.placeholder = ""
+        q.setAttribute('readonly', true)
+        
     }
     
 
@@ -76,7 +93,7 @@ function keepUserInput(query, year, search_category) {
   // ensuring which fields to display is saved across page change
   var genderChecked = JSON.parse(sessionStorage.getItem("genderChecked"));
   var statusChecked = JSON.parse(sessionStorage.getItem("statusChecked"));
-  var migrantChecked = JSON.parse(sessionStorage.getItem("migrantChecked"));
+  var locationChecked = JSON.parse(sessionStorage.getItem("locationChecked"));
   
   if (genderChecked != null) {
     // console.log("check was set")
@@ -88,9 +105,9 @@ function keepUserInput(query, year, search_category) {
     document.getElementById("status").checked = statusChecked;
   } 
 
-  if (migrantChecked != null) {
+  if (locationChecked != null) {
     // console.log("check was set")
-    document.getElementById("migrant").checked = migrantChecked;
+    document.getElementById("location").checked = locationChecked;
   } 
   
   
@@ -106,9 +123,9 @@ function saveStatus() {
     sessionStorage.setItem("statusChecked", checkbox.checked);	
 }
 
-function saveMigrant() {	
-	var checkbox = document.getElementById("migrant");
-    sessionStorage.setItem("migrantChecked", checkbox.checked);	
+function saveLocation() {	
+	var checkbox = document.getElementById("location");
+    sessionStorage.setItem("locationChecked", checkbox.checked);	
 }
 
 
@@ -126,7 +143,7 @@ function updateFieldBooleans() {
 
     // var fieldBooleans = (JSON.parse(sessionStorage.getItem("booleans")) || {"show-pa-id": true, "show-name": true, "show-age": true, "show-gender": true, "show-status": true, "show-migrant": true})
 
-    var fieldBooleans = JSON.parse(sessionStorage.getItem("booleans") || JSON.stringify({"show-pa-id": true, "show-name": true, "show-age": true, "show-gender": true, "show-status": true, "show-migrant": true}));
+    var fieldBooleans = JSON.parse(sessionStorage.getItem("booleans") || JSON.stringify({"show-pa-id": true, "show-name": true, "show-age": true, "show-gender": true, "show-status": true, "show-location": true}));
 
     // console.log("fieldbooleans: ", fieldBooleans)
 
@@ -161,14 +178,14 @@ function updateFieldBooleans() {
         showResults(fieldBooleans)
         })
 
-    $('#migrant').change(function() {
+    $('#location').change(function() {
         if ($(this).is(':checked')) {
-            // console.log("migrant checkbox was checked");
-            fieldBooleans["show-migrant"] = true
+            // console.log("location checkbox was checked");
+            fieldBooleans["show-location"] = true
         }
         else {
-            fieldBooleans["show-migrant"] = false
-            // console.log("migrant checkbox was unchecked");
+            fieldBooleans["show-location"] = false
+            // console.log("location checkbox was unchecked");
         }
         saveBooleans(fieldBooleans)
         showResults(fieldBooleans)
@@ -176,7 +193,7 @@ function updateFieldBooleans() {
 }
 
 function showResults(booleans) {
-  var fields = ["show-pa-id", "show-name", "show-age", "show-gender", "show-status", "show-migrant"]
+  var fields = ["show-pa-id", "show-name", "show-age", "show-gender", "show-status", "show-location"]
   // var fields = ["gender"]
   fields.forEach(field => {
       // console.log("fieldsdict: ", fieldDict.name)
@@ -215,10 +232,11 @@ function updateAllowances(allowances, btn, val) {
 
 
 function updateGraphInput() {
+  updateGraphDisplay()
   
   // if the allowance objects already exists, we get them, otherwise we create them and set them all to false
-  var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, migrant: false, location_type: false, county: false}, z: {gender: false, status: false, migrant: false, location_type: false, county: false}}
-  var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, migrant: false, location_type: false, county: false}}
+  var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, location: false, county: false}, z: {gender: false, status: false, location: false, county: false}}
+  var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, location: false, county: false}}
 
   // when x changes, should affect both y and z
   $('input[name=x]').on('change', (function() {
@@ -337,6 +355,8 @@ function recallGraphInput() {
     document.getElementById(xID).checked=true;
   }
   if (yID != null) {
+    console.log("yID is not null")
+    console.log({yID: yID})
     document.getElementById(yID).checked=true;
   }
   if (zID != null) {
@@ -347,6 +367,7 @@ function recallGraphInput() {
 function recallDisabledGraphButtons() {
   const yBtns = document.querySelectorAll('input[name=y]')
   const zBtns = document.querySelectorAll('input[name=z]')
+//   console.log({yBtnsChecked: document.querySelectorAll('input[name=z]:checked').length})
   const xAllowances = JSON.parse(sessionStorage.getItem("xAllowances"))
   const yAllowances = JSON.parse(sessionStorage.getItem("yAllowances"))
   console.log("xallow is: ", xAllowances)
@@ -374,23 +395,27 @@ function recallDisabledGraphButtons() {
         btn.checked = false
       }
     })}
+
+
+  updateGraphDisplay()
 }
 
 function updateGraphDisplay() {
-  var isX = $('input[name=x]:checked').length > 0
-  var isY = $('input[name=y]:checked').length > 0
-  var isZ = $('input[name=z]:checked').length > 0
+    var isX = $('input[name=x]:checked').length > 0
+    var isY = $('input[name=y]:checked').length > 0
+    var isZ = $('input[name=z]:checked').length > 0
+    console.log({isY: isY})
+    console.log({isX: isX})
 
-  if (isX) {
-    if (!isY) {
-      $('#pie-btn').show()
-      $('#line-btn').show()
-      $('#bar-btn').show()
-    }
+    if (isX) {
+        $('#line-btn').show()
+        $('#bar-btn').show()
+        if (!isY) {
+            $('#pie-btn').show()    
+        }
     else {
-      $('#pie-btn').hide()
-      $('#line-btn').show()
-      $('#bar-btn').show()
-    } 
-  }
+        console.log("what is going on")
+        $('#pie-btn').hide()
+        } 
+    }
 }

@@ -22,9 +22,9 @@ class PersonAdmin(admin.ModelAdmin):
         "bostedstype",
         "erhverv_original",
         "stilling_i_husstanden_standardiseret",
-        "fødested_original",
-        "fødesogn_by_standardiseret",
-        "migrant_type",
+        # "fødested_original",
+        # "fødesogn_by_standardiseret",
+        # "migrant_type",
     )
 
 
