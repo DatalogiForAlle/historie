@@ -38,19 +38,27 @@
 
       <!-- search fields  -->
       <div class="row mt-5">
+
+        <!-- first search field -->
         <div class="col-sm">
           <input class="form-control" name="q" id="id_q" required readonly>
         </div>
+
+        <!-- first drop down -->
         <div class="col-sm">
-          <select class="form-select" aria-label="Select first category">
+          <select class="form-select" name="search_category" aria-label="Select first category">
             <option id="nofilter" selected>Intet filter</option>
             <option value="age" id="age">Alder</option>
             <option value="city" id="city" >Sogn/By</option>
           </select>
         </div>
+
+        <!-- second search field -->
         <div class="col-sm">
           <input class="form-control" name="q2" id="id_q2" required readonly>
         </div>
+
+        <!-- second drop down -->
         <div class="col-sm">
           <select class="form-select" aria-label="Select second category">
             <option id="nofilter" selected>Intet filter</option>
@@ -61,6 +69,9 @@
         <div class="col-sm">
           <button type="submit" class="btn btn-primary btn-lg mb-2">Search</button>
         </div>
+
+      <!-- search fields end -->
+      </div>
         <!-- <div class="col-sm">
           <div class="form-check">
             <input class="form-check-input" type="radio" name="search_category" id="age" value="age">
@@ -80,8 +91,8 @@
               Intet filter
             </label>
           </div> -->
-        </div>
-      </div>
+        <!-- </div> -->
+      <!-- </div> -->
       <!-- search fields end -->
 
     </form>
@@ -337,8 +348,8 @@
             <div class="modal-body" id="chart-modal-body">
               <canvas id="chart-canvas" style="min-width:100%;min-height:100%;"></canvas>
               <a id="chart-download" style="visibility:hidden">
-              <button type="button" class="btn btn-primary float-end">Download</button>
-            </a>
+                <button type="button" class="btn btn-primary float-end">Download</button>
+              </a>
             </div>
 
           </div>
