@@ -3,6 +3,11 @@
 {% load crispy_forms_tags %}
 {% load data_tags %} 
 {% block title %}Search{% endblock title %} 
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock extra_css %}
+
 {% block content %}
 
 <script src="{% static 'js/search.js' %}"></script>
@@ -14,29 +19,46 @@
 <div class="row">
   <div class="col-9">
     <form method="get">
-      <div class="row">
-        <div class="col-sm">
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="year" id="1801" value="1801">
-            <label class="form-check-label" for="1801">
-              1801
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="year" id="1850" value="1850" required>
-            <label class="form-check-label" for="1850">
-              1850
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="year" id="1901" value="1901">
-            <label class="form-check-label" for="1901">
-              1901
-            </label>
-          </div>
+
+      <!-- year options -->
+      <div class="row justify-content-center">
+        <div class="col-4">
+          <label class="btn btn-secondary year-option">
+            <input type="radio" name="year" id="1801" value="1801"> 1801
+          </label>
+          <label class="btn btn-secondary year-option">
+            <input type="radio" name="year" id="1850" value="1850"> 1850
+          </label>
+          <label class="btn btn-secondary year-option">
+            <input type="radio" name="year" id="1901" value="1901"> 1901
+          </label>
         </div>
+      </div>
+      <!-- year options end -->
+
+      <!-- it is working -->
+
+      <!-- search fields  -->
+      <div class="row mt-5">
         <div class="col-sm">
           <input class="form-control" name="q" id="id_q" required readonly>
+        </div>
+        <div class="col-sm">
+          <select class="form-select" aria-label="Default select example">
+            <option id="nofilter" selected>Intet filter</option>
+            <option value="age" id="age">Alder</option>
+            <option value="city">Sogn/By</option>
+          </select>
+        </div>
+        <div class="col-sm">
+          <input class="form-control" name="q2" id="id_q2" required readonly>
+        </div>
+        <div class="col-sm">
+          <select class="form-select" aria-label="Default select example">
+            <option id="nofilter" selected>Intet filter</option>
+            <option value="age" id="age2">Alder</option>
+            <option value="city2">Sogn/By</option>
+          </select>
         </div>
         <div class="col-sm">
           <div class="form-check">
@@ -57,8 +79,11 @@
               Intet filter
             </label>
           </div>
+          <button type="submit" class="btn btn-primary btn-lg mb-2">Search</button>
         </div>
       </div>
+      <!-- search fields end -->
+
     </form>
 
     <div class="row">
