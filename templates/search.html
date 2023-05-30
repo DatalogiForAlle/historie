@@ -36,31 +36,32 @@
       </div>
       <!-- year options end -->
 
-      <!-- it is working -->
-
       <!-- search fields  -->
       <div class="row mt-5">
         <div class="col-sm">
           <input class="form-control" name="q" id="id_q" required readonly>
         </div>
         <div class="col-sm">
-          <select class="form-select" aria-label="Default select example">
+          <select class="form-select" aria-label="Select first category">
             <option id="nofilter" selected>Intet filter</option>
             <option value="age" id="age">Alder</option>
-            <option value="city">Sogn/By</option>
+            <option value="city" id="city" >Sogn/By</option>
           </select>
         </div>
         <div class="col-sm">
           <input class="form-control" name="q2" id="id_q2" required readonly>
         </div>
         <div class="col-sm">
-          <select class="form-select" aria-label="Default select example">
+          <select class="form-select" aria-label="Select second category">
             <option id="nofilter" selected>Intet filter</option>
             <option value="age" id="age2">Alder</option>
-            <option value="city2">Sogn/By</option>
+            <option value="city" id="city2">Sogn/By</option>
           </select>
         </div>
         <div class="col-sm">
+          <button type="submit" class="btn btn-primary btn-lg mb-2">Search</button>
+        </div>
+        <!-- <div class="col-sm">
           <div class="form-check">
             <input class="form-check-input" type="radio" name="search_category" id="age" value="age">
             <label class="form-check-label" for="age" data-bs-toggle="tooltip" data-bs-placement="right" title="Hvis du vil have dataen for en specifik alder">
@@ -78,8 +79,7 @@
             <label class="form-check-label" for="no-query" data-bs-toggle="tooltip" data-bs-placement="right" title="Hvis du vil have al data">
               Intet filter
             </label>
-          </div>
-          <button type="submit" class="btn btn-primary btn-lg mb-2">Search</button>
+          </div> -->
         </div>
       </div>
       <!-- search fields end -->
