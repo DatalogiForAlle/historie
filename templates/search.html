@@ -24,7 +24,7 @@
       <div class="row justify-content-center">
         <div class="col-4">
           <label class="btn btn-secondary year-option">
-            <input type="radio" name="year" id="1801" value="1801"> 1801
+            <input type="radio" name="year" id="1801" value="1801" required> 1801
           </label>
           <label class="btn btn-secondary year-option">
             <input type="radio" name="year" id="1850" value="1850"> 1850
@@ -46,32 +46,36 @@
 
         <!-- first drop down -->
         <div class="col-sm">
-          <select class="form-select" name="search_category" aria-label="Select first category">
-            <option id="nofilter" selected>Intet filter</option>
+          <select class="form-select" name="search_category" id = "select1" aria-label="Select first category">
+            <option  id="no-query" value="no-query" selected>Intet filter</option>
             <option value="age" id="age">Alder</option>
             <option value="city" id="city" >Sogn/By</option>
           </select>
         </div>
 
         <!-- second search field -->
-        <div class="col-sm">
+        <!-- <div class="col-sm">
           <input class="form-control" name="q2" id="id_q2" required readonly>
-        </div>
+        </div> -->
 
         <!-- second drop down -->
-        <div class="col-sm">
+        <!-- <div class="col-sm">
           <select class="form-select" aria-label="Select second category">
             <option id="nofilter" selected>Intet filter</option>
             <option value="age" id="age2">Alder</option>
             <option value="city" id="city2">Sogn/By</option>
           </select>
-        </div>
+        </div> -->
+
+        <!-- search button -->
         <div class="col-sm">
           <button type="submit" class="btn btn-primary btn-lg mb-2">Search</button>
         </div>
 
-      <!-- search fields end -->
+      <!-- search fields row end -->
       </div>
+
+
         <!-- <div class="col-sm">
           <div class="form-check">
             <input class="form-check-input" type="radio" name="search_category" id="age" value="age">

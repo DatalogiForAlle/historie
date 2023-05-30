@@ -37,26 +37,28 @@ function keepUserInput(query, year, search_category) {
     document.getElementById("1901").checked = true;
   }
   
+  console.log({search_category: search_category})
 
   if (search_category == 'age') {
-    document.getElementById("age").checked = true;
-    // console.log("input field should now be set to readonly")
+    document.getElementById("age").selected = true;
+    console.log("age selected, input field should no longer be readonly")
     document.getElementById("id_q").removeAttribute('readonly')
   }
   else if (search_category == 'city') {
-    document.getElementById("city").checked = true;
-    document.getElementById("id_q").removeAttribute('readonly')
+    document.getElementById("city").selected = true;
+    console.log("city selected, input field should no longer be readonly")
     document.getElementById("id_q").removeAttribute('readonly')
   }
   else if (search_category == 'no-query') {
-    document.getElementById("no-query").checked = true;
+    document.getElementById("no-query").selected = true;
     document.getElementById("id_q").setAttribute('readonly', true)
   }
 
-  $('input:radio[name=search_category]').click(function() {
-    var value = $('input:radio[name=search_category]:checked').map(function() {
-      return this.value
-    }).get();
+  const select1 = document.getElementById("select1")
+
+  select1.addEventListener("change", (function() {
+    var value = this.value
+    console.log({select_val: value})
     q = document.getElementById("id_q")
     if (value=='age'){
       q.type = "number";
@@ -79,14 +81,11 @@ function keepUserInput(query, year, search_category) {
         q.type = "text";
         q.value = null
         q.placeholder = ""
-        q.setAttribute('readonly', true)
-        
+        q.setAttribute('readonly', true)  
     }
-    
+  }))
 
-    // do something with values array
 
-  })
 
   // ensuring which fields to display is saved across page change
   var genderChecked = JSON.parse(sessionStorage.getItem("genderChecked"));
