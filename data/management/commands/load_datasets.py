@@ -4,6 +4,7 @@ from django.core.management import BaseCommand
 # from data.models import Person
 from data.models import Person1801, Person1850, Person1901
 from tqdm import tqdm
+from data.utils import get_person_model
 
 # ALREADY_LOADED_ERROR_MESSAGE = """
 # If you need to reload the child data from the csv file, then ADD EXPLANATION"""
@@ -86,16 +87,6 @@ def validate_columns(required_columns, dict_reader):
             raise Exception(
                 f"A required column is missing from the uploaded CSV: '{req_col}'"
             )
-
-
-def get_person_model(year):
-    match year:
-        case 1801:
-            return Person1801
-        case 1850:
-            return Person1850
-        case 1901:
-            return Person1901
 
 
 def upload_dataset(file_name):

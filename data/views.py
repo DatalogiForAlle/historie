@@ -8,7 +8,8 @@ from django.http import JsonResponse
 from django.core import serializers
 
 from .models import Person
-from .utils import translate_field
+from .models import Person1801, Person1850, Person1901
+from .utils import translate_field, get_person_model, get_q_filter, get_filter_result
 from .forms import SqlForm, SearchForm
 from django.core.paginator import (
     Paginator,
@@ -259,24 +260,14 @@ def search(request):
         query = request.GET.get("q").lower()
         year = request.GET.get("year")
         search_category = request.GET.get("search_category")
-        print("year request is: ", year)
-        print("year type is: ", type(year))
 
         context["query"] = str(query)
         context["year"] = str(year)
         context["search_category"] = str(search_category)
 
-        q_filter = Q(år=year)
-
-        print("query is: ", query)
-        print("query type is: ", type(query))
-        if search_category == "city":
-            q_filter.add(Q(sogn_by=query), Q.AND)
-        elif search_category == "age":
-            q_filter.add(Q(alder=query), Q.AND)
-
-        page_obj = Person.objects.filter(q_filter)
-        print("pageobj count: ", page_obj.count())
+        person = get_person_model(int(year))
+        q_filter = get_q_filter(search_category, query)
+        page_obj = get_filter_result(q_filter, person)
 
         get_copy = request.GET.copy()
         parameters = get_copy.pop("page", True) and get_copy.urlencode()
@@ -307,19 +298,23 @@ def one_input_chart(request):
             search_category = request.GET.get("search_category")
             query = request.GET.get("query")
 
-            q_filter = Q(år=year)
+            # q_filter = Q(år=year)
 
-            print("query is: ", query)
-            print("query type is: ", type(query))
-            if search_category == "city":
-                q_filter.add(Q(sogn_by=query), Q.AND)
-            elif search_category == "age":
-                q_filter.add(Q(alder=query), Q.AND)
+            # print("query is: ", query)
+            # print("query type is: ", type(query))
+            # if search_category == "city":
+            #     q_filter.add(Q(sogn_by=query), Q.AND)
+            # elif search_category == "age":
+            #     q_filter.add(Q(alder=query), Q.AND)
+            person = get_person_model(int(year))
+            q_filter = get_q_filter(search_category, query)
+            filter_result = get_filter_result(q_filter, person)
 
             # querying the database, returns a list of dicts
+
             query_res = list(
-                Person.objects.filter(q_filter)
-                .values(x_val)
+                # person.objects.filter(q_filter)
+                filter_result.values(x_val)
                 .annotate(total=Count("id"))
                 .order_by()
             )
@@ -373,19 +368,22 @@ def two_input_chart(request):
             search_category = request.GET.get("search_category")
             query = request.GET.get("query")
 
-            q_filter = Q(år=year)
+            # q_filter = Q(år=year)
 
-            print("query is: ", query)
-            print("query type is: ", type(query))
-            if search_category == "city":
-                q_filter.add(Q(sogn_by=query), Q.AND)
-            elif search_category == "age":
-                q_filter.add(Q(alder=query), Q.AND)
+            # print("query is: ", query)
+            # print("query type is: ", type(query))
+            # if search_category == "city":
+            #     q_filter.add(Q(sogn_by=query), Q.AND)
+            # elif search_category == "age":
+            #     q_filter.add(Q(alder=query), Q.AND)
 
+            person = get_person_model(int(year))
+            q_filter = get_q_filter(search_category, query)
+            filter_result = get_filter_result(q_filter, person)
             # querying the database, returns a list of dicts
             query_res = list(
-                Person.objects.filter(q_filter)
-                .values(x_val, y_val)
+                # person.objects.filter(q_filter)
+                filter_result.values(x_val, y_val)
                 .annotate(total=Count("id"))
                 .order_by()
             )
