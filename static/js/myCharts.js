@@ -26,7 +26,7 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
               bottom: 10
             }
           },
-          responsive: false,
+          responsive: true,
           scales: {
           },
           plugins: {
@@ -83,7 +83,7 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
               bottom: 10
             }
           },
-          responsive: false,
+          responsive: true,
           scales: {
           },
           plugins: {

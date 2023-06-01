@@ -117,8 +117,8 @@ def upload_dataset(file_name):
             data = []
 
         # for testing purposes don't use all data
-        if i > 10000:
-            break
+        # if i > 10000:
+        #     break
 
     if data:
         person.objects.bulk_create(data)
