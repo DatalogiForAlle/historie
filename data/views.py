@@ -285,7 +285,7 @@ def search(request):
 
         context["page_obj"] = page_obj
 
-    return render(request, "search.html", context)
+    return render(request, "search/search.html", context)
 
 
 def one_input_chart(request):

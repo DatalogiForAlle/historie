@@ -1,4 +1,4 @@
-{% extends "base.html" %} 
+{% extends "base/base.html" %} 
 {% load static %} 
 {% load crispy_forms_tags %}
 {% load data_tags %} 
@@ -24,7 +24,7 @@
       <div class="row justify-content-center">
         <div class="col-4">
           <label class="btn btn-secondary year-option">
-            <input type="radio" name="year" id="1801" value="1801" required> 1801
+            <input type="radio" name="year" id="1801" value="1801" required checked> 1801
           </label>
           <label class="btn btn-secondary year-option">
             <input type="radio" name="year" id="1850" value="1850"> 1850

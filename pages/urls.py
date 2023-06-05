@@ -4,5 +4,5 @@ from .views import HomePageView, ChartView
 
 urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
-    path("chart/", ChartView.as_view(), name="chart"),
+    # path("chart/", ChartView.as_view(), name="chart"),
 ]
