@@ -20,60 +20,11 @@
   <div class="col-9">
     <form method="get">
 
-      <!-- year options -->
-      <div class="row justify-content-center">
-        <div class="col-4">
-          <label class="btn btn-secondary year-option">
-            <input type="radio" name="year" id="1801" value="1801" required checked> 1801
-          </label>
-          <label class="btn btn-secondary year-option">
-            <input type="radio" name="year" id="1850" value="1850"> 1850
-          </label>
-          <label class="btn btn-secondary year-option">
-            <input type="radio" name="year" id="1901" value="1901"> 1901
-          </label>
-        </div>
-      </div>
-      <!-- year options end -->
+      <!-- buttons for choosing year -->
+      {% include "search/year_choice.html" %}
 
       <!-- search fields  -->
-      <div class="row mt-5">
-
-        <!-- first search field -->
-        <div class="col-sm">
-          <input class="form-control" name="q" id="id_q" required readonly>
-        </div>
-
-        <!-- first drop down -->
-        <div class="col-sm">
-          <select class="form-select" name="search_category" id = "select1" aria-label="Select first category">
-            <option  id="no-query" value="no-query" selected>Intet filter</option>
-            <option value="age" id="age">Alder</option>
-            <option value="city" id="city" >Sogn/By</option>
-          </select>
-        </div>
-
-        <!-- second search field -->
-        <!-- <div class="col-sm">
-          <input class="form-control" name="q2" id="id_q2" required readonly>
-        </div> -->
-
-        <!-- second drop down -->
-        <!-- <div class="col-sm">
-          <select class="form-select" aria-label="Select second category">
-            <option id="nofilter" selected>Intet filter</option>
-            <option value="age" id="age2">Alder</option>
-            <option value="city" id="city2">Sogn/By</option>
-          </select>
-        </div> -->
-
-        <!-- search button -->
-        <div class="col-sm">
-          <button type="submit" class="btn btn-primary btn-lg mb-2">Search</button>
-        </div>
-
-      <!-- search fields row end -->
-      </div>
+      {% include "search/search_fields.html" %}
 
 
         <!-- <div class="col-sm">
