@@ -20,92 +20,137 @@ function displayFieldCheckboxes(elmID) {
 }
 
 
-function keepUserInput(query, year, search_category) {
-  //keeping the input values in the form throughout pagination/submitting
-  sessionStorage.setItem("year", year)
-  sessionStorage.setItem("searchCategory", search_category)
-  sessionStorage.setItem("query", query)
-  document.getElementById("id_q").value = query
-//   document.getElementById("modal-size").classList.add('modal-xl');
-  if (year == '1801') {
-    document.getElementById("1801").checked = true;
-  }
-  else if (year == '1850') {
-    document.getElementById("1850").checked = true;
-  }
-  else if (year == '1901') {
-    document.getElementById("1901").checked = true;
-  }
-  
-  console.log({search_category: search_category})
 
-  if (search_category == 'age') {
-    document.getElementById("age").selected = true;
-    console.log("age selected, input field should no longer be readonly")
-    document.getElementById("id_q").removeAttribute('readonly')
-  }
-  else if (search_category == 'city') {
-    document.getElementById("city").selected = true;
-    console.log("city selected, input field should no longer be readonly")
-    document.getElementById("id_q").removeAttribute('readonly')
-  }
-  else if (search_category == 'no-query') {
-    document.getElementById("no-query").selected = true;
-    document.getElementById("id_q").setAttribute('readonly', true)
-  }
+function recallSelectedOption(search_category) {
+    document.getElementById(`${search_category}`).selected = true
+}
 
-  const select1 = document.getElementById("select1")
+function recallYear(year) {
+    document.getElementById(`${year}`).checked = true
+}
 
-  select1.addEventListener("change", (function() {
-    var value = this.value
-    console.log({select_val: value})
+function createSelect(optionList, q_select) {
+    optionList.forEach(option => {
+        let opt = document.createElement('option');
+        console.log({opt: option})
+        opt.value = option
+        opt.innerHTML = option
+        q_select.appendChild(opt)
+    })
+}
+
+function resetToDefaultAttributes(q) {
+    attributesToRemove = ["readonly", "min", "max", "pattern", "placeholder", "title"]
+    attributesToRemove.forEach(attr => q.removeAttribute(attr))
+    q.setAttribute("class", "form-control")
+    // q.style.removeProperty("display")
+    // q_select.style.display = "none"
+    // q_select.value = null
+}
+
+function recallQueryInputAttributes(search_category, onChange=false) {
+    console.log({search_category})
     q = document.getElementById("id_q")
-    if (value=='age'){
-      q.type = "number";
-      q.placeholder = "0";
-      q.min = "0";
-      q.max = "100";
-      q.removeAttribute('readonly')
-    }
-    else if (value=='city'){
-      // console.log("inside byer")
-      q.type = "text";
-      //setting value to empty string to let the placeholder take over. In the opposite case (value=='age'), since a number field does not accept text, the value is removed automatically, I suppose
-      q.value = ""
-      q.placeholder = "Indtast en by"
-      q.removeAttribute('readonly')
-      q.removeAttribute('min')
-      q.removeAttribute('max')
-    }
-    else if (value=='no-query') {
-        q.type = "text";
+    // q_select = document.getElementById("q_select")
+    // console.log({q_select: q_select})
+    
+    resetToDefaultAttributes(q)
+
+    if (onChange) {
         q.value = null
-        q.placeholder = ""
-        q.setAttribute('readonly', true)  
     }
-  }))
 
+    switch (search_category) {
+        case "age" :
+            console.log("inside age onSelectChange")
+            q.type = "number";
+            q.placeholder = "0";
+            q.min = "0";
+            q.max = "100";
+            break
+        case "parish" :
+            console.log("inside parish onSelectChange")
+            console.log({qVaL:q.value})
+            q.type = "text"
+            // q.value = null
+            q.placeholder = "Indtast en by"
+            break
+        case "no-query" :
+            console.log("inside no-query onSelectChange")
+            q.type = "text";
+            q.value = null
+            q.placeholder = ""
+            q.setAttribute('readonly', true) 
+            break
+        case "age-interval" :
+            console.log("inside age-interval onSelectChange")
+            q.type = "text"
+            q.title="Example of acceptable input: 10-20"
+            q.placeholder = "Ex: 20-35"
+            q.pattern="^[0-9]{1,3}-[0-9]{1,3}$"
+            console.log({age_q: q})
+            break
+        // case "gender" :
+        //     const optionList = ["m", "f"]
+        //     createSelect(optionList, q_select)
+        //     q.style.display = "none"
+        //     q.value = null
+        //     q_select.style.removeProperty("display")
+        //     break
+        // case "gender" :
+        //     q.type = "text"
+        //     q.title= "Acceptabelt input: m eller f"
+        //     q.placeholder= "Ex: f"
+        //     q.pattern= "[m,f]"
+        //     break
+    }
+}
 
+function keepUserInput(query, year, search_category) {
+    //keeping the input values in the form throughout pagination/submitting
+    sessionStorage.setItem("year", year)
+    sessionStorage.setItem("searchCategory", search_category)
+    sessionStorage.setItem("query", query)
+    document.getElementById("id_q").value = query
+    console.log({search_category: search_category})
+    //   document.getElementById("modal-size").classList.add('modal-xl');
 
-  // ensuring which fields to display is saved across page change
-  var genderChecked = JSON.parse(sessionStorage.getItem("genderChecked"));
-  var statusChecked = JSON.parse(sessionStorage.getItem("statusChecked"));
-  var locationChecked = JSON.parse(sessionStorage.getItem("locationChecked"));
-  
-  if (genderChecked != null) {
-    // console.log("check was set")
-    document.getElementById("gender").checked = genderChecked;
-  } 
+    if (year) {
+        recallYear(year)
+    } else {
+        console.log("no year")
+    }
+    
+    if (search_category) {
+        recallSelectedOption(search_category)
+        recallQueryInputAttributes(search_category)
+    }
+    
+    const select1 = document.getElementById("select1")
 
-  if (statusChecked != null) {
-    // console.log("check was set")
-    document.getElementById("status").checked = statusChecked;
-  } 
+    select1.addEventListener("change", function() {
+        recallQueryInputAttributes(this.value, true)
+    })
+        
+    // ensuring which fields to display is saved across page change
+    var genderChecked = JSON.parse(sessionStorage.getItem("genderChecked"));
+    var statusChecked = JSON.parse(sessionStorage.getItem("statusChecked"));
+    var locationChecked = JSON.parse(sessionStorage.getItem("locationChecked"));
+    
+    if (genderChecked != null) {
+        // console.log("check was set")
+        document.getElementById("gender").checked = genderChecked;
+    } 
 
-  if (locationChecked != null) {
-    // console.log("check was set")
-    document.getElementById("location").checked = locationChecked;
-  } 
+    if (statusChecked != null) {
+        // console.log("check was set")
+        document.getElementById("status").checked = statusChecked;
+    } 
+
+    if (locationChecked != null) {
+        // console.log("check was set")
+        document.getElementById("location").checked = locationChecked;
+    } 
   
   
 }

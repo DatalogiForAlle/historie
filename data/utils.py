@@ -38,10 +38,18 @@ def get_person_model(year):
 
 
 def get_q_filter(search_category, query):
-    if search_category == "city":
-        return Q(sogn_by=query)
-    elif search_category == "age":
-        return Q(alder=query)
+    match search_category:
+        case "parish":
+            print("we are inside case parish")
+            return Q(sogn_by=query)
+        case "age":
+            return Q(alder=query)
+        case "age-interval":
+            ages = query.split("-")
+            return Q(alder__gte=ages[0]) & Q(alder__lte=ages[1])
+        case "gender":
+            return Q(køn=query)
+
     # if search_category == "city":
     #     q_filter.add(Q(sogn_by=query), Q.AND)
     # elif search_category == "age":

@@ -3,14 +3,45 @@
     <!-- first search field -->
     <div class="col-sm">
         <input class="form-control" name="q" id="id_q" required readonly>
+
+        <!-- <select class="form-select" name="q_select" id="q_select" style="display:none"></select> -->
+
     </div>
 
     <!-- first drop down -->
     <div class="col-sm">
         <select class="form-select" name="search_category" id = "select1" aria-label="Select first category">
-            <option  id="no-query" value="no-query" selected>Intet filter</option>
-            <option value="age" id="age">Alder</option>
-            <option value="city" id="city" >Sogn/By</option>
+            <option 
+                id="no-query" 
+                value="no-query" 
+                selected>
+                Intet filter
+            </option>
+            <option 
+                id="age"
+                value="age">
+                Alder
+            </option>
+            <option 
+                id="parish"
+                value="parish">
+                Sogn/By
+            </option>
+            <option 
+                id="age-interval" 
+                value="age-interval">
+                Aldersinterval
+            </option>
+            <!-- <option 
+                id="gender"
+                value="gender">
+                Køn
+            </option> -->
+            <!-- <option
+                id="household_function_std"
+                value="household_function_std">
+                Stilling i husstanden
+            </option> -->
         </select>
     </div>
 
