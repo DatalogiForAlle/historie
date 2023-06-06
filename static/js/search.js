@@ -37,28 +37,105 @@ function createSelect(optionList, q_select) {
         opt.innerHTML = option
         q_select.appendChild(opt)
     })
+    // q_select.selectedIndex = 0
 }
 
-function resetToDefaultAttributes(q) {
+function resetToDefaultAttributes(q, q_select) {
     attributesToRemove = ["readonly", "min", "max", "pattern", "placeholder", "title"]
     attributesToRemove.forEach(attr => q.removeAttribute(attr))
     q.setAttribute("class", "form-control")
-    // q.style.removeProperty("display")
-    // q_select.style.display = "none"
-    // q_select.value = null
+    q.style.removeProperty("display")
+    q_select.style.display = "none"
+    q_select.value = null
 }
 
-function recallQueryInputAttributes(search_category, onChange=false) {
-    console.log({search_category})
-    q = document.getElementById("id_q")
-    // q_select = document.getElementById("q_select")
-    // console.log({q_select: q_select})
-    
-    resetToDefaultAttributes(q)
 
-    if (onChange) {
-        q.value = null
-    }
+function createFormElm(elmType) {
+    formElm = document.createElement(elmType)
+    formElm.name = "q"
+    formElm.id = "id_q"
+    return formElm
+}
+
+function creatInputElm() {
+    formElm = createFormElm("input")
+    formElm.required = true
+    formElm.setAttribute("class", "form-control")
+    return formElm
+}
+
+function createSelectElm(optionList) {
+    formElm = createFormElm("select")
+    formElm.setAttribute("class", "form-select")
+    optionList.forEach(option => {
+        let opt = document.createElement('option');
+        opt.value = option
+        opt.innerHTML = option
+        formElm.appendChild(opt)
+    })
+    return formElm
+}
+
+function insertFormElm(elm) {
+    const q1_form = document.getElementById("q1-form")
+    q1_form.replaceChildren(elm)
+}
+
+
+// function onChangeHandler(search_category) {
+//     insertFormElm(creatInputElm())
+//     q = document.getElementById("id_q")
+
+//     switch (search_category) {
+//         case "age" :
+//             console.log("inside age onSelectChange")
+//             q.type = "number";
+//             q.placeholder = "0";
+//             q.min = "0";
+//             q.max = "100";
+//             break
+//         case "parish" :
+//             console.log("inside parish onSelectChange")
+//             q.type = "text"
+//             q.placeholder = "Indtast en by"
+//             break
+//         case "no-query" :
+//             console.log("inside no-query onSelectChange")
+//             q.type = "text";
+//             q.value = null
+//             q.placeholder = ""
+//             q.setAttribute('readonly', true) 
+//             console.log({noquery_qval: q.value})
+//             break
+//         case "age-interval" :
+//             console.log("inside age-interval onSelectChange")
+//             q.type = "text"
+//             q.title="Example of acceptable input: 10-20"
+//             q.placeholder = "Ex: 20-35"
+//             q.pattern="^[0-9]{1,3}-[0-9]{1,3}$"
+//             console.log({age_q: q})
+//             break
+//         case "gender" :
+//             const genderOptions = ["m", "f"]
+//             insertFormElm(createSelectElm(genderOptions))
+//             // q = document.getElementById("id_q")
+//             break
+//         case "household_function_std" :
+//             const householdOptions = ['hendes barn', 'ukendt', 'barn', 'tjeneste', 'husfader', 'kone', 'husmoder', 'hans barn', 'andet']
+//             insertFormElm(createSelectElm(householdOptions))
+//             break
+//     }
+// }
+
+
+function recallQueryInputAttributes(search_category, query, onChange=false) {
+    console.log({search_category})
+    insertFormElm(creatInputElm())
+    q = document.getElementById("id_q")
+    if (!onChange) {
+        q.value = query
+    }   
+    console.log({q: q})
 
     switch (search_category) {
         case "age" :
@@ -70,9 +147,7 @@ function recallQueryInputAttributes(search_category, onChange=false) {
             break
         case "parish" :
             console.log("inside parish onSelectChange")
-            console.log({qVaL:q.value})
             q.type = "text"
-            // q.value = null
             q.placeholder = "Indtast en by"
             break
         case "no-query" :
@@ -81,6 +156,7 @@ function recallQueryInputAttributes(search_category, onChange=false) {
             q.value = null
             q.placeholder = ""
             q.setAttribute('readonly', true) 
+            console.log({noquery_qval: q.value})
             break
         case "age-interval" :
             console.log("inside age-interval onSelectChange")
@@ -90,19 +166,22 @@ function recallQueryInputAttributes(search_category, onChange=false) {
             q.pattern="^[0-9]{1,3}-[0-9]{1,3}$"
             console.log({age_q: q})
             break
-        // case "gender" :
-        //     const optionList = ["m", "f"]
-        //     createSelect(optionList, q_select)
-        //     q.style.display = "none"
-        //     q.value = null
-        //     q_select.style.removeProperty("display")
-        //     break
-        // case "gender" :
-        //     q.type = "text"
-        //     q.title= "Acceptabelt input: m eller f"
-        //     q.placeholder= "Ex: f"
-        //     q.pattern= "[m,f]"
-        //     break
+        case "gender" :
+            const genderOptions = ["m", "f"]
+            insertFormElm(createSelectElm(genderOptions))
+            q = document.getElementById("id_q")
+            if (!onChange) {
+                q.value = query
+            }
+            break
+        case "household_function_std" :
+            const householdOptions = ['hendes barn', 'ukendt', 'barn', 'tjeneste', 'husfader', 'kone', 'husmoder', 'hans barn', 'andet']
+            insertFormElm(createSelectElm(householdOptions))
+            q = document.getElementById("id_q")
+            if (!onChange) {
+                q.value = query
+            }
+            break
     }
 }
 
@@ -111,7 +190,6 @@ function keepUserInput(query, year, search_category) {
     sessionStorage.setItem("year", year)
     sessionStorage.setItem("searchCategory", search_category)
     sessionStorage.setItem("query", query)
-    document.getElementById("id_q").value = query
     console.log({search_category: search_category})
     //   document.getElementById("modal-size").classList.add('modal-xl');
 
@@ -123,13 +201,13 @@ function keepUserInput(query, year, search_category) {
     
     if (search_category) {
         recallSelectedOption(search_category)
-        recallQueryInputAttributes(search_category)
+        recallQueryInputAttributes(search_category, query, onChange=false)
     }
     
     const select1 = document.getElementById("select1")
 
     select1.addEventListener("change", function() {
-        recallQueryInputAttributes(this.value, true)
+        recallQueryInputAttributes(this.value, query, onChange=true)
     })
         
     // ensuring which fields to display is saved across page change

@@ -49,11 +49,8 @@ def get_q_filter(search_category, query):
             return Q(alder__gte=ages[0]) & Q(alder__lte=ages[1])
         case "gender":
             return Q(køn=query)
-
-    # if search_category == "city":
-    #     q_filter.add(Q(sogn_by=query), Q.AND)
-    # elif search_category == "age":
-    #     q_filter.add(Q(alder=query), Q.AND)
+        case "household_function_std":
+            return Q(stilling_i_husstanden_standardiseret=query)
 
 
 def get_filter_result(q_filter, person):

@@ -258,11 +258,6 @@ def search(request):
     # query = ""
     if request.GET:
         query = request.GET.get("q").lower()
-        # query_select = request.GET.get("q_select")
-
-        # # if
-        # if query_select:
-        #     query = query_select.lower()
 
         year = request.GET.get("year")
         search_category = request.GET.get("search_category")
