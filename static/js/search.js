@@ -20,124 +20,64 @@ function displayFieldCheckboxes(elmID) {
 }
 
 
+const queryOneIdentifiers = {formId: "q1-form", queryId: "id_q1", queryName: "q1", selectName: "search-category-1", selectId: "select1", storageCategoryKey: "searchCategory1", storageQueryKey: "query1", optionIdSuffix: "-1"}
 
-function recallSelectedOption(search_category) {
-    document.getElementById(`${search_category}`).selected = true
+const queryTwoIdentifiers = {formId: "q2-form", queryId: "id_q2", queryName: "q2", selectName: "search-category-2", selectId: "select2", storageCategoryKey: "searchCategory2", storageQueryKey: "query2", optionIdSuffix: "-2"}
+
+
+// helper function for updating the query fields to be either input or select elements
+function createInputElm(name, id) {
+    inputElm = document.createElement("input")
+    inputElm.name = name
+    inputElm.id = id
+    inputElm.required = true
+    inputElm.setAttribute("class", "form-control")
+    return inputElm
 }
 
+function createSelectElm(optionList, name, id) {
+    selectElm = document.createElement('select')
+    selectElm.name = name
+    selectElm.id = id
+    selectElm.setAttribute("class", "form-select")
+    optionList.forEach(option => {
+        let opt = document.createElement('option');
+        opt.value = option
+        opt.innerHTML = option
+        selectElm.appendChild(opt)
+    })
+    return selectElm
+}
+
+function insertFormElm(formElm, formId) {
+    const q_form = document.getElementById(formId)
+    q_form.replaceChildren(formElm)
+}
+
+
+// helper functions for recalling user input on reload/pagination use
 function recallYear(year) {
     document.getElementById(`${year}`).checked = true
 }
 
-function createSelect(optionList, q_select) {
-    optionList.forEach(option => {
-        let opt = document.createElement('option');
-        console.log({opt: option})
-        opt.value = option
-        opt.innerHTML = option
-        q_select.appendChild(opt)
-    })
-    // q_select.selectedIndex = 0
+function recallSelectedOption(searchCategory, optionIdSuffix) {
+    selectId = `${searchCategory}${optionIdSuffix}`
+    document.getElementById(`${selectId}`).selected = true
 }
 
-function resetToDefaultAttributes(q, q_select) {
-    attributesToRemove = ["readonly", "min", "max", "pattern", "placeholder", "title"]
-    attributesToRemove.forEach(attr => q.removeAttribute(attr))
-    q.setAttribute("class", "form-control")
-    q.style.removeProperty("display")
-    q_select.style.display = "none"
-    q_select.value = null
+function recallQueryValue(queryId, query) {
+    q = document.getElementById(queryId)
+    q.value = query
 }
 
+function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
+    const queryName = queryIdentifiers.queryName
+    const queryId = queryIdentifiers.queryId
+    const formId = queryIdentifiers.formId
+    insertFormElm(createInputElm(queryName, queryId), formId)
+    q = document.getElementById(queryId)
 
-function createFormElm(elmType) {
-    formElm = document.createElement(elmType)
-    formElm.name = "q"
-    formElm.id = "id_q"
-    return formElm
-}
-
-function creatInputElm() {
-    formElm = createFormElm("input")
-    formElm.required = true
-    formElm.setAttribute("class", "form-control")
-    return formElm
-}
-
-function createSelectElm(optionList) {
-    formElm = createFormElm("select")
-    formElm.setAttribute("class", "form-select")
-    optionList.forEach(option => {
-        let opt = document.createElement('option');
-        opt.value = option
-        opt.innerHTML = option
-        formElm.appendChild(opt)
-    })
-    return formElm
-}
-
-function insertFormElm(elm) {
-    const q1_form = document.getElementById("q1-form")
-    q1_form.replaceChildren(elm)
-}
-
-
-// function onChangeHandler(search_category) {
-//     insertFormElm(creatInputElm())
-//     q = document.getElementById("id_q")
-
-//     switch (search_category) {
-//         case "age" :
-//             console.log("inside age onSelectChange")
-//             q.type = "number";
-//             q.placeholder = "0";
-//             q.min = "0";
-//             q.max = "100";
-//             break
-//         case "parish" :
-//             console.log("inside parish onSelectChange")
-//             q.type = "text"
-//             q.placeholder = "Indtast en by"
-//             break
-//         case "no-query" :
-//             console.log("inside no-query onSelectChange")
-//             q.type = "text";
-//             q.value = null
-//             q.placeholder = ""
-//             q.setAttribute('readonly', true) 
-//             console.log({noquery_qval: q.value})
-//             break
-//         case "age-interval" :
-//             console.log("inside age-interval onSelectChange")
-//             q.type = "text"
-//             q.title="Example of acceptable input: 10-20"
-//             q.placeholder = "Ex: 20-35"
-//             q.pattern="^[0-9]{1,3}-[0-9]{1,3}$"
-//             console.log({age_q: q})
-//             break
-//         case "gender" :
-//             const genderOptions = ["m", "f"]
-//             insertFormElm(createSelectElm(genderOptions))
-//             // q = document.getElementById("id_q")
-//             break
-//         case "household_function_std" :
-//             const householdOptions = ['hendes barn', 'ukendt', 'barn', 'tjeneste', 'husfader', 'kone', 'husmoder', 'hans barn', 'andet']
-//             insertFormElm(createSelectElm(householdOptions))
-//             break
-//     }
-// }
-
-
-function recallQueryInputAttributes(search_category, query, onChange=false) {
-    console.log({search_category})
-    insertFormElm(creatInputElm())
-    q = document.getElementById("id_q")
-    if (!onChange) {
-        q.value = query
-    }   
-    console.log({q: q})
-
-    switch (search_category) {
+    switch (searchCategory) {
         case "age" :
             console.log("inside age onSelectChange")
             q.type = "number";
@@ -168,48 +108,52 @@ function recallQueryInputAttributes(search_category, query, onChange=false) {
             break
         case "gender" :
             const genderOptions = ["m", "f"]
-            insertFormElm(createSelectElm(genderOptions))
-            q = document.getElementById("id_q")
-            if (!onChange) {
-                q.value = query
-            }
+            insertFormElm(createSelectElm(genderOptions, queryName, queryId), formId)
+            console.log({q: q})
             break
         case "household_function_std" :
             const householdOptions = ['hendes barn', 'ukendt', 'barn', 'tjeneste', 'husfader', 'kone', 'husmoder', 'hans barn', 'andet']
-            insertFormElm(createSelectElm(householdOptions))
-            q = document.getElementById("id_q")
-            if (!onChange) {
-                q.value = query
-            }
+            insertFormElm(createSelectElm(householdOptions, queryName, queryId), formId)
             break
     }
 }
 
-function keepUserInput(query, year, search_category) {
-    //keeping the input values in the form throughout pagination/submitting
+function keepYearInput(year) {
     sessionStorage.setItem("year", year)
-    sessionStorage.setItem("searchCategory", search_category)
-    sessionStorage.setItem("query", query)
-    console.log({search_category: search_category})
-    //   document.getElementById("modal-size").classList.add('modal-xl');
-
     if (year) {
         recallYear(year)
-    } else {
+    } else { 
         console.log("no year")
     }
-    
-    if (search_category) {
-        recallSelectedOption(search_category)
-        recallQueryInputAttributes(search_category, query, onChange=false)
-    }
-    
-    const select1 = document.getElementById("select1")
+}
 
-    select1.addEventListener("change", function() {
-        recallQueryInputAttributes(this.value, query, onChange=true)
+function keepQueryInput(queryIdentifiers, searchCategory, query) {
+    sessionStorage.setItem(queryIdentifiers.storageCategoryKey, searchCategory)
+    sessionStorage.setItem(queryIdentifiers.storageQueryKey, query)
+    if (searchCategory) {
+        recallSelectedOption(searchCategory, queryIdentifiers.optionIdSuffix)
+        recallQueryInputAttributes(searchCategory, queryIdentifiers)
+        recallQueryValue(queryIdentifiers.queryId, query)
+    }
+}
+
+function setSelectChangeFunction(queryIdentifiers) {
+    selectElm = document.getElementById(queryIdentifiers.selectId)
+    selectElm.addEventListener("change", function() {
+        recallQueryInputAttributes(this.value, queryIdentifiers)
     })
-        
+}
+
+
+function keepUserInput(year, searchCategory1, query1, searchCategory2, query2) {
+
+    keepYearInput(year)
+    keepQueryInput(queryOneIdentifiers, searchCategory1, query1)
+    keepQueryInput(queryTwoIdentifiers, searchCategory2, query2)
+    
+    setSelectChangeFunction(queryOneIdentifiers)
+    setSelectChangeFunction(queryTwoIdentifiers)
+
     // ensuring which fields to display is saved across page change
     var genderChecked = JSON.parse(sessionStorage.getItem("genderChecked"));
     var statusChecked = JSON.parse(sessionStorage.getItem("statusChecked"));

@@ -2,7 +2,7 @@
 
     <!-- first search field -->
     <div class="col-sm" id="q1-form">
-        <input class="form-control" name="q" id="id_q" required readonly>
+        <input class="form-control" name="q1" id="id-q1" required readonly>
 
         <!-- <select class="form-select" name="q_select" id="q_select" style="display:none"></select> -->
 
@@ -10,35 +10,81 @@
 
     <!-- first drop down -->
     <div class="col-sm">
-        <select class="form-select" name="search_category" id = "select1" aria-label="Select first category">
+        <select class="form-select" name="search-category-1" id = "select1" aria-label="Select first category">
             <option 
-                id="no-query" 
+                id="no-query-1" 
                 value="no-query" 
                 selected>
                 Intet filter
             </option>
             <option 
-                id="age"
+                id="age-1"
                 value="age">
                 Alder
             </option>
             <option 
-                id="parish"
+                id="parish-1"
                 value="parish">
                 Sogn/By
             </option>
             <option 
-                id="age-interval" 
+                id="age-interval-1" 
                 value="age-interval">
                 Aldersinterval
             </option>
             <option 
-                id="gender"
+                id="gender-1"
                 value="gender">
                 Køn
             </option>
             <option
-                id="household_function_std"
+                id="household_function_std-1"
+                value="household_function_std">
+                Stilling i husstanden
+            </option>
+        </select>
+    </div>
+
+
+    <!-- second search field -->
+    <div class="col-sm" id="q2-form">
+        <input class="form-control" name="q2" id="id-q2" required readonly>
+
+        <!-- <select class="form-select" name="q_select" id="q_select" style="display:none"></select> -->
+
+    </div>
+
+    <!-- second drop down -->
+    <div class="col-sm">
+        <select class="form-select" name="search-category-2" id = "select2" aria-label="Select second category">
+            <option 
+                id="no-query-2" 
+                value="no-query" 
+                selected>
+                Intet filter
+            </option>
+            <option 
+                id="age-2"
+                value="age">
+                Alder
+            </option>
+            <option 
+                id="parish-2"
+                value="parish">
+                Sogn/By
+            </option>
+            <option 
+                id="age-interval-2" 
+                value="age-interval">
+                Aldersinterval
+            </option>
+            <option 
+                id="gender-2"
+                value="gender">
+                Køn
+            </option>
+            <option
+                id="household_function_std-2"
                 value="household_function_std">
                 Stilling i husstanden
             </option>

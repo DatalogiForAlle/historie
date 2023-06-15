@@ -257,17 +257,20 @@ def search(request):
 
     # query = ""
     if request.GET:
-        query = request.GET.get("q").lower()
-
         year = request.GET.get("year")
-        search_category = request.GET.get("search_category")
+        query_1 = request.GET.get("q1").lower()
+        search_category_1 = request.GET.get("search-category-1")
+        query_2 = request.GET.get("q2").lower()
+        search_category_2 = request.GET.get("search-category-2")
 
-        context["query"] = str(query)
         context["year"] = str(year)
-        context["search_category"] = str(search_category)
+        context["query_1"] = str(query_1)
+        context["search_category_1"] = str(search_category_1)
+        context["query_2"] = str(query_2)
+        context["search_category_2"] = str(search_category_2)
 
         person = get_person_model(int(year))
-        q_filter = get_q_filter(search_category, query)
+        q_filter = get_q_filter(search_category_1, query_1)
         page_obj = get_filter_result(q_filter, person)
 
         get_copy = request.GET.copy()
