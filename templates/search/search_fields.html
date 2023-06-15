@@ -4,8 +4,6 @@
     <div class="col-sm" id="q1-form">
         <input class="form-control" name="q1" id="id-q1" required readonly>
 
-        <!-- <select class="form-select" name="q_select" id="q_select" style="display:none"></select> -->
-
     </div>
 
     <!-- first drop down -->
@@ -45,12 +43,26 @@
         </select>
     </div>
 
+    <!-- choose whether to exclude or include -->
+
+    <div class="col-sm">
+        <div class="form-check">
+            <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="combine" id="include" value="include" required checked>
+                Include
+            </label>
+        </div>
+        <div class="form-check">
+            <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="combine" id="exclude" value="exclude">
+                Exclude
+            </label>
+        </div>
+    </div>
 
     <!-- second search field -->
     <div class="col-sm" id="q2-form">
         <input class="form-control" name="q2" id="id-q2" required readonly>
-
-        <!-- <select class="form-select" name="q_select" id="q_select" style="display:none"></select> -->
 
     </div>
 

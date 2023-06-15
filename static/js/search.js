@@ -60,6 +60,10 @@ function recallYear(year) {
     document.getElementById(`${year}`).checked = true
 }
 
+function recallCombineValue(combine) {
+    document.getElementById(`${combine}`).checked = true
+}
+
 function recallSelectedOption(searchCategory, optionIdSuffix) {
     selectId = `${searchCategory}${optionIdSuffix}`
     document.getElementById(`${selectId}`).selected = true
@@ -127,6 +131,15 @@ function keepYearInput(year) {
     }
 }
 
+function keepCombineInput(combine) {
+    sessionStorage.setItem("combine", combine)
+    if (combine) {
+        recallCombineValue(combine)
+    } else {
+        console.log("no combine")
+    }
+}
+
 function keepQueryInput(queryIdentifiers, searchCategory, query) {
     sessionStorage.setItem(queryIdentifiers.storageCategoryKey, searchCategory)
     sessionStorage.setItem(queryIdentifiers.storageQueryKey, query)
@@ -145,9 +158,10 @@ function setSelectChangeFunction(queryIdentifiers) {
 }
 
 
-function keepUserInput(year, searchCategory1, query1, searchCategory2, query2) {
+function keepUserInput(year, searchCategory1, query1, searchCategory2, query2, combine) {
 
     keepYearInput(year)
+    keepCombineInput(combine)
     keepQueryInput(queryOneIdentifiers, searchCategory1, query1)
     keepQueryInput(queryTwoIdentifiers, searchCategory2, query2)
     

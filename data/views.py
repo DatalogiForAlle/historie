@@ -255,19 +255,20 @@ def search(request):
 
     context = {}
 
-    # query = ""
     if request.GET:
         year = request.GET.get("year")
         query_1 = request.GET.get("q1").lower()
         search_category_1 = request.GET.get("search-category-1")
         query_2 = request.GET.get("q2").lower()
         search_category_2 = request.GET.get("search-category-2")
+        combine = request.GET.get("combine")
 
         context["year"] = str(year)
         context["query_1"] = str(query_1)
         context["search_category_1"] = str(search_category_1)
         context["query_2"] = str(query_2)
         context["search_category_2"] = str(search_category_2)
+        context["combine"] = str(combine)
 
         person = get_person_model(int(year))
         q_filter = get_q_filter(search_category_1, query_1)
