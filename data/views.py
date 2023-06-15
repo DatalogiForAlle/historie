@@ -9,7 +9,15 @@ from django.core import serializers
 
 from .models import Person
 from .models import Person1801, Person1850, Person1901
-from .utils import translate_field, get_person_model, get_q_filter, get_filter_result
+from .utils import (
+    translate_field,
+    get_person_model,
+    get_q_filter,
+    # get_filter_result,
+    # combine_with_query_2_filter,
+    get_query_values,
+    get_query_result,
+)
 from .forms import SqlForm, SearchForm
 from django.core.paginator import (
     Paginator,
@@ -256,23 +264,35 @@ def search(request):
     context = {}
 
     if request.GET:
-        year = request.GET.get("year")
-        query_1 = request.GET.get("q1").lower()
-        search_category_1 = request.GET.get("search-category-1")
-        query_2 = request.GET.get("q2").lower()
-        search_category_2 = request.GET.get("search-category-2")
-        combine = request.GET.get("combine")
+        # year = request.GET.get("year")
+        # query_1 = request.GET.get("q1").lower()
+        # search_category_1 = request.GET.get("search-category-1")
+        # query_2 = request.GET.get("q2").lower()
+        # search_category_2 = request.GET.get("search-category-2")
+        # combine = request.GET.get("combine")
+        query_values = get_query_values(request)
+        # (
+        #     year,
+        #     query_1,
+        #     search_category_1,
+        #     query_2,
+        #     search_category_2,
+        #     combine,
+        # ) = query_values
+        context["year"] = str(query_values["year"])
+        context["query_1"] = str(query_values["query_1"])
+        context["search_category_1"] = str(query_values["search_category_1"])
+        context["query_2"] = str(query_values["query_2"])
+        context["search_category_2"] = str(query_values["search_category_2"])
+        context["combine"] = str(query_values["combine"])
 
-        context["year"] = str(year)
-        context["query_1"] = str(query_1)
-        context["search_category_1"] = str(search_category_1)
-        context["query_2"] = str(query_2)
-        context["search_category_2"] = str(search_category_2)
-        context["combine"] = str(combine)
-
-        person = get_person_model(int(year))
-        q_filter = get_q_filter(search_category_1, query_1)
-        page_obj = get_filter_result(q_filter, person)
+        # context["year"] = str(year)
+        # context["query_1"] = str(query_1)
+        # context["search_category_1"] = str(search_category_1)
+        # context["query_2"] = str(query_2)
+        # context["search_category_2"] = str(search_category_2)
+        # context["combine"] = str(combine)
+        page_obj = get_query_result(query_values)
 
         get_copy = request.GET.copy()
         parameters = get_copy.pop("page", True) and get_copy.urlencode()
@@ -299,22 +319,8 @@ def one_input_chart(request):
     if is_ajax:
         if request.method == "GET":
             x_val = translate_field(request.GET.get("x_val"))
-            year = request.GET.get("year")
-            search_category = request.GET.get("search_category")
-            query = request.GET.get("query")
-
-            # q_filter = Q(år=year)
-
-            # print("query is: ", query)
-            # print("query type is: ", type(query))
-            # if search_category == "city":
-            #     q_filter.add(Q(sogn_by=query), Q.AND)
-            # elif search_category == "age":
-            #     q_filter.add(Q(alder=query), Q.AND)
-            person = get_person_model(int(year))
-            q_filter = get_q_filter(search_category, query)
-            filter_result = get_filter_result(q_filter, person)
-
+            query_values = get_query_values(request)
+            filter_result = get_query_result(query_values)
             # querying the database, returns a list of dicts
 
             query_res = list(
@@ -368,23 +374,10 @@ def two_input_chart(request):
         if request.method == "GET":
             x_val = translate_field(request.GET.get("x_val"))
             y_val = translate_field(request.GET.get("y_val"))
-            year = request.GET.get("year")
 
-            search_category = request.GET.get("search_category")
-            query = request.GET.get("query")
+            query_values = get_query_values(request)
+            filter_result = get_query_result(query_values)
 
-            # q_filter = Q(år=year)
-
-            # print("query is: ", query)
-            # print("query type is: ", type(query))
-            # if search_category == "city":
-            #     q_filter.add(Q(sogn_by=query), Q.AND)
-            # elif search_category == "age":
-            #     q_filter.add(Q(alder=query), Q.AND)
-
-            person = get_person_model(int(year))
-            q_filter = get_q_filter(search_category, query)
-            filter_result = get_filter_result(q_filter, person)
             # querying the database, returns a list of dicts
             query_res = list(
                 # person.objects.filter(q_filter)

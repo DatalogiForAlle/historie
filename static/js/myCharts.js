@@ -154,13 +154,7 @@ function getSelectedVals() {
     return selectedVals
 }
 
-function buildFetchUrl(startString, year, selectedVals, searchCategory, query) {
-    url = `${startString}_input_chart/?year=${year}&search_category=${searchCategory}&query=${query}`
-    selectedVals.forEach(function(item) {
-        url += `&${item["varName"]}=${item["varValue"]}`
-    })
-    return url
-}
+
 
 function getTwoInputChart(url, chartType) {
     fetch(url, {
@@ -195,16 +189,46 @@ function getOneInputChart(url, chartType) {
       
 }
 
+// function buildFetchUrl(startString, year, selectedVals, searchCategory, query) {
+//     url = `${startString}_input_chart/?year=${year}&search_category=${searchCategory}&query=${query}`
+//     selectedVals.forEach(function(item) {
+//         url += `&${item["varName"]}=${item["varValue"]}`
+//     })
+//     return url
+// }
+
+function buildFetchUrl(startString, selectedVals, queryParams) {
+    // console.log({year_buildFetchUrl: queryParams.year})
+    url = `${startString}_input_chart/?year=${queryParams.year}&search-category-1=${queryParams.searchCategory1}&q1=${queryParams.query1}&search-category-2=${queryParams.searchCategory2}&q2=${queryParams.query2}&combine=${queryParams.combine}`
+    selectedVals.forEach(function(item) {
+        url += `&${item["varName"]}=${item["varValue"]}`
+    })
+    return url
+}
+
+function retrieveQueryParams() {
+    year = sessionStorage.getItem("year")
+    console.log({year_retrieveQueryParams: year})
+    searchCategory1 = sessionStorage.getItem("searchCategory1")
+    query1 = sessionStorage.getItem("query1")
+    searchCategory2 = sessionStorage.getItem("searchCategory2")
+    query2 = sessionStorage.getItem("query2")
+    combine = sessionStorage.getItem("combine")
+    return {year:year, searchCategory1: searchCategory1, query1: query1, searchCategory2: searchCategory2, query2: query2, combine:combine}
+} 
+
+
 function getChart(chartType) {
     ctx = replaceChartCanvas()
     selectedVals = getSelectedVals()
     // year = document.querySelector('input[name="year"]:checked').value;
-    year = sessionStorage.getItem("year")
-    searchCategory = sessionStorage.getItem("searchCategory")
-    query = sessionStorage.getItem("query")
+    // year = sessionStorage.getItem("year")
+    // searchCategory = sessionStorage.getItem("searchCategory")
+    // query = sessionStorage.getItem("query")
+    queryParams = retrieveQueryParams()
     // remember to make check somewhere that at least the x variable has to be chosen in order to get a chart
     if (selectedVals.length === 1) {
-        url = buildFetchUrl("one", year, selectedVals, searchCategory, query)
+        url = buildFetchUrl("one", selectedVals, queryParams)
         if (chartType == "pie") {
             document.getElementById("modal-size").classList.remove('modal-xl');
         } else {
@@ -215,7 +239,7 @@ function getChart(chartType) {
     }
     else if (selectedVals.length === 2) {
         document.getElementById("modal-size").classList.add('modal-xl');
-        url = buildFetchUrl("two", year, selectedVals, searchCategory, query)
+        url = buildFetchUrl("two", selectedVals, queryParams)
         getTwoInputChart(url, chartType)
     }
 }
