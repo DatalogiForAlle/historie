@@ -79,7 +79,6 @@ def get_query_values(request):
     search_category_2 = request.GET.get("search-category-2")
     combine = request.GET.get("combine")
 
-    # return (year, query_1, search_category_1, query_2, search_category_2, combine)
     return {
         "year": year,
         "query_1": query_1,

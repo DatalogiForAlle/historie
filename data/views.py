@@ -11,10 +11,6 @@ from .models import Person
 from .models import Person1801, Person1850, Person1901
 from .utils import (
     translate_field,
-    get_person_model,
-    get_q_filter,
-    # get_filter_result,
-    # combine_with_query_2_filter,
     get_query_values,
     get_query_result,
 )
@@ -264,21 +260,8 @@ def search(request):
     context = {}
 
     if request.GET:
-        # year = request.GET.get("year")
-        # query_1 = request.GET.get("q1").lower()
-        # search_category_1 = request.GET.get("search-category-1")
-        # query_2 = request.GET.get("q2").lower()
-        # search_category_2 = request.GET.get("search-category-2")
-        # combine = request.GET.get("combine")
         query_values = get_query_values(request)
-        # (
-        #     year,
-        #     query_1,
-        #     search_category_1,
-        #     query_2,
-        #     search_category_2,
-        #     combine,
-        # ) = query_values
+
         context["year"] = str(query_values["year"])
         context["query_1"] = str(query_values["query_1"])
         context["search_category_1"] = str(query_values["search_category_1"])
@@ -286,12 +269,6 @@ def search(request):
         context["search_category_2"] = str(query_values["search_category_2"])
         context["combine"] = str(query_values["combine"])
 
-        # context["year"] = str(year)
-        # context["query_1"] = str(query_1)
-        # context["search_category_1"] = str(search_category_1)
-        # context["query_2"] = str(query_2)
-        # context["search_category_2"] = str(search_category_2)
-        # context["combine"] = str(combine)
         page_obj = get_query_result(query_values)
 
         get_copy = request.GET.copy()

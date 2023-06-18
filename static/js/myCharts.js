@@ -198,7 +198,6 @@ function getOneInputChart(url, chartType) {
 // }
 
 function buildFetchUrl(startString, selectedVals, queryParams) {
-    // console.log({year_buildFetchUrl: queryParams.year})
     url = `${startString}_input_chart/?year=${queryParams.year}&search-category-1=${queryParams.searchCategory1}&q1=${queryParams.query1}&search-category-2=${queryParams.searchCategory2}&q2=${queryParams.query2}&combine=${queryParams.combine}`
     selectedVals.forEach(function(item) {
         url += `&${item["varName"]}=${item["varValue"]}`
@@ -208,7 +207,6 @@ function buildFetchUrl(startString, selectedVals, queryParams) {
 
 function retrieveQueryParams() {
     year = sessionStorage.getItem("year")
-    console.log({year_retrieveQueryParams: year})
     searchCategory1 = sessionStorage.getItem("searchCategory1")
     query1 = sessionStorage.getItem("query1")
     searchCategory2 = sessionStorage.getItem("searchCategory2")
@@ -221,10 +219,6 @@ function retrieveQueryParams() {
 function getChart(chartType) {
     ctx = replaceChartCanvas()
     selectedVals = getSelectedVals()
-    // year = document.querySelector('input[name="year"]:checked').value;
-    // year = sessionStorage.getItem("year")
-    // searchCategory = sessionStorage.getItem("searchCategory")
-    // query = sessionStorage.getItem("query")
     queryParams = retrieveQueryParams()
     // remember to make check somewhere that at least the x variable has to be chosen in order to get a chart
     if (selectedVals.length === 1) {
