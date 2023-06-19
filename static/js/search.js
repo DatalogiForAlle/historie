@@ -74,6 +74,46 @@ function recallQueryValue(queryId, query) {
     q.value = query
 }
 
+
+function setYearChangeFunction(queryIdentifiers){
+    yearButtons = document.querySelectorAll('input[name="year"]')
+    for (const yearBtn of yearButtons) {
+        yearBtn.addEventListener('change', function() {
+            if (this.checked) {
+                console.log({buttonClicked: this.value})
+                setMigrationOptionVisibility(year=this.value, queryIdentifiers)
+            }
+        })
+    }
+}
+
+function setMigrationOptionVisibility(year, queryIdentifiers) {
+    const option = document.getElementById("migration" + queryIdentifiers.optionIdSuffix)
+    if (year === "1801") {
+        option.style.display = "none"
+        resetSearchField(queryIdentifiers)  
+    } else {
+        option.style.display = "block"  
+    }
+}
+
+function resetSearchField(queryIdentifiers) {
+    const selectElm = document.getElementById(queryIdentifiers.selectId)
+    const optionNoQuery = "no-query"
+    if (selectElm.value === "migration") {
+        recallQueryInputAttributes(optionNoQuery, queryIdentifiers)
+        selectElm.value = optionNoQuery
+    }  
+}
+
+function recallIfMigration(year, queryIdentifiers) {
+    if (year) {
+        setMigrationOptionVisibility(year, queryIdentifiers)
+    }
+}
+
+
+
 function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
     const queryName = queryIdentifiers.queryName
     const queryId = queryIdentifiers.queryId
@@ -118,6 +158,10 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
         case "household_function_std" :
             const householdOptions = ['hendes barn', 'ukendt', 'barn', 'tjeneste', 'husfader', 'kone', 'husmoder', 'hans barn', 'andet']
             insertFormElm(createSelectElm(householdOptions, queryName, queryId), formId)
+            break
+        case "migration" :
+            const migrationOptions = ['migrant', 'indfødt', 'ukendt']
+            insertFormElm(createSelectElm(migrationOptions, queryName, queryId), formId)
             break
     }
 }
@@ -164,7 +208,11 @@ function keepUserInput(year, searchCategory1, query1, searchCategory2, query2, c
     keepCombineInput(combine)
     keepQueryInput(queryOneIdentifiers, searchCategory1, query1)
     keepQueryInput(queryTwoIdentifiers, searchCategory2, query2)
+    recallIfMigration(year, queryOneIdentifiers)
+    recallIfMigration(year, queryTwoIdentifiers)
     
+    setYearChangeFunction(queryOneIdentifiers)
+    setYearChangeFunction(queryTwoIdentifiers)
     setSelectChangeFunction(queryOneIdentifiers)
     setSelectChangeFunction(queryTwoIdentifiers)
 

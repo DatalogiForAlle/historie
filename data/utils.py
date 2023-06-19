@@ -40,7 +40,6 @@ def get_person_model(year):
 def get_q_filter(search_category, query):
     match search_category:
         case "parish":
-            print("we are inside case parish")
             return Q(sogn_by=query)
         case "age":
             return Q(alder=query)
@@ -51,6 +50,8 @@ def get_q_filter(search_category, query):
             return Q(køn=query)
         case "household_function_std":
             return Q(stilling_i_husstanden_standardiseret=query)
+        case "migration":
+            return Q(migrant_type=query)
 
 
 def get_single_filter_result(q_filter, person):
