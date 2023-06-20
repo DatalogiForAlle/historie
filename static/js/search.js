@@ -1,55 +1,3 @@
-function displayFieldCheckBoxes(){
-    grandParent = document.getElementById("field-checkboxes")
-    parent = document.createElement("div")
-    parent.id = "field-checkbox-parent"
-    parent.style="display:flex"
-
-    for (const [fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
-        parent.insertAdjacentHTML("beforeend",
-        `
-        <div class="form-check form-check-inline">
-            <label class="form-check-label">
-                <input 
-                    class="form-check-input" 
-                    type="checkbox" 
-                    name=${fieldId} 
-                    id=${fieldId} 
-                    onClick=saveFieldChoice(this.id) 
-                    checked>
-                ${fieldTitle}
-            </label>
-        </div>
-        `)
-    } 
-    grandParent.replaceChildren(parent)  
-}
-
-
-// const fieldsToDisplay = ["age", "gender", "status", "location", "parish", "household-function-std"]
-
-
-// function displayFieldCheckboxes(elmID) {
-//     elm = document.getElementById(elmID)
-//     elm.insertAdjacentHTML('beforeend', `
-//     <b>Vælg hvilke felter du vil se</b>
-//             <div style="display:flex">
-//                 <div class="form-check form-check-inline">
-//                     <input class="form-check-input" type="checkbox" name="gender" id="gender" onClick=saveFieldChoice(this.id) checked>
-//                     <label class="form-check-label" for="gender">Køn</label>
-//                 </div>
-//                 <div class="form-check form-check-inline">
-//                     <input class="form-check-input" type="checkbox" name="status" id="status" onClick=saveFieldChoice(this.id) checked>
-//                     <label class="form-check-label" for="status">Ægteskabelig status</label>
-//                 </div>
-//                 <div class="form-check form-check-inline">
-//                     <input class="form-check-input" type="checkbox" name="location" id="location" onClick=saveFieldChoice(this.id) checked>
-//                     <label class="form-check-label" for="location">Bostedstype</label>
-//                 </div>
-//             </div>
-//         `)
-// }
-
-
 const queryOneIdentifiers = {formId: "q1-form", queryId: "id_q1", queryName: "q1", selectName: "search-category-1", selectId: "select1", storageCategoryKey: "searchCategory1", storageQueryKey: "query1", optionIdSuffix: "-1"}
 
 const queryTwoIdentifiers = {formId: "q2-form", queryId: "id_q2", queryName: "q2", selectName: "search-category-2", selectId: "select2", storageCategoryKey: "searchCategory2", storageQueryKey: "query2", optionIdSuffix: "-2"}
@@ -247,8 +195,51 @@ function keepUserInput(year, searchCategory1, query1, searchCategory2, query2, c
     setSelectChangeFunction(queryTwoIdentifiers)
 }
 
-const fieldsToDisplay = { age: "Alder", gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", parish: "Sogn/By", "household-function-std": "Stilling i husstanden"}
 
+function displayFieldCheckBoxes(year){
+    const fieldsToDisplay = setFieldsToDisplay(year)
+    grandParent = document.getElementById("field-checkboxes")
+    parent = document.createElement("div")
+    parent.id = "field-checkbox-parent"
+    parent.style="display:flex"
+
+    for (const [fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
+        parent.insertAdjacentHTML("beforeend",
+        `
+        <div class="form-check form-check-inline">
+            <label class="form-check-label">
+                <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    name=${fieldId} 
+                    id=${fieldId} 
+                    checked>
+                ${fieldTitle}
+            </label>
+        </div>
+        `)
+    } 
+    grandParent.replaceChildren(parent)  
+}
+
+function setFieldsToDisplay(year) {
+    let fieldsToDisplay = { age: "Alder", gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", parish: "Sogn/By", "household-function-std": "Stilling i husstanden"}
+    if (year !== "1801") {
+        fieldsToDisplay.migration = "Migranttype"
+    } 
+    return fieldsToDisplay
+}
+
+function saveFieldChoice(fieldCheckboxId, fieldsToDisplay) {
+    console.log("inside saveFieldChoice")
+    let fieldCheckBoxBooleans = retrieveFieldCheckboxBooleans()
+    if (fieldCheckBoxBooleans) {
+        let fieldCheckbox = document.getElementById(fieldCheckboxId)
+        fieldCheckBoxBooleans[fieldCheckboxId] = fieldCheckbox.checked
+    }
+    saveFieldCheckboxBooleans(fieldCheckBoxBooleans)
+    showResults(fieldsToDisplay)
+}
 
 function saveFieldCheckboxBooleans(fieldCheckboxBooleans) {
     sessionStorage.setItem("fieldCheckboxBooleans", JSON.stringify(fieldCheckboxBooleans))
@@ -259,7 +250,7 @@ function retrieveFieldCheckboxBooleans(){
 }
 
 
-function setDefaultFieldCheckboxBooleans(select1Id, select2Id) {
+function setDefaultFieldCheckboxBooleans(select1Id, select2Id, fieldsToDisplay) {
     const select1 = document.getElementById(select1Id)
     const select2 = document.getElementById(select2Id)
     const initialTrue = ["age", "gender", select1.value, select2.value]
@@ -285,23 +276,13 @@ function updateFieldCheckboxes() {
     }
 }
 
-function saveFieldChoice(fieldCheckboxId) {
-    let fieldCheckBoxBooleans = retrieveFieldCheckboxBooleans()
-    if (fieldCheckBoxBooleans) {
-        let fieldCheckbox = document.getElementById(fieldCheckboxId)
-        fieldCheckBoxBooleans[fieldCheckboxId] = fieldCheckbox.checked
-    }
-    saveFieldCheckboxBooleans(fieldCheckBoxBooleans)
-    showResults()
-}
-
 function isNewQuery() {
     const searchParams = window.location.search;
     //a brand new query does not have a page param in the url
     return !searchParams.includes("page=")
 }
 
-function showResults() {
+function showResults(fieldsToDisplay) {
     let fieldCheckBoxBooleans = retrieveFieldCheckboxBooleans()
     for ([fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
         const fieldDisplayElms = document.getElementsByName("show-"+fieldId);
@@ -318,12 +299,30 @@ function showResults() {
     }
 }
 
-function keepFieldCheckboxInput() {
+
+function setAllFieldCheckboxClickFunction(fieldsToDisplay) {
+    for (const [fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
+        let fieldCheckbox = document.getElementById(fieldId)
+        if (fieldCheckbox) {
+            fieldCheckbox.addEventListener("change", function(e) {
+                saveFieldChoice(e.target.id, fieldsToDisplay)
+            })
+        }
+        
+    }
+}
+
+function keepFieldCheckboxInput(year) {
+    // right now I create same const fieldsToDisplay twice, one here and one in displayFieldCheckBoxes.
+    // if time, fix so it is only done once(since they should always be the same)
+    const fieldsToDisplay = setFieldsToDisplay(year)
+    setAllFieldCheckboxClickFunction(fieldsToDisplay)
+   
     if (isNewQuery()) {
-        setDefaultFieldCheckboxBooleans(queryOneIdentifiers.selectId, queryTwoIdentifiers.selectId)
+        setDefaultFieldCheckboxBooleans(queryOneIdentifiers.selectId, queryTwoIdentifiers.selectId, fieldsToDisplay)
     }
     updateFieldCheckboxes()
-    showResults()
+    showResults(fieldsToDisplay)
 
 }
 

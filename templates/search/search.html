@@ -35,7 +35,7 @@
             {% if page_obj %}
 
             <script>
-                displayFieldCheckBoxes()
+                displayFieldCheckBoxes("{{year}}")
             </script>
 
             {% else %}
@@ -63,6 +63,7 @@
               <h6 class="card-title col-2" name="show-location">Bostedstype</h6>
               <h6 class="card-title col-2" name="show-parish">Sogn/By</h6>
               <h6 class="card-title col-2" name="show-household-function-std">Stilling i husstanden</h6>
+              <h6 class="card-title col-2" name="show-migration" style="display:none">Migranttype</h6>
             </div>
           </div>
         </div>
@@ -78,6 +79,9 @@
                   <p class="card-title col-2" name="show-location">{{ item.bostedstype }}</p>
                   <p class="card-title col-2" name="show-parish">{{ item.sogn_by }}</p>
                   <p class="card-title col-2" name="show-household-function-std">{{ item.stilling_i_husstanden_standardiseret }}</p>
+                  {% if year != "1801" %} 
+                    <p class="card-title col-2" name="show-migration">{{ item.migrant_type }}</p>
+                  {% endif %}
               </div>
             </div>
           </div>
@@ -319,7 +323,7 @@
   
   keepUserInput("{{year}}", "{{search_category_1}}", "{{query_1}}", "{{search_category_2}}", "{{query_2}}", "{{combine}}");
 
-  keepFieldCheckboxInput()
+  keepFieldCheckboxInput("{{year}}")
 
   var toolTipList = getToolTipList()
   
