@@ -48,7 +48,7 @@ def get_q_filter(search_category, query):
             return Q(alder__gte=ages[0]) & Q(alder__lte=ages[1])
         case "gender":
             return Q(køn=query)
-        case "household_function_std":
+        case "household-function-std":
             return Q(stilling_i_husstanden_standardiseret=query)
         case "migration":
             return Q(migrant_type=query)

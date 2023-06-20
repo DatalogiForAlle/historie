@@ -1,23 +1,53 @@
-function displayFieldCheckboxes(elmID) {
-    elm = document.getElementById(elmID)
-    elm.insertAdjacentHTML('beforeend', `
-    <b>Vælg hvilke felter du vil se</b>
-            <div style="display:flex">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="gender" id="gender" value="køn" onClick=saveGender() checked>
-                    <label class="form-check-label" for="gender">Køn</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="status" id="status" value="ægteskabelig_status" onClick=saveStatus() checked>
-                    <label class="form-check-label" for="status">Ægteskabelig status</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="location" id="location" value="bostedstype" onClick=saveLocation() checked>
-                    <label class="form-check-label" for="location">Bostedstype</label>
-                </div>
-            </div>
+function displayFieldCheckBoxes(){
+    grandParent = document.getElementById("field-checkboxes")
+    parent = document.createElement("div")
+    parent.id = "field-checkbox-parent"
+    parent.style="display:flex"
+
+    for (const [fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
+        parent.insertAdjacentHTML("beforeend",
+        `
+        <div class="form-check form-check-inline">
+            <label class="form-check-label">
+                <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    name=${fieldId} 
+                    id=${fieldId} 
+                    onClick=saveFieldChoice(this.id) 
+                    checked>
+                ${fieldTitle}
+            </label>
+        </div>
         `)
+    } 
+    grandParent.replaceChildren(parent)  
 }
+
+
+// const fieldsToDisplay = ["age", "gender", "status", "location", "parish", "household-function-std"]
+
+
+// function displayFieldCheckboxes(elmID) {
+//     elm = document.getElementById(elmID)
+//     elm.insertAdjacentHTML('beforeend', `
+//     <b>Vælg hvilke felter du vil se</b>
+//             <div style="display:flex">
+//                 <div class="form-check form-check-inline">
+//                     <input class="form-check-input" type="checkbox" name="gender" id="gender" onClick=saveFieldChoice(this.id) checked>
+//                     <label class="form-check-label" for="gender">Køn</label>
+//                 </div>
+//                 <div class="form-check form-check-inline">
+//                     <input class="form-check-input" type="checkbox" name="status" id="status" onClick=saveFieldChoice(this.id) checked>
+//                     <label class="form-check-label" for="status">Ægteskabelig status</label>
+//                 </div>
+//                 <div class="form-check form-check-inline">
+//                     <input class="form-check-input" type="checkbox" name="location" id="location" onClick=saveFieldChoice(this.id) checked>
+//                     <label class="form-check-label" for="location">Bostedstype</label>
+//                 </div>
+//             </div>
+//         `)
+// }
 
 
 const queryOneIdentifiers = {formId: "q1-form", queryId: "id_q1", queryName: "q1", selectName: "search-category-1", selectId: "select1", storageCategoryKey: "searchCategory1", storageQueryKey: "query1", optionIdSuffix: "-1"}
@@ -80,7 +110,6 @@ function setYearChangeFunction(queryIdentifiers){
     for (const yearBtn of yearButtons) {
         yearBtn.addEventListener('change', function() {
             if (this.checked) {
-                console.log({buttonClicked: this.value})
                 setMigrationOptionVisibility(year=this.value, queryIdentifiers)
             }
         })
@@ -155,7 +184,7 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
             insertFormElm(createSelectElm(genderOptions, queryName, queryId), formId)
             console.log({q: q})
             break
-        case "household_function_std" :
+        case "household-function-std" :
             const householdOptions = ['hendes barn', 'ukendt', 'barn', 'tjeneste', 'husfader', 'kone', 'husmoder', 'hans barn', 'andet']
             insertFormElm(createSelectElm(householdOptions, queryName, queryId), formId)
             break
@@ -165,6 +194,7 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
             break
     }
 }
+
 
 function keepYearInput(year) {
     sessionStorage.setItem("year", year)
@@ -215,127 +245,86 @@ function keepUserInput(year, searchCategory1, query1, searchCategory2, query2, c
     setYearChangeFunction(queryTwoIdentifiers)
     setSelectChangeFunction(queryOneIdentifiers)
     setSelectChangeFunction(queryTwoIdentifiers)
-
-    // ensuring which fields to display is saved across page change
-    var genderChecked = JSON.parse(sessionStorage.getItem("genderChecked"));
-    var statusChecked = JSON.parse(sessionStorage.getItem("statusChecked"));
-    var locationChecked = JSON.parse(sessionStorage.getItem("locationChecked"));
-    
-    if (genderChecked != null) {
-        // console.log("check was set")
-        document.getElementById("gender").checked = genderChecked;
-    } 
-
-    if (statusChecked != null) {
-        // console.log("check was set")
-        document.getElementById("status").checked = statusChecked;
-    } 
-
-    if (locationChecked != null) {
-        // console.log("check was set")
-        document.getElementById("location").checked = locationChecked;
-    } 
-  
-  
 }
 
-function saveGender() {	
-	var checkbox = document.getElementById("gender");
-    sessionStorage.setItem("genderChecked", checkbox.checked);	
+const fieldsToDisplay = { age: "Alder", gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", parish: "Sogn/By", "household-function-std": "Stilling i husstanden"}
+
+
+function saveFieldCheckboxBooleans(fieldCheckboxBooleans) {
+    sessionStorage.setItem("fieldCheckboxBooleans", JSON.stringify(fieldCheckboxBooleans))
 }
 
-function saveStatus() {	
-	var checkbox = document.getElementById("status");
-    sessionStorage.setItem("statusChecked", checkbox.checked);	
-}
-
-function saveLocation() {	
-	var checkbox = document.getElementById("location");
-    sessionStorage.setItem("locationChecked", checkbox.checked);	
+function retrieveFieldCheckboxBooleans(){
+    return JSON.parse(sessionStorage.getItem("fieldCheckboxBooleans"))
 }
 
 
-function saveBooleans(booleans) {
-  sessionStorage.setItem("booleans", JSON.stringify(booleans))
+function setDefaultFieldCheckboxBooleans(select1Id, select2Id) {
+    const select1 = document.getElementById(select1Id)
+    const select2 = document.getElementById(select2Id)
+    const initialTrue = ["age", "gender", select1.value, select2.value]
+    let defaultFieldCheckboxBooleans = {}
+    for (const [fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
+        let checkField = initialTrue.includes(fieldId)
+        fieldCheckbox = document.getElementById(fieldId)
+        defaultFieldCheckboxBooleans[fieldId] = checkField
+    }
+    saveFieldCheckboxBooleans(defaultFieldCheckboxBooleans)
+    updateFieldCheckboxes()
 }
 
-// function saveGraphVariables() {
-//   sessionStorage.setItem("")
-// }
-
-function updateFieldBooleans() {
-    // var fieldBooleans = {"show-pa-id": true, "show-name": true, "show-age": true, "show-gender": true, "show-status": true, "show-migrant": true}
-
-
-    // var fieldBooleans = (JSON.parse(sessionStorage.getItem("booleans")) || {"show-pa-id": true, "show-name": true, "show-age": true, "show-gender": true, "show-status": true, "show-migrant": true})
-
-    var fieldBooleans = JSON.parse(sessionStorage.getItem("booleans") || JSON.stringify({"show-pa-id": true, "show-name": true, "show-age": true, "show-gender": true, "show-status": true, "show-location": true}));
-
-    // console.log("fieldbooleans: ", fieldBooleans)
-
-    saveBooleans(fieldBooleans)
-
-    showResults(fieldBooleans)
-    
-    $('#gender').change(function() {
-        if ($(this).is(':checked')) {
-            // console.log("gender checkbox was checked");
-            fieldBooleans["show-gender"] = true
+function updateFieldCheckboxes() {
+    const fieldCheckboxBooleans = retrieveFieldCheckboxBooleans()
+    if (fieldCheckboxBooleans) {
+        for (const [fieldId, checked] of Object.entries(fieldCheckboxBooleans)) {
+            fieldCheckbox = document.getElementById(fieldId)
+            if (fieldCheckbox) {
+                fieldCheckbox.checked = checked
+            }
         }
-        else {
-
-            fieldBooleans["show-gender"] = false
-            // console.log("gender checkbox was unchecked");
-        }
-        saveBooleans(fieldBooleans)
-        showResults(fieldBooleans)
-        })
-
-    $('#status').change(function() {
-        if ($(this).is(':checked')) {
-            // console.log("status checkbox was checked");
-            fieldBooleans["show-status"] = true
-        }
-        else {
-            fieldBooleans[["show-status"]] = false
-            // console.log("status checkbox was unchecked");
-        }
-        saveBooleans(fieldBooleans)
-        showResults(fieldBooleans)
-        })
-
-    $('#location').change(function() {
-        if ($(this).is(':checked')) {
-            // console.log("location checkbox was checked");
-            fieldBooleans["show-location"] = true
-        }
-        else {
-            fieldBooleans["show-location"] = false
-            // console.log("location checkbox was unchecked");
-        }
-        saveBooleans(fieldBooleans)
-        showResults(fieldBooleans)
-        })
+    }
 }
 
-function showResults(booleans) {
-  var fields = ["show-pa-id", "show-name", "show-age", "show-gender", "show-status", "show-location"]
-  // var fields = ["gender"]
-  fields.forEach(field => {
-      // console.log("fieldsdict: ", fieldDict.name)
-      // console.log("field is: ", field)
-      toHide = document.getElementsByName(field);
-      // console.log(toHide[0])
-      if (booleans[field]) {
-        for (elm of toHide) {
-          elm.style.display="inline";
-        }
-      }
-      else {
-        for (elm of toHide) {
-          elm.style.display="none";
-        }
-      }})
+function saveFieldChoice(fieldCheckboxId) {
+    let fieldCheckBoxBooleans = retrieveFieldCheckboxBooleans()
+    if (fieldCheckBoxBooleans) {
+        let fieldCheckbox = document.getElementById(fieldCheckboxId)
+        fieldCheckBoxBooleans[fieldCheckboxId] = fieldCheckbox.checked
+    }
+    saveFieldCheckboxBooleans(fieldCheckBoxBooleans)
+    showResults()
+}
+
+function isNewQuery() {
+    const searchParams = window.location.search;
+    //a brand new query does not have a page param in the url
+    return !searchParams.includes("page=")
+}
+
+function showResults() {
+    let fieldCheckBoxBooleans = retrieveFieldCheckboxBooleans()
+    for ([fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
+        const fieldDisplayElms = document.getElementsByName("show-"+fieldId);
+        if (fieldCheckBoxBooleans[fieldId]) {
+            for (elm of fieldDisplayElms) {
+              elm.style.display="inline";
+            }
+          }
+          else {
+            for (elm of fieldDisplayElms) {
+              elm.style.display="none";
+            }
+          } 
+    }
+}
+
+function keepFieldCheckboxInput() {
+    if (isNewQuery()) {
+        setDefaultFieldCheckboxBooleans(queryOneIdentifiers.selectId, queryTwoIdentifiers.selectId)
+    }
+    updateFieldCheckboxes()
+    showResults()
+
 }
 
 function getToolTipList() {

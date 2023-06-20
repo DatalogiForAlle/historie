@@ -15,9 +15,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
-<div class="container">
+<div class="container-fluid">
 <div class="row">
-  <div class="col-9">
+  <div class="col-1"></div>
+  <div class="col-8">
     <form method="get">
 
       <!-- buttons for choosing year -->
@@ -30,22 +31,21 @@
 
     <div class="row">
       
-      <div class="col-9" id="field-checkboxes">
-        {% if page_obj %}
+        <div class="col-9" id="field-checkboxes">
+            {% if page_obj %}
 
+            <script>
+                displayFieldCheckBoxes()
+            </script>
 
-          <script>
-            displayFieldCheckboxes("field-checkboxes")
-          </script>
+            {% else %}
 
-        {% else %}
+            <script>
+                sessionStorage.clear()
+            </script>
 
-          <script>
-            sessionStorage.clear()
-          </script>
-
-        {% endif %}
-      </div>
+            {% endif %}
+        </div>
     </div>
     
     <!-- only show results and graph interface if we have a actually performed a search/gotten a page_obj-->
@@ -55,12 +55,14 @@
         <div class="card border-0">
           <div class="card-body">
             <div class="row">
-              <h6 class="card-title col-2" name="show-pa-id"> Pa ID</h6>
-              <h6 class="card-title col-3" name="show-name">Navn</h6>
-              <h6 class="card-title col-1" name="show-age">Alder</h6>
-              <h6 class="card-title col-1" name="show-gender">Køn</h6>
-              <h6 class="card-title col-3" name="show-status">Ægteskabelig Stilling</h6>
+              <h6 class="card-title col-1" name="show-pa-id"> Pa ID</h6>
+              <h6 class="card-title col-2" name="show-name">Navn</h6>
+              <h6 class="card-title col-2" name="show-age">Alder</h6>
+              <h6 class="card-title col-2" name="show-gender">Køn</h6>
+              <h6 class="card-title col-2" name="show-status">Ægteskabelig Stilling</h6>
               <h6 class="card-title col-2" name="show-location">Bostedstype</h6>
+              <h6 class="card-title col-2" name="show-parish">Sogn/By</h6>
+              <h6 class="card-title col-2" name="show-household-function-std">Stilling i husstanden</h6>
             </div>
           </div>
         </div>
@@ -68,12 +70,14 @@
           <div class="card mb-1">
             <div class="card-body">
               <div class="row">
-                  <p class="card-title col-2" name="show-pa-id">{{ item.pa_id }}</p>
-                  <p class="card-title col-3" name="show-name">{{ item.navn }}</p>
-                  <p class="card-title col-1" name="show-age">{{ item.alder }}</p>
-                  <p class="card-title col-1" name="show-gender">{{ item.køn }}</p>
-                  <p class="card-title col-3" name="show-status">{{ item.ægteskabelig_stilling }}</p>
+                  <p class="card-title col-1" name="show-pa-id">{{ item.pa_id }}</p>
+                  <p class="card-title col-2" name="show-name">{{ item.navn }}</p>
+                  <p class="card-title col-2" name="show-age">{{ item.alder }}</p>
+                  <p class="card-title col-2" name="show-gender">{{ item.køn }}</p>
+                  <p class="card-title col-2" name="show-status">{{ item.ægteskabelig_stilling }}</p>
                   <p class="card-title col-2" name="show-location">{{ item.bostedstype }}</p>
+                  <p class="card-title col-2" name="show-parish">{{ item.sogn_by }}</p>
+                  <p class="card-title col-2" name="show-household-function-std">{{ item.stilling_i_husstanden_standardiseret }}</p>
               </div>
             </div>
           </div>
@@ -314,17 +318,15 @@
 <script type="text/javascript">
   
   keepUserInput("{{year}}", "{{search_category_1}}", "{{query_1}}", "{{search_category_2}}", "{{query_2}}", "{{combine}}");
-//   keepUserInput("{{year}}", "{{query_2}}", "{{search_category_2}}");
-  
-  updateFieldBooleans();
+
+  keepFieldCheckboxInput()
 
   var toolTipList = getToolTipList()
   
   updateGraphInput()
   recallGraphInput()
   recallDisabledGraphButtons()
-  showChart()
-  
+  showChart() 
  
 </script>
 
