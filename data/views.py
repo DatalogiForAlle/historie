@@ -268,6 +268,7 @@ def search(request):
         context["query_2"] = str(query_values["query_2"])
         context["search_category_2"] = str(query_values["search_category_2"])
         context["combine"] = str(query_values["combine"])
+        context["submit_elm"] = str(query_values["submit_elm"])
 
         results_per_page = str(query_values["results_per_page"])
         context["results_per_page"] = results_per_page

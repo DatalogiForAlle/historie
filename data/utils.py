@@ -82,6 +82,7 @@ def get_query_values(request):
     search_category_2 = request.GET.get("search-category-2")
     combine = request.GET.get("combine")
     results_per_page = request.GET.get("num-results", 5)
+    submit_elm = request.GET.get("submit-elm")
 
     return {
         "year": year,
@@ -91,6 +92,7 @@ def get_query_values(request):
         "search_category_2": search_category_2,
         "combine": combine,
         "results_per_page": results_per_page,
+        "submit_elm": submit_elm,
     }
 
 

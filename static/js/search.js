@@ -208,7 +208,7 @@ function displayFieldCheckBoxes(year){
     parent.insertAdjacentHTML("beforeend",
     `
     <div style="margin-right:10px; display:inline-block">
-        Synlige felter: 
+        Vis felter: 
     </div>
     `)
 
@@ -232,7 +232,7 @@ function displayFieldCheckBoxes(year){
 }
 
 function setFieldsToDisplay(year) {
-    let fieldsToDisplay = { age: "Alder", gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", parish: "Sogn/By", "household-function-std": "Stilling i husstanden"}
+    let fieldsToDisplay = { age: "Alder", gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", parish: "Sogn/By", "household-function-std": "Stilling i husstanden", "household-id": "Husstands ID", "job-original": "Erhverv"}
     if (year !== "1801") {
         fieldsToDisplay.migration = "Migranttype"
     } 
@@ -293,19 +293,21 @@ function isNewQuery() {
 
 function showResults(fieldsToDisplay) {
     let fieldCheckBoxBooleans = retrieveFieldCheckboxBooleans()
-    for ([fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
-        const fieldDisplayElms = document.getElementsByName("show-"+fieldId);
-        if (fieldCheckBoxBooleans[fieldId]) {
-            for (elm of fieldDisplayElms) {
-              elm.style.display="inline";
-            }
-          }
-          else {
-            for (elm of fieldDisplayElms) {
-              elm.style.display="none";
-            }
-          } 
-    }
+    if (fieldCheckBoxBooleans) {
+        for ([fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
+            const fieldDisplayElms = document.getElementsByName("show-"+fieldId);
+            if (fieldCheckBoxBooleans[fieldId]) {
+                for (elm of fieldDisplayElms) {
+                  elm.style.display="inline";
+                }
+              }
+              else {
+                for (elm of fieldDisplayElms) {
+                  elm.style.display="none";
+                }
+              } 
+        }
+    } 
 }
 
 
@@ -321,21 +323,25 @@ function setAllFieldCheckboxClickFunction(fieldsToDisplay) {
     }
 }
 
-function keepFieldCheckboxInput(year) {
+function keepFieldCheckboxInput(year, submitElm) {
     // right now I create same const fieldsToDisplay twice, one here and one in displayFieldCheckBoxes.
     // if time, fix so it is only done once(since they should always be the same)
     const fieldsToDisplay = setFieldsToDisplay(year)
     setAllFieldCheckboxClickFunction(fieldsToDisplay)
+    console.log({submitElm: submitElm})
    
     if (isNewQuery()) {
-        setDefaultFieldCheckboxBooleans(queryOneIdentifiers.selectId, queryTwoIdentifiers.selectId, fieldsToDisplay)
+        if (submitElm === "search-btn") {
+            setDefaultFieldCheckboxBooleans(queryOneIdentifiers.selectId, queryTwoIdentifiers.selectId, fieldsToDisplay)
+        }
     }
+
     updateFieldCheckboxes()
     showResults(fieldsToDisplay)
 }
 
 function savePerPage(per_page) {
-    sessionStorage.setItem("per_page", per_page)
+    sessionStorage.setItem("perPage", per_page)
 }
 
 function recallPerPage(per_page) {
@@ -368,10 +374,9 @@ function setPerPageButtonFunctions() {
         // changing per page should resubmit query
         
         perPageBtn.addEventListener('change', function() {
-            console.log("inside perPageonchange")
             queryInputs = retrieveQueryInput()
-            console.log(queryInputs)
             keepUserInput(queryInputs.year, queryInputs.searchCategory1, queryInputs.query1, queryInputs.searchCategory2, queryInputs.query2, queryInputs.combine)
+            // keepFieldCheckboxInput(queryInputs.year, setDefault=false)
             queryForm.submit()
         })
     }
@@ -379,7 +384,6 @@ function setPerPageButtonFunctions() {
 
 
 function handleResultsPerPage(per_page) {
-    console.log("inside handleResultsperpage")
     keepPerPage(per_page)
     
     setPerPageButtonFunctions()
