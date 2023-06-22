@@ -16,232 +16,58 @@
 
 
 <div class="container-fluid">
-<div class="row">
-  <div class="col-1"></div>
-  <div class="col-8">
-    <form method="get" id="query-form">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-8">
+            <form method="get" id="query-form">
 
-      <!-- buttons for choosing year -->
-      {% include "search/year_choice.html" %}
+            <!-- buttons for choosing year -->
+            {% include "search/year_choice.html" %}
 
-      <!-- search fields  -->
-      {% include "search/search_fields.html" %}
+            <!-- search fields  -->
+            {% include "search/search_fields.html" %}
 
-    </form>
+            </form>
 
-    <!-- showing checkboxes for displaying fields (if we have a actually performed a search/gotten a page_obj) -->
-    {% if page_obj %}
+            <!-- showing checkboxes for displaying fields (if we have a actually performed a search/gotten a page_obj) -->
+            {% if page_obj %}
 
-        {% include "search/results_display_options.html" %}
+                {% include "search/results_display_options.html" %}
 
-    {% else %}
+            {% else %}
 
-        <script>
-            sessionStorage.clear()
-        </script>
+                <script>
+                    sessionStorage.clear()
+                </script>
 
-    {% endif %}
-    
+            {% endif %}
+            
+            <!-- only show results and graph interface if we have a actually performed a search/gotten a page_obj-->
+            {% if page_obj %}
 
-    
-    <!-- only show results and graph interface if we have a actually performed a search/gotten a page_obj-->
-    {% if page_obj %}
+                {% include "search/search_results.html" %}
+                
+                {% include "search/search_results_pagination.html" %}
+                
+                <!-- chart interface starts here-->
+                {% include "search/chart_variables.html" %}
+            
+                <!-- buttons for choosing a chart type -->
+                {% include "search/chart_type_buttons.html" %}
 
-    {% include "search/search_results.html" %}
-    
-    {% include "search/search_results_pagination.html" %}
-    
+                <!-- popup/modal for showing and downloading chart-->
+                {% include "search/chart_modal.html" %}
+            
+            {% endif %}
+            
+        </div>
+        <div class="col-3">
+            
+            <!-- Guide on how to use the page -->  
+            {% include "search/guide.html" %}
 
-    <!-- graph interface starts here-->
-    <div class="mt-3">
-      <h3>Grafer</h3>
+        </div>
     </div>
-    <div class="card mb-1">
-        <!--choose x variable-->
-        <div class="row g-0 border-bottom">
-          <div class="col-3 border-end">
-            <div class="card-body">
-            Vælg en X variabel
-            </div>
-          </div>
-          <div class="col-9">
-            <div class="card-body">
-              <div style="display:flex">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="x" id="gender-x" value="gender">
-                    <label class="form-check-label" for="gender-x">Køn</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="x" id="status-x" value="status">
-                    <label class="form-check-label" for="status-x">Ægteskabelig status</label>
-                </div>
-                <!-- <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="x" id="migrant-x" value="migrant">
-                    <label class="form-check-label" for="migrant">Migranttype</label>
-                </div> -->
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="x" id="location-x" value="location">
-                  <label class="form-check-label" for="location-x">Bostedstype</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="x" id="county-x" value="county">
-                    <label class="form-check-label" for="county-x">Amt</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="x" id="five-x" value="five">
-                    <label class="form-check-label" for="five-x">5 års aldersgrupper</label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- choose y variable-->
-        <div class="row g-0 border-bottom">
-          <div class="col-3 border-end">
-            <div class="card-body">
-            Vælg en Y variabel
-            </div>
-          </div>
-          <div class="col-9">
-            <div class="card-body">
-              <div style="display:flex">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="y" id="gender-y" value="gender" disabled>
-                    <label class="form-check-label" for="gender-y">Køn</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="y" id="status-y" value="status" disabled>
-                    <label class="form-check-label" for="status-y">Ægteskabelig status</label>
-                </div>
-                <!-- <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="y" id="migrant-y" value="migrant" disabled>
-                    <label class="form-check-label" for="migrant-y">Migranttype</label>
-                </div> -->
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="y" id="location-y" value="location" disabled>
-                  <label class="form-check-label" for="location-y">Bostedstype</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="y" id="county-y" 
-                    value="county" disabled>
-                    <label class="form-check-label" for="county-y">Amt</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="y" id="five-y" 
-                    value="five" disabled>
-                    <label class="form-check-label" for="five-y">5 års aldersgrupper</label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- choose z variable-->
-        <div class="row g-0">
-          <div class="col-3 border-end">
-            <div class="card-body">
-            Vælg en Z variabel
-            </div>
-          </div>
-          <div class="col-9">
-            <div class="card-body">
-              <div style="display:flex">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="z" id="gender-z" value="gender" disabled>
-                    <label class="form-check-label" for="gender-z">Køn</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="z" id="status-z" value="status" disabled>
-                    <label class="form-check-label" for="status-z">Ægteskabelig status</label>
-                </div>
-                <!-- <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="z" id="migrant-z" value="migrant" disabled>
-                    <label class="form-check-label" for="migrant-z">Migranttype</label>
-                </div> -->
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="z" id="location-z" value="location" disabled>
-                  <label class="form-check-label" for="location-z">Bostedstype</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="z" id="county-z" 
-                    value="county" disabled>
-                    <label class="form-check-label" for="county-z">Amt</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="z" id="five-z" 
-                    value="five" disabled>
-                    <label class="form-check-label" for="five-z">5 års aldersgrupper</label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- graph input button ends here-->
-
-      <!-- buttons for choosing a chart type -->
-      <div class="card mb-1">
-        <div class="card-body text-center">
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#chart-modal" id="pie-btn" style="display: visibility;">
-                Pie Chart
-              </button>
-            </div>
-            <div class="col">
-              <button type="button" class="btn btn-primary" 
-              data-bs-toggle="modal" data-bs-target="#chart-modal" id="line-btn" style="display: visibility;">
-                Line Chart
-              </button>
-            </div>
-            <div class="col">
-              <button type="button" class="btn btn-primary"
-              data-bs-toggle="modal" data-bs-target="#chart-modal" id="bar-btn" style="display: visibility;">
-                Bar Chart
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- popup/modal for showing and downloading chart-->
-      <div class="modal fade" id="chart-modal" tabindex="-1">
-        <div class="modal-dialog modal-xl" id="modal-size">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="chart-modal-label">Chart</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="chart-modal-body">
-              <canvas id="chart-canvas" style="min-width:100%;min-height:100%;"></canvas>
-              <a id="chart-download" style="visibility:hidden">
-                <button type="button" class="btn btn-primary float-end">Download</button>
-              </a>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    {% endif %}
-    <!-- the stuff dependent on there being a search results ends here-->
-    
-  </div>
-    <!-- first col-9 ends here -->
-  
-  <!-- Guide on how to use the page -->  
-  <div class="col-3">
-    <div class="card" style="width: 18rem;">
-      <div class="card-body">
-        <h5 class="card-title">Guide</h5>
-        <p class="card-text">Tryk enter for at søge efter du har valgt et årstal og evt et filter at søge ind i.</p>
-        <p class="card-text">Forklar noget mere her</p>
-        <br>
-        <br>
-        <br>
-        <p class="card-text">Forklar endnu mere her</p>
-      </div>
-    </div>
-  </div>
-</div>
 <!-- first row ends here -->
 </div>
 <!-- first container ends here -->

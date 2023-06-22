@@ -402,8 +402,6 @@ function getToolTipList() {
   })
 }
 
-
-
 function updateAllowances(allowances, btn, val) {
   Object.keys(allowances[btn]).forEach((item) => {
     if(item != val) {
