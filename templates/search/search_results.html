@@ -15,6 +15,7 @@
             <h6 class="card-title col-sm" name="show-household-function-std">Stilling i husstanden</h6>
             <h6 class="card-title col-sm" name="show-household-id">Husstands ID</h6>
             <h6 class="card-title col-sm" name="show-job-original">Erhverv</h6>
+            <h6 class="card-title col-sm" name="show-county">Amt</h6>
             <h6 class="card-title col-sm" name="show-migration" style="display:none">Migranttype</h6>
           </div>
         </div>
@@ -33,6 +34,7 @@
                 <p class="card-title col-sm" name="show-household-function-std">{{ item.stilling_i_husstanden_standardiseret }}</p>
                 <p class="card-title col-sm" name="show-household-id">{{ item.husstands_id }}</p>
                 <p class="card-title col-sm" name="show-job-original">{{ item.erhverv_original }}</p>
+                <p class="card-title col-sm" name="show-county">{{ item.amt }}</p>
                 {% if year != "1801" %} 
                   <p class="card-title col-sm" name="show-migration">{{ item.migrant_type }}</p>
                 {% endif %}

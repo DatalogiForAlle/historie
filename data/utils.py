@@ -17,8 +17,8 @@ field_dict = {
     "location": "bostedstype",
     "job_original": "erhverv_original",
     "household_function_std": "stilling_i_husstanden_standardiseret",
+    "migration": "migrant_type",
     # "fødesogn_by_standardiseret",
-    # "migrant": "migrant_type",
 }
 
 
