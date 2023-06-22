@@ -1,0 +1,35 @@
+<div class="row">
+    <!--show number of results in a style consistent with the pagination nav style-->
+    <div class="col-sm">
+      <ul class="pagination">
+        <li class="page-item disabled">
+          <div class="page-link"> Viser {{ page_obj.start_index }}-{{ page_obj.end_index }} ud af {{ page_obj.paginator.count }} resultater.
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm">
+      <!-- actual pagination starts here -->
+      <nav aria-label="Search results pages">
+        <ul class="pagination justify-content-end">
+          {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?{{ parameters }}&page=1">
+                First</a></li>
+            <li class="page-item"><a class="page-link" href="?{{ parameters }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+          {% endif %}
+      
+          {% if page_obj %}
+            <li class="page-item disabled"><div class="page-link">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</div>
+            </li>
+          {% endif %}
+      
+          {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?{{ parameters }}&page={{ page_obj.next_page_number }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?{{ parameters }}&page={{ page_obj.paginator.num_pages }}">Last</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <!-- pagination ends here -->

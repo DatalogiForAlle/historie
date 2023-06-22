@@ -1,0 +1,40 @@
+
+
+<div class="row">
+    <div class="col-12" id="results">
+      <div class="card border-0">
+        <div class="card-body">
+          <div class="row">
+            <h6 class="card-title col-sm" name="show-pa-id"> Pa ID</h6>
+            <h6 class="card-title col-sm" name="show-name">Navn</h6>
+            <h6 class="card-title col-sm" name="show-age">Alder</h6>
+            <h6 class="card-title col-sm" name="show-gender">Køn</h6>
+            <h6 class="card-title col-sm" name="show-status">Ægteskabelig Stilling</h6>
+            <h6 class="card-title col-sm" name="show-location">Bostedstype</h6>
+            <h6 class="card-title col-sm" name="show-parish">Sogn/By</h6>
+            <h6 class="card-title col-sm" name="show-household-function-std">Stilling i husstanden</h6>
+            <h6 class="card-title col-sm" name="show-migration" style="display:none">Migranttype</h6>
+          </div>
+        </div>
+      </div>
+      {% for item in page_obj %}
+        <div class="card mb-1">
+          <div class="card-body">
+            <div class="row">
+                <p class="card-title col-sm" name="show-pa-id">{{ item.pa_id }}</p>
+                <p class="card-title col-sm" name="show-name">{{ item.navn }}</p>
+                <p class="card-title col-sm" name="show-age">{{ item.alder }}</p>
+                <p class="card-title col-sm" name="show-gender">{{ item.køn }}</p>
+                <p class="card-title col-sm" name="show-status">{{ item.ægteskabelig_stilling }}</p>
+                <p class="card-title col-sm" name="show-location">{{ item.bostedstype }}</p>
+                <p class="card-title col-sm" name="show-parish">{{ item.sogn_by }}</p>
+                <p class="card-title col-sm" name="show-household-function-std">{{ item.stilling_i_husstanden_standardiseret }}</p>
+                {% if year != "1801" %} 
+                  <p class="card-title col-sm" name="show-migration">{{ item.migrant_type }}</p>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>

@@ -255,7 +255,7 @@ class SqlSearchResultsListView(ListView):
 
 
 def search(request):
-    persons_per_page = 5
+    # persons_per_page = 5
 
     context = {}
 
@@ -269,6 +269,9 @@ def search(request):
         context["search_category_2"] = str(query_values["search_category_2"])
         context["combine"] = str(query_values["combine"])
 
+        results_per_page = str(query_values["results_per_page"])
+        context["results_per_page"] = results_per_page
+
         page_obj = get_query_result(query_values)
 
         get_copy = request.GET.copy()
@@ -276,12 +279,12 @@ def search(request):
         context["parameters"] = parameters
 
         page = request.GET.get("page", 1)
-        paginator = Paginator(page_obj, persons_per_page)
+        paginator = Paginator(page_obj, results_per_page)
 
         try:
             page_obj = paginator.page(page)
         except PageNotAnInteger:
-            page_obj = paginator.page(persons_per_page)
+            page_obj = paginator.page(results_per_page)
         except EmptyPage:
             page_obj = paginator.page(paginator.num_pages)
 

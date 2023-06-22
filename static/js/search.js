@@ -143,7 +143,6 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
     }
 }
 
-
 function keepYearInput(year) {
     sessionStorage.setItem("year", year)
     if (year) {
@@ -202,6 +201,12 @@ function displayFieldCheckBoxes(year){
     parent = document.createElement("div")
     parent.id = "field-checkbox-parent"
     parent.style="display:flex"
+    parent.insertAdjacentHTML("beforeend",
+    `
+    <div style="margin-right:10px; display:inline-block">
+        Synlige felter: 
+    </div>
+    `)
 
     for (const [fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
         parent.insertAdjacentHTML("beforeend",
@@ -323,8 +328,60 @@ function keepFieldCheckboxInput(year) {
     }
     updateFieldCheckboxes()
     showResults(fieldsToDisplay)
-
 }
+
+function savePerPage(per_page) {
+    sessionStorage.setItem("per_page", per_page)
+}
+
+function recallPerPage(per_page) {
+    const perPageElm = document.getElementById(`per-page-${per_page}`)
+    if (perPageElm) {
+        perPageElm.checked = true
+    }
+}
+
+function keepPerPage(per_page) {
+    savePerPage(per_page)
+    recallPerPage(per_page)
+}
+
+
+function retrieveQueryInput() {
+    const inputFields = ["year", "searchCategory1", "query1", "searchCategory2","query2", "combine"]
+    const queryInputs = {}
+    for (const inputField of inputFields) {
+        queryInputs[inputField] = sessionStorage.getItem(inputField)
+    }
+    return queryInputs 
+} 
+
+function setPerPageButtonFunctions() {
+    console.log("inside setPerPAgeButtonFuntions")
+    const perPageButtons = document.querySelectorAll('input[name="num-results"]')
+    const queryForm = document.getElementById("query-form")
+    for (const perPageBtn of perPageButtons) {
+        // changing per page should resubmit query
+        
+        perPageBtn.addEventListener('change', function() {
+            console.log("inside perPageonchange")
+            queryInputs = retrieveQueryInput()
+            console.log(queryInputs)
+            keepUserInput(queryInputs.year, queryInputs.searchCategory1, queryInputs.query1, queryInputs.searchCategory2, queryInputs.query2, queryInputs.combine)
+            queryForm.submit()
+        })
+    }
+}
+
+
+function handleResultsPerPage(per_page) {
+    console.log("inside handleResultsperpage")
+    keepPerPage(per_page)
+    
+    setPerPageButtonFunctions()
+}
+
+
 
 function getToolTipList() {
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

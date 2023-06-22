@@ -79,6 +79,7 @@ def get_query_values(request):
     query_2 = request.GET.get("q2").lower()
     search_category_2 = request.GET.get("search-category-2")
     combine = request.GET.get("combine")
+    results_per_page = request.GET.get("num-results", 5)
 
     return {
         "year": year,
@@ -87,6 +88,7 @@ def get_query_values(request):
         "query_2": query_2,
         "search_category_2": search_category_2,
         "combine": combine,
+        "results_per_page": results_per_page,
     }
 
 
