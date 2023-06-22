@@ -197,8 +197,8 @@ function getOneInputChart(url, chartType) {
 //     return url
 // }
 
-function buildFetchUrl(startString, selectedVals, queryParams) {
-    url = `${startString}_input_chart/?year=${queryParams.year}&search-category-1=${queryParams.searchCategory1}&q1=${queryParams.query1}&search-category-2=${queryParams.searchCategory2}&q2=${queryParams.query2}&combine=${queryParams.combine}`
+function buildFetchUrl(startString, selectedVals, queryParams, chartType) {
+    url = `${startString}_input_chart/?year=${queryParams.year}&search-category-1=${queryParams.searchCategory1}&q1=${queryParams.query1}&search-category-2=${queryParams.searchCategory2}&q2=${queryParams.query2}&combine=${queryParams.combine}&chartType=${chartType}`
     selectedVals.forEach(function(item) {
         url += `&${item["varName"]}=${item["varValue"]}`
     })
@@ -222,7 +222,7 @@ function getChart(chartType) {
     queryParams = retrieveQueryParams()
     // remember to make check somewhere that at least the x variable has to be chosen in order to get a chart
     if (selectedVals.length === 1) {
-        url = buildFetchUrl("one", selectedVals, queryParams)
+        url = buildFetchUrl("one", selectedVals, queryParams, chartType)
         if (chartType == "pie") {
             document.getElementById("modal-size").classList.remove('modal-xl');
         } else {
@@ -233,7 +233,7 @@ function getChart(chartType) {
     }
     else if (selectedVals.length === 2) {
         document.getElementById("modal-size").classList.add('modal-xl');
-        url = buildFetchUrl("two", selectedVals, queryParams)
+        url = buildFetchUrl("two", selectedVals, queryParams, chartType)
         getTwoInputChart(url, chartType)
     }
 }

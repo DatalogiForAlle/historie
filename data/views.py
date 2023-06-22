@@ -300,6 +300,8 @@ def one_input_chart(request):
     if is_ajax:
         if request.method == "GET":
             x_val = translate_field(request.GET.get("x_val"))
+            chart_type = request.GET.get("chartType")
+            print("chartType is: ", chart_type)
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
             # querying the database, returns a list of dicts
@@ -338,9 +340,18 @@ def one_input_chart(request):
                 dict_res = {d[x_val]: d.get("total") for d in query_res}
                 print("dict res one input: ", dict_res)
 
+            if chart_type == "pie":
+                # only take biggest 5 categories, the rest are lumped into other
+                sorted_elms = sorted(dict_res.items(), key=lambda x: x[1], reverse=True)
+                dict_res = dict(sorted_elms[:5])
+                other_total = sum(dict(sorted_elms[5:]).values())
+                if other_total != 0:
+                    dict_res["other"] = other_total
+                print("pie dict res: ", dict_res)
+
             labels, data = zip(*dict_res.items())
-            # print("one input data: ", data)
-            # print("one input data type: ", type(data))
+            print("one input data: ", data)
+            print("one input data type: ", type(data))
 
             return JsonResponse({"labels": labels, "data": data, "datasetLabel": x_val})
         return JsonResponse({"status": "Invalid request"}, status=400)
