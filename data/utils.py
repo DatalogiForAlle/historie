@@ -52,6 +52,8 @@ def get_q_filter(search_category, query):
             return Q(stilling_i_husstanden_standardiseret=query)
         case "status":
             return Q(ægteskabelig_stilling=query)
+        case "location":
+            return Q(bostedstype=query)
         case "migration":
             return Q(migrant_type=query)
 
