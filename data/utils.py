@@ -50,6 +50,8 @@ def get_q_filter(search_category, query):
             return Q(køn=query)
         case "household-function-std":
             return Q(stilling_i_husstanden_standardiseret=query)
+        case "status":
+            return Q(ægteskabelig_stilling=query)
         case "migration":
             return Q(migrant_type=query)
 

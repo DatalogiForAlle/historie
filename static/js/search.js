@@ -136,6 +136,10 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
             const householdOptions = ['hendes barn', 'ukendt', 'barn', 'tjeneste', 'husfader', 'kone', 'husmoder', 'hans barn', 'andet']
             insertFormElm(createSelectElm(householdOptions, queryName, queryId), formId)
             break
+        case "status":
+            const statusOptions = ["ugift", "gift", "enke", "skilt", "ukendt"]
+            insertFormElm(createSelectElm(statusOptions, queryName, queryId), formId)
+            break
         case "migration" :
             const migrationOptions = ['migrant', 'indfødt', 'ukendt']
             insertFormElm(createSelectElm(migrationOptions, queryName, queryId), formId)
