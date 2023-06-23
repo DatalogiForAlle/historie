@@ -9,7 +9,21 @@ function replaceChartCanvas() {
     return ctx 
 }
 
+function stackedOption(chartType) {
+    if (chartType === "bar") {
+        const scales = {x: { stacked: true},y: {stacked: true}}
+        return scales
+    } else {
+        return {}
+    } 
+}
+
 function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
+    console.log({datasetlabel: datasetLabel})
+    let titleText = year
+    if (datasetLabel === "sogn_by" && chartType !== "pie") {
+        titleText += " - største 20 sogn" 
+    }
     var myChart = new Chart(ctx, {
       type: chartType,
       data: {
@@ -18,7 +32,7 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
             //   label: datasetLabel,
               data: data,
               borderWidth: 1
-          }]
+          }],
       },
       options: {
           layout: {
@@ -35,7 +49,7 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
             //   },
               title: {
                   display: true,
-                  text: year
+                  text: titleText
               },
               customCanvasBackgroundColor: {
                 color: 'white',
@@ -70,12 +84,15 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
     });
   }
 
+
+  
   function createTwoInputChart(ctx, labels, datasets, year, chartType) {
+    
     var myChart = new Chart(ctx, {
       type: chartType,
       data: {
           labels: labels,
-          datasets: datasets
+          datasets: datasets,
       },
       options: {
           layout: {
@@ -115,7 +132,17 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
               pieDownload.href = myChart.toBase64Image()
               pieDownload.download = "chart_image.png"
             }
-          }
+          },
+        //   indexAxis: "y",
+          scales: stackedOption(chartType)
+        //   {
+        //     x: {
+        //         stacked: true
+        //     },
+        //     y: {
+        //         stacked: true
+        //     }
+        //   }
       },
       //custom plugins to create proper background for the downloaded image
       //see https://www.chartjs.org/docs/latest/configuration/canvas-background.html#color
@@ -198,11 +225,20 @@ function getOneInputChart(url, chartType) {
 // }
 
 function buildFetchUrl(startString, selectedVals, queryParams, chartType) {
-    url = `${startString}_input_chart/?year=${queryParams.year}&search-category-1=${queryParams.searchCategory1}&q1=${queryParams.query1}&search-category-2=${queryParams.searchCategory2}&q2=${queryParams.query2}&combine=${queryParams.combine}&chartType=${chartType}`
+    url = `${startString}_input_chart/?year=${queryParams.year}&search-category-1=${queryParams.searchCategory1}&q1=${queryParams.query1}&search-category-2=${queryParams.searchCategory2}&q2=${queryParams.query2}&combine=${queryParams.combine}&chartType=${chartType}&absRatio=${queryParams.absRatio}`
     selectedVals.forEach(function(item) {
         url += `&${item["varName"]}=${item["varValue"]}`
     })
     return url
+}
+
+function getAbsRatio() {
+    const absRatioBtns = document.getElementsByName("abs-ratio")
+    for (const btn of absRatioBtns) {
+        if (btn.checked) {
+            return btn.value
+        }
+    }
 }
 
 function retrieveQueryParams() {
@@ -212,7 +248,8 @@ function retrieveQueryParams() {
     searchCategory2 = sessionStorage.getItem("searchCategory2")
     query2 = sessionStorage.getItem("query2")
     combine = sessionStorage.getItem("combine")
-    return {year:year, searchCategory1: searchCategory1, query1: query1, searchCategory2: searchCategory2, query2: query2, combine:combine}
+    absRatio = getAbsRatio()
+    return {year:year, searchCategory1: searchCategory1, query1: query1, searchCategory2: searchCategory2, query2: query2, combine:combine, absRatio: absRatio}
 } 
 
 

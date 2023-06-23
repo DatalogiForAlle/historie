@@ -53,7 +53,7 @@
                 <!-- chart interface starts here-->
                 {% include "search/chart_variables.html" %}
                 <script>
-                    displayAllChartVariableChoices()
+                    displayAllChartVariableChoices("{{year}}")
                 </script>
             
                 <!-- buttons for choosing a chart type -->
@@ -86,7 +86,7 @@
 
   var toolTipList = getToolTipList()
   
-  updateGraphInput()
+  updateGraphInput("{{year}}")
   recallGraphInput()
   recallDisabledGraphButtons()
   showChart() 

@@ -1,10 +1,15 @@
-function displayChartVariableChoices(variableName, choices) {
+function displayChartVariableChoices(variableName, year) {
     // const titleText = `Vælg en ${variableName.toUpperCase()}-variabel.`
+    const choices = setChoices(year, variableName) 
     const gpId = `choose-${variableName}-variable`
     console.log({gpId: gpId})
     const grandParent = document.getElementById(gpId)
     const parent = document.createElement("div")
     parent.style="display:flex"
+    //temporary fix
+    if (variableName === "z") {
+        parent.style="visibility:hidden"
+    }
     for (const [choice, title] of Object.entries(choices)) {
         parent.insertAdjacentHTML("beforeend", `
         <div class="form-check form-check-inline">
@@ -14,24 +19,35 @@ function displayChartVariableChoices(variableName, choices) {
         `)
     }
     grandParent.replaceChildren(parent)
+    if (variableName === "x") {
+        document.getElementById(`gender-${variableName}`).checked = true 
+    }
+    
 }
 
-function displayAllChartVariableChoices() {
-    const choices = setChoices()
+function displayAllChartVariableChoices(year) {
+    // const choices = setChoices(year)
     const variables = ["x", "y", "z"]
     for (const variableName of variables) {
-        displayChartVariableChoices(variableName, choices)
+        displayChartVariableChoices(variableName, year)
     }
 }
 
-function setChoices() {
-    const choices = {gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", county: "Amt", five: "5 års aldersgruppe", migration: "Migrationstype"}
+function setChoices(year, variableName) {
+    const choices = {gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", county: "Amt", five: "5 års aldersgruppe", age: "Alder", household_function_std: "Stilling i husstanden"}
+    if (year !== "1801") {
+        choices.migration = "Migrationstype"
+    }
+    if (variableName === "x") {
+        choices.parish = "Sogn/By"
+    }
     return choices
 }
 
-function setAllowances(variableNames, choices) {
+function setAllowances(variableNames, year) {
     const allowances = {}
     for (const variableName of variableNames) {
+        const choices = setChoices(year, variableName)
         let varBooleans = {}
         for (const [choice, title] of Object.entries(choices)) {
             varBooleans[choice] = false
@@ -48,19 +64,25 @@ function updateAllowances(allowances, btn, val) {
         }
         else allowances[btn][item] = false
     })
+    console.log({insideUpdateAllowancesVal: val})
+    if (val === "parish") {
+        Object.keys(allowances[btn]).forEach((item) => {
+            allowances[btn][item] = false
+        })
+    }
 }
   
   
-function updateGraphInput() {
+function updateGraphInput(year) {
     updateGraphDisplay()
     
     // var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, location: false, county: false, five: false}, z: {gender: false, status: false, location: false, county: false, five: false}}
     // var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, location: false, county: false, five: false}}
 
-    const choices = setChoices()
+    // const choices = setChoices()
     // if the allowance objects already exists, we get them, otherwise we create them and set them all to false
-    let xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || setAllowances(["y", "z"], choices)
-    let yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || setAllowances(["z"], choices)
+    let xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || setAllowances(["y", "z"], year)
+    let yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || setAllowances(["z"], year)
 
     // console.log({xEqual: JSON.stringify(xAllowances)===JSON.stringify(xAllowances2)})
 

@@ -232,7 +232,7 @@ function displayFieldCheckBoxes(year){
         </div>
         `)
     } 
-    grandParent.replaceChildren(parent)  
+    grandParent.replaceChildren(parent) 
 }
 
 function setFieldsToDisplay(year) {

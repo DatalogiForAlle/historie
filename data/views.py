@@ -301,6 +301,7 @@ def one_input_chart(request):
         if request.method == "GET":
             x_val = translate_field(request.GET.get("x_val"))
             chart_type = request.GET.get("chartType")
+            absRatio = request.GET.get("absRatio")
             print("chartType is: ", chart_type)
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
@@ -334,6 +335,9 @@ def one_input_chart(request):
                 # creating a dict with fieldvalue as key, count as value
                 print("query_res_sorted", query_res_sorted)
                 dict_res = {d[x_val]: d.get("total") for d in query_res_sorted}
+            # elif x_val == "alder":
+            #     # nødvendigt at sortere alder
+            #     print("age queryres is: ", query_res)
             else:
                 # creating a dict with fieldvalue as key, count as value
                 print("queryres is: ", query_res)
@@ -341,19 +345,48 @@ def one_input_chart(request):
                 print("dict res one input: ", dict_res)
 
             if chart_type == "pie":
-                # only take biggest 5 categories, the rest are lumped into other
+                NUM_CUTOFF = 5
+                # only take biggest NUM_CUTOFF categories, the rest are lumped into other
                 sorted_elms = sorted(dict_res.items(), key=lambda x: x[1], reverse=True)
-                dict_res = dict(sorted_elms[:5])
-                other_total = sum(dict(sorted_elms[5:]).values())
+                dict_res = dict(sorted_elms[:NUM_CUTOFF])
+                other_total = sum(dict(sorted_elms[NUM_CUTOFF:]).values())
                 if other_total != 0:
-                    dict_res["other"] = other_total
+                    dict_res["andet"] = other_total
+                print("pie dict res: ", dict_res)
+            elif x_val == "sogn_by":
+                NUM_CUTOFF = 20
+                # only take biggest NUM_CUTOFF categories, the rest are lumped into other
+                sorted_elms = sorted(dict_res.items(), key=lambda x: x[1], reverse=True)
+                dict_res = dict(sorted_elms[:NUM_CUTOFF])
                 print("pie dict res: ", dict_res)
 
             labels, data = zip(*dict_res.items())
             print("one input data: ", data)
             print("one input data type: ", type(data))
+            print("labaels", labels)
 
-            return JsonResponse({"labels": labels, "data": data, "datasetLabel": x_val})
+            def get_percentages(ds):
+                ds_list = list(ds)
+                items_total = sum(ds_list)
+                percentages = [((x / items_total) * 100) for x in ds_list]
+                print("items_total: ", items_total)
+                print("ds_list: ", ds_list)
+                print("percentages: ", percentages)
+                return tuple(percentages)
+
+            if absRatio == "absolute":
+                return JsonResponse(
+                    {"labels": labels, "data": data, "datasetLabel": x_val}
+                )
+            else:
+                return JsonResponse(
+                    {
+                        "labels": labels,
+                        "data": get_percentages(data),
+                        "datasetLabel": x_val,
+                    }
+                )
+
         return JsonResponse({"status": "Invalid request"}, status=400)
     else:
         return HttpResponseBadRequest("Invalid request")
@@ -366,6 +399,7 @@ def two_input_chart(request):
         if request.method == "GET":
             x_val = translate_field(request.GET.get("x_val"))
             y_val = translate_field(request.GET.get("y_val"))
+            abs_ratio = request.GET.get("absRatio")
 
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
@@ -383,9 +417,9 @@ def two_input_chart(request):
                 seen = set()
                 return [x for x in sequence if not (x in seen or seen.add(x))]
 
-            # print("queryRes: ", query_res)
-            # print("x: ", x_val)
-            # print("y: ", y_val)
+            print("queryRes: ", query_res)
+            print("x: ", x_val)
+            print("y: ", y_val)
             x_labels = unique([d[x_val] for d in query_res])
             y_labels = unique([d[y_val] for d in query_res])
 
@@ -405,15 +439,33 @@ def two_input_chart(request):
             elif y_val == "fem_års_aldersgrupper":
                 y_labels = sort_age_labels(y_labels)
 
-            # initializing datasets with total=0 for all possible combos, in case some combos do not exist in the query result
-            datasets = []
-            for x_label in x_labels:
-                tempA = {}
-                for y_label in y_labels:
-                    tempA[y_label] = 0
-                datasets.append({"label": x_label, "data": tempA})
+            if x_val == "alder":
+                x_labels = sorted(x_labels)
+            if y_val == "alder":
+                y_labels = sorted(y_labels)
 
-            print("orig dataset: ", datasets)
+            print("x_labels: ", x_labels)
+            print("y_labels: ", y_labels)
+
+            # initializing datasets with total=0 for all possible combos, in case some combos do not exist in the query result
+            def get_empty_dataset(xls, yls):
+                empty_ds = []
+                for xl in xls:
+                    tempA = {}
+                    for yl in yls:
+                        tempA[yl] = 0
+                    empty_ds.append({"label": xl, "data": tempA})
+                return empty_ds
+
+            # datasets = []
+            # for x_label in x_labels:
+            #     tempA = {}
+            #     for y_label in y_labels:
+            #         tempA[y_label] = 0
+            #     datasets.append({"label": x_label, "data": tempA})
+            datasets = get_empty_dataset(x_labels, y_labels)
+
+            print("empty dataset: ", datasets)
 
             # update datasets with real values from queryset
             for i in range(len(datasets)):
@@ -421,10 +473,32 @@ def two_input_chart(request):
                     if datasets[i]["label"] == d[x_val]:
                         datasets[i]["data"][d[y_val]] = d["total"]
 
+            def get_percentages(xls, yls, ds):
+                percentage_ds = get_empty_dataset(xls, yls)
+                for yl in yls:
+                    yl_total = 0
+                    for d in ds:
+                        yl_total += d["data"][yl]
+                    print(yl_total)
+                    for i in range(len(percentage_ds)):
+                        xl = percentage_ds[i]["label"]
+                        xl_yl = [x["data"][yl] for x in ds if x["label"] == xl][0]
+                        xl_yl_percentage = (xl_yl / yl_total) * 100
+                        percentage_ds[i]["data"][yl] = xl_yl_percentage
+                return percentage_ds
+
+            percentage_ds = get_percentages(x_labels, y_labels, datasets)
+            print("percentage_datasets: ", percentage_ds)
             print("datasets: ", datasets)
+            print("labels: ", y_labels)
+            y_labels = [str(x) for x in y_labels]
+            print("labels: ", y_labels)
             # print("queryres: ", query_res)
 
-            return JsonResponse({"labels": y_labels, "datasets": datasets})
+            if abs_ratio == "absolute":
+                return JsonResponse({"labels": y_labels, "datasets": datasets})
+            else:
+                return JsonResponse({"labels": y_labels, "datasets": percentage_ds})
 
         return JsonResponse({"status": "Invalid request"}, status=400)
     else:
