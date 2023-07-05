@@ -503,3 +503,133 @@ def two_input_chart(request):
         return JsonResponse({"status": "Invalid request"}, status=400)
     else:
         return HttpResponseBadRequest("Invalid request")
+
+
+def population_pyramid(request):
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+    if is_ajax:
+        if request.method == "GET":
+            x_val = translate_field(request.GET.get("x_val"))
+            y_val = translate_field(request.GET.get("y_val"))
+            abs_ratio = request.GET.get("absRatio")
+
+            query_values = get_query_values(request)
+            filter_result = get_query_result(query_values)
+
+            # querying the database, returns a list of dicts
+            query_res = list(
+                # person.objects.filter(q_filter)
+                filter_result.values(x_val, y_val)
+                .annotate(total=Count("id"))
+                .order_by()
+            )
+
+            # removing duplicates while preserving order
+            def unique(sequence):
+                seen = set()
+                return [x for x in sequence if not (x in seen or seen.add(x))]
+
+            x_labels = unique([d[x_val] for d in query_res])[::-1]
+            y_labels = unique([d[y_val] for d in query_res])
+
+            # print("queryRes: ", query_res)
+            # print("x: ", x_val)
+            # print("y: ", y_val)
+            # print("x_label_unique: ", x_labels)
+            # print("y_label_unique: ", y_labels)
+
+            def sort_age_labels(labels):
+                def sorting_key(elem):
+                    if elem[0] == "-":
+                        return int(elem)
+                    elif "-" in elem:
+                        return int(elem.split("-")[0])
+                    elif "+" in elem:
+                        return int(elem.split("+")[0])
+
+                age_labels = sorted(labels, key=sorting_key, reverse=True)
+                print("agelabels: ", age_labels)
+                return age_labels
+
+            if x_val == "fem_års_aldersgrupper":
+                x_labels = sort_age_labels(x_labels)
+            elif y_val == "fem_års_aldersgrupper":
+                y_labels = sort_age_labels(y_labels)
+
+            if x_val == "alder":
+                x_labels = sorted(x_labels)
+            if y_val == "alder":
+                y_labels = sorted(y_labels)
+
+            # print("x_labels: ", x_labels)
+            # print("y_labels: ", y_labels)
+
+            # initializing datasets with total=0 for all possible combos, in case some combos do not exist in the query result
+            def get_empty_dataset(xls, yls):
+                empty_ds = []
+                for xl in xls:
+                    tempA = {}
+                    for yl in yls:
+                        tempA[yl] = 0
+                    empty_ds.append({"label": xl, "data": tempA})
+                return empty_ds
+
+            datasets = get_empty_dataset(x_labels, y_labels)
+
+            print("empty dataset: ", datasets)
+
+            # update datasets with real values from queryset
+            for i in range(len(datasets)):
+                for d in query_res:
+                    if datasets[i]["label"] == d[x_val]:
+                        datasets[i]["data"][d[y_val]] = d["total"]
+
+            def get_population_percentages(xls, yls, ds):
+                print("ds is: ", ds)
+                percentage_ds = get_empty_dataset(xls, yls)
+                total = 0
+                for yl in yls:
+                    for d in ds:
+                        total += d["data"][yl]
+                print("total is: ", total)
+                for yl in yls:
+                    for i in range(len(percentage_ds)):
+                        xl = percentage_ds[i]["label"]
+                        xl_yl = [x["data"][yl] for x in ds if x["label"] == xl][0]
+                        xl_yl_percentage = (xl_yl / total) * 100
+                        percentage_ds[i]["data"][yl] = xl_yl_percentage
+                return percentage_ds
+
+            percentage_ds = get_population_percentages(x_labels, y_labels, datasets)
+
+            # percentage_ds = get_percentages(x_labels, y_labels, datasets)
+            # print("percentage_datasets: ", percentage_ds)
+            # print("datasets: ", datasets)
+            # print("labels: ", y_labels)
+            y_labels = [str(x) for x in y_labels]
+            # print("labels: ", y_labels)
+            # print("queryres: ", query_res)
+
+            def get_list_of_values(elm):
+                _, val_list = zip(*elm["data"].items())
+                elm["data"] = list(val_list)
+                if elm["label"] == "m":
+                    elm["data"] = [x * (-1) for x in elm["data"]]
+                return elm
+
+            list(map(get_list_of_values, datasets))
+            list(map(get_list_of_values, percentage_ds))
+            # print("new_ds: ", new_ds)
+
+            print("datasets_changed: ", datasets)
+            print("percentage datasets changed: ", percentage_ds)
+
+            if abs_ratio == "absolute":
+                return JsonResponse({"labels": y_labels, "datasets": datasets})
+            else:
+                return JsonResponse({"labels": y_labels, "datasets": percentage_ds})
+
+        return JsonResponse({"status": "Invalid request"}, status=400)
+    else:
+        return HttpResponseBadRequest("Invalid request")

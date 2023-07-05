@@ -8,6 +8,7 @@ from .views import (
     search,
     one_input_chart,
     two_input_chart,
+    population_pyramid,
     # FinalSearch,
 )
 
@@ -21,6 +22,7 @@ urlpatterns = [
     # path("search/", FinalSearch.as_view(), name="final_search"),
     path("one_input_chart/", one_input_chart, name="one_input_chart"),
     path("two_input_chart/", two_input_chart, name="two_input_chart"),
+    path("population_pyramid/", population_pyramid, name="population_pyramid"),
 ]
 
 # urlpatterns = [

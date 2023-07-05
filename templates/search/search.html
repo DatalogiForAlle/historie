@@ -78,19 +78,18 @@
 
 <script type="text/javascript">
   
-  keepUserInput("{{year}}", "{{search_category_1}}", "{{query_1}}", "{{search_category_2}}", "{{query_2}}", "{{combine}}");
+    keepUserInput("{{year}}", "{{search_category_1}}", "{{query_1}}", "{{search_category_2}}", "{{query_2}}", "{{combine}}");
 
-  keepFieldCheckboxInput("{{year}}", "{{submit_elm}}")
+    keepFieldCheckboxInput("{{year}}", "{{submit_elm}}")
 
-  handleResultsPerPage("{{results_per_page}}")
+    handleResultsPerPage("{{results_per_page}}")
 
-  var toolTipList = getToolTipList()
-  
-  updateGraphInput("{{year}}")
-  recallGraphInput()
-  recallDisabledGraphButtons()
-  showChart() 
- 
+    var toolTipList = getToolTipList()
+    
+    updateGraphInput("{{year}}")
+    recallGraphInput()
+    recallDisabledGraphButtons()
+    showChart()
 </script>
 
 {% endblock content %}

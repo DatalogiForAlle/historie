@@ -246,20 +246,49 @@ function recallDisabledGraphButtons() {
 }
   
 function updateGraphDisplay() {
-    var isX = $('input[name=x]:checked').length > 0
-    var isY = $('input[name=y]:checked').length > 0
-    var isZ = $('input[name=z]:checked').length > 0
+    const isX = $('input[name=x]:checked').length > 0
+    const isY = $('input[name=y]:checked').length > 0
+    const isZ = $('input[name=z]:checked').length > 0
+    const pieBtn = document.getElementById("pie-btn")
+    const lineBtn = document.getElementById("line-btn")
+    const barBtn = document.getElementById("bar-btn")
+    const pyramidBtn = document.getElementById("pyramid-btn")
     // console.log({isY: isY})
     // console.log({isX: isX})
 
+    // xVal = document.querySelector('input[name="x"]:checked').value
+    // yVal = document.querySelector('input[name="y"]:checked').value
+
     if (isX) {
-        $('#line-btn').show()
-        $('#bar-btn').show()
+        lineBtn.disabled = false
+        barBtn.disabled = false
         if (!isY) {
-            $('#pie-btn').show()    
+            pieBtn.disabled = false
+            pyramidBtn.disabled = true 
         } else {
-            $('#pie-btn').hide()
+            pieBtn.disabled = true
+
+            xVal = document.querySelector('input[name="x"]:checked').value
+            yVal = document.querySelector('input[name="y"]:checked').value
+            if (xVal === "gender" && yVal === "five") {
+                pyramidBtn.disabled = false
+            } else {
+                pyramidBtn.disabled = true 
+            }
+            
         } 
+        // if (!isY) {
+        //     $('#pie-btn').show()  
+        //     if (xVal === "gender") {
+        //         $('#pyramid-btn').show() 
+        //     } else {
+        //         $('#pyramid-btn').hide() 
+        //     }
+        // } else {
+        //     $('#pie-btn').hide()
+        //     $('#pyramid-btn').hide() 
+        // } 
     }
 }
+
   
