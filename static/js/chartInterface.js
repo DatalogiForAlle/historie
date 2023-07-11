@@ -289,7 +289,7 @@ function updateGraphDisplay() {
 
             xVal = document.querySelector('input[name="x"]:checked').value
             yVal = document.querySelector('input[name="y"]:checked').value
-            if (xVal === "gender" && yVal === "five") {
+            if ((xVal === "gender" && ["five", "age"].includes(yVal)) || (yVal === "gender" && ["five", "age"].includes(xVal))) {
                 pyramidBtn.disabled = false
             } else {
                 pyramidBtn.disabled = true 

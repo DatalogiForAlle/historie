@@ -513,6 +513,13 @@ def population_pyramid(request):
         if request.method == "GET":
             x_val = translate_field(request.GET.get("x_val"))
             y_val = translate_field(request.GET.get("y_val"))
+
+            if x_val != "køn":
+                y_val = x_val
+                x_val = "køn"
+
+            # x_val = "køn"
+            # y_val = "alder"
             abs_ratio = request.GET.get("absRatio")
 
             query_values = get_query_values(request)
@@ -559,9 +566,9 @@ def population_pyramid(request):
                 y_labels = sort_age_labels(y_labels)
 
             if x_val == "alder":
-                x_labels = sorted(x_labels)
+                x_labels = sorted(x_labels, reverse=True)
             if y_val == "alder":
-                y_labels = sorted(y_labels)
+                y_labels = sorted(y_labels, reverse=True)
 
             # print("x_labels: ", x_labels)
             # print("y_labels: ", y_labels)
