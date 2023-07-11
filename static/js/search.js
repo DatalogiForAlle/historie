@@ -144,6 +144,10 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
             const locationOptions = ["land", "by", "københavn"]
             insertFormElm(createSelectElm(locationOptions, queryName, queryId), formId)
             break
+        case "job-original":
+            q.type = "text"
+            q.placeholder = "Indtast et erhverv"
+            break
         case "migration" :
             const migrationOptions = ['migrant', 'indfødt', 'ukendt']
             insertFormElm(createSelectElm(migrationOptions, queryName, queryId), formId)

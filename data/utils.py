@@ -40,7 +40,12 @@ def get_person_model(year):
 def get_q_filter(search_category, query):
     match search_category:
         case "parish":
-            return Q(sogn_by=query)
+            # this version will check that it contains the whole word
+            return Q(sogn_by__iregex=r"\y{0}\y".format(query))
+            # this version would have searching for "randers" include both rander and eg nørre tranders
+            # return Q(sogn_by__icontains=query)
+            # this version only accepts exact matches
+            # return Q(sogn_by=query)
         case "age":
             return Q(alder=query)
         case "age-interval":
@@ -54,6 +59,8 @@ def get_q_filter(search_category, query):
             return Q(ægteskabelig_stilling=query)
         case "location":
             return Q(bostedstype=query)
+        case "job-original":
+            return Q(erhverv_original__icontains=query)
         case "migration":
             return Q(migrant_type=query)
 
