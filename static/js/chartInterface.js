@@ -72,7 +72,7 @@ function updateAllowances(allowances, btn, val) {
         else allowances[btn][item] = false
     })
     console.log({insideUpdateAllowancesVal: val})
-    if (val === "parish") {
+    if (["parish", "household_id", "job_original"].includes(val)) {
         Object.keys(allowances[btn]).forEach((item) => {
             allowances[btn][item] = false
         })

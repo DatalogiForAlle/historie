@@ -55,8 +55,19 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
     console.log({datasetlabel: datasetLabel})
     console.log({ctx: ctx})
     let titleText = year
-    if (datasetLabel === "sogn_by" && chartType !== "pie") {
-        titleText += " - største 20 sogn" 
+    function translateTitle(t) {
+        console.log({tIs: t})
+        switch (t) {
+            case "sogn_by":
+                return "sogn"
+            case "husstands_id":
+                return "husstande"
+            case "erhverv_original":
+                return "erhverv"
+        }
+    }
+    if (["sogn_by", "husstands_id", "erhverv_original"].includes(datasetLabel) && chartType !== "pie") {
+        titleText += `- største 20 ${translateTitle(datasetLabel)}` 
     }
     var myChart = new Chart(ctx, {
       type: chartType,

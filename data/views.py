@@ -354,7 +354,7 @@ def one_input_chart(request):
                 if other_total != 0:
                     dict_res["andet"] = other_total
                 print("pie dict res: ", dict_res)
-            elif x_val == "sogn_by":
+            elif x_val in ["sogn_by", "husstands_id", "erhverv_original"]:
                 NUM_CUTOFF = 20
                 # only take biggest NUM_CUTOFF categories, the rest are lumped into other
                 sorted_elms = sorted(dict_res.items(), key=lambda x: x[1], reverse=True)
