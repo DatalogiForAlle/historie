@@ -2,14 +2,31 @@
     <div class="modal-dialog modal-xl" id="modal-size">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title" id="chart-modal-label">Chart</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="chart-modal-label">Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="chart-modal-body">
-            <canvas id="chart-canvas" style="min-width:100%;min-height:100%;"></canvas>
-            <a id="chart-download" style="visibility:hidden">
+                <canvas id="chart-canvas" style="min-width:100%;min-height:100%;"></canvas>
+                <a id="chart-download" style="visibility:hidden">
                 <button type="button" class="btn btn-primary float-end">Download</button>
             </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="list-modal" tabindex="-1">
+    <div class="modal-dialog modal-xl" id="list-modal-size">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="list-modal-label">Chart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="list-modal-body" style="height: 80vh; overflow-y: auto">
+                <div id="list-canvas" style="min-width:100%;min-height:100%;"></div>
+                <!-- <a id="load-btn"> -->
+                <button type="button" id="load-btn" class="btn btn-primary float-middle">Load more</button>
+            <!-- </a> -->
             </div>
         </div>
     </div>

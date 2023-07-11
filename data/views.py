@@ -1,4 +1,4 @@
-from django.db.models import Q, Count, Value, Case, When
+from django.db.models import Q, Count, Value, Case, When, Sum, F
 from django.db.models.functions import Coalesce
 from django.views.generic import ListView, TemplateView
 from django.shortcuts import render
@@ -274,6 +274,7 @@ def search(request):
         context["results_per_page"] = results_per_page
 
         page_obj = get_query_result(query_values)
+        # print("search page obj: ", page_obj)
 
         get_copy = request.GET.copy()
         parameters = get_copy.pop("page", True) and get_copy.urlencode()
@@ -633,3 +634,196 @@ def population_pyramid(request):
         return JsonResponse({"status": "Invalid request"}, status=400)
     else:
         return HttpResponseBadRequest("Invalid request")
+
+
+def aggregation_list(request):
+    print("inside aggregation_list")
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+    if is_ajax:
+        if request.method == "GET":
+            x_val = translate_field(request.GET.get("x_val"))
+            # y_val = translate_field(request.GET.get("y_val"))
+            # abs_ratio = request.GET.get("absRatio")
+
+            page_number = int(request.GET.get("page"))
+            key_number = request.GET.get("key")
+            # x_val = "husstands_id"
+            # x_val = "erhverv_original"
+            # x_val = "køn"
+
+            query_values = get_query_values(request)
+            filter_result = get_query_result(query_values)
+
+            PER_PAGE = 10
+            if not key_number:
+                query_res = list(
+                    # person.objects.filter(q_filter)
+                    filter_result.values(x_val)
+                    .annotate(total=Count("id"))
+                    .order_by("total", x_val)
+                )
+                # query_res = [{234: 10}, {456, 0}]
+
+                # db_agg_query_res = list(
+                #     # person.objects.filter(q_filter)
+                #     filter_result.values(x_val)
+                #     .annotate(total=Count("id"))
+                #     .values("total")
+                #     .annotate(Count("total"))
+                #     # .order_by("newTotal")
+                # )
+
+                # print("db_agg_query_res: ", db_agg_query_res[:100])
+
+                def aggregate_res(query_res):
+                    agg_dict = {}
+                    hid_dict = {}  # dict of lists of first ten hid for each total
+                    counter = 0
+                    totalCheck = 1
+                    for elm in query_res:
+                        counter += 1
+                        total_key = elm["total"]
+                        hid_key = elm[x_val]
+                        if total_key == totalCheck and counter < 30:
+                            print("hidkey for {}: {}".format(totalCheck, hid_key))
+
+                        if total_key in agg_dict.keys():
+                            agg_dict[total_key] += 1
+                        else:
+                            agg_dict[total_key] = 1
+
+                        if total_key not in hid_dict.keys():
+                            hid_dict[total_key] = {
+                                "hids": [hid_key],
+                                "lastPage": True,
+                            }
+                        elif len(hid_dict[total_key]["hids"]) < (
+                            PER_PAGE * page_number
+                        ):
+                            hid_dict[elm["total"]]["hids"].append(hid_key)
+                        else:
+                            hid_dict[elm["total"]]["lastPage"] = False
+                    return agg_dict, hid_dict
+
+                (aggregate_result, first_hid_results) = aggregate_res(query_res)
+                print("aggresult: ", aggregate_result)
+
+                print("queryRes: ", query_res[:100])
+
+                # print("hiddict: ", first_hid_results[35])
+                print("hiddict: ", first_hid_results)
+
+                return JsonResponse(
+                    {
+                        "aggregationOverview": aggregate_result,
+                        "firstHidResults": first_hid_results,
+                    }
+                )
+
+            else:
+                query_res = list(
+                    # person.objects.filter(q_filter)
+                    filter_result.values(x_val)
+                    .annotate(total=Count("id"))
+                    .order_by("total", x_val)
+                    .filter(total=key_number)
+                )
+
+                print("queryRes: ", query_res[:21])
+                paginator = Paginator(query_res, PER_PAGE)
+
+                if int(page_number) < paginator.num_pages:
+                    print("page {} out of {}".format(page_number, paginator.num_pages))
+                    page_obj = paginator.get_page(page_number)
+                    return JsonResponse(
+                        {
+                            "hidResults": [x[x_val] for x in page_obj.object_list],
+                            "lastPage": False,
+                            "totalAmountOfHids": len(query_res),
+                        }
+                    )
+                elif int(page_number) == paginator.num_pages:
+                    print(
+                        "should be last page, page {} out of {}".format(
+                            page_number, paginator.num_pages
+                        )
+                    )
+                    page_obj = paginator.get_page(page_number)
+                    return JsonResponse(
+                        {
+                            "hidResults": [x[x_val] for x in page_obj.object_list],
+                            "lastPage": True,
+                            "totalAmountOfHids": len(query_res),
+                        }
+                    )
+
+            # print("queryRes: ", query_res[:100])
+
+            # def sort_res(res):
+            #     def sorting_key(elem):
+            #         return elem["total"]
+
+            #     return sorted(res, key=sorting_key, reverse=True)
+
+            # sorted_query_res = sort_res(query_res)
+
+            # print("agg res: ", aggregate_result)
+            # print(len(query_res))
+            # print("sort_res: ", sorted_query_res[:100])
+
+        return JsonResponse({"status": "Invalid request"}, status=400)
+    else:
+        return HttpResponseBadRequest("Invalid request")
+
+
+# def infinite_scroll(request):
+#     print("inside aggregation_list")
+#     is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+#     if is_ajax:
+#         if request.method == "GET":
+#             # x_val = translate_field(request.GET.get("x_val"))
+#             # y_val = translate_field(request.GET.get("y_val"))
+#             # abs_ratio = request.GET.get("absRatio")
+#             x_val = "husstands_id"
+#             # x_val = "erhverv_original"
+
+#             query_values = get_query_values(request)
+#             filter_result = get_query_result(query_values)
+
+#             query_res = list(
+#                 # person.objects.filter(q_filter)
+#                 filter_result.values(x_val)
+#                 .annotate(total=Count("id"))
+#                 .order_by()
+#             )
+
+#             def sort_res(res):
+#                 def sorting_key(elem):
+#                     return elem["total"]
+
+#                 return sorted(res, key=sorting_key, reverse=True)
+
+#             sorted_query_res = sort_res(query_res)
+
+#             def aggregate_res(sorted_res):
+#                 agg_dict = {}
+#                 for elm in sorted_res:
+#                     if elm["total"] in agg_dict.keys():
+#                         agg_dict[elm["total"]] += 1
+#                     else:
+#                         agg_dict[elm["total"]] = 1
+#                 return agg_dict
+
+#             aggregate_result = aggregate_res(sorted_query_res)
+#             print("agg res: ", aggregate_result)
+
+#             print(len(query_res))
+#             print("sort_res: ", sorted_query_res[:100])
+#             # print("queryRes: ", query_res)
+#             return JsonResponse({"data": sorted_query_res[:]})
+
+#         return JsonResponse({"status": "Invalid request"}, status=400)
+#     else:
+#         return HttpResponseBadRequest("Invalid request")

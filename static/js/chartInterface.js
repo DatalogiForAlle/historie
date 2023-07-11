@@ -4,17 +4,21 @@ function displayChartVariableChoices(variableName, year) {
     const gpId = `choose-${variableName}-variable`
     console.log({gpId: gpId})
     const grandParent = document.getElementById(gpId)
+    // const parent = document.createElement("div")
+    // parent.style="display:flex"
     const parent = document.createElement("div")
-    parent.style="display:flex"
+    parent.className = "row"
     //temporary fix
     if (variableName === "z") {
         parent.style="visibility:hidden"
     }
     for (const [choice, title] of Object.entries(choices)) {
         parent.insertAdjacentHTML("beforeend", `
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="${variableName}" id="${choice}-${variableName}" value="${choice}">
-            <label class="form-check-label" for="${choice}-${variableName}">${title}</label>
+        <div class="col-auto">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="${variableName}" id="${choice}-${variableName}" value="${choice}">
+                <label class="form-check-label" for="${choice}-${variableName}">${title}</label>
+            </div>
         </div>
         `)
     }
@@ -27,7 +31,8 @@ function displayChartVariableChoices(variableName, year) {
 
 function displayAllChartVariableChoices(year) {
     // const choices = setChoices(year)
-    const variables = ["x", "y", "z"]
+    // const variables = ["x", "y", "z"]
+    const variables = ["x", "y"]
     for (const variableName of variables) {
         displayChartVariableChoices(variableName, year)
     }
@@ -40,6 +45,8 @@ function setChoices(year, variableName) {
     }
     if (variableName === "x") {
         choices.parish = "Sogn/By"
+        choices.job_original = "Erhverv"
+        choices.household_id = "Husstands ID"
     }
     return choices
 }
@@ -253,6 +260,7 @@ function updateGraphDisplay() {
     const lineBtn = document.getElementById("line-btn")
     const barBtn = document.getElementById("bar-btn")
     const pyramidBtn = document.getElementById("pyramid-btn")
+    const listBtn = document.getElementById("list-btn")
     // console.log({isY: isY})
     // console.log({isX: isX})
 
@@ -264,9 +272,20 @@ function updateGraphDisplay() {
         barBtn.disabled = false
         if (!isY) {
             pieBtn.disabled = false
-            pyramidBtn.disabled = true 
+            pyramidBtn.disabled = true
+
+            xVal = document.querySelector('input[name="x"]:checked').value
+
+            if (["household_id", "job_original"].includes(xVal)) {
+                listBtn.disabled = false 
+            } else {
+                listBtn.disabled = true
+            }
+
+            
         } else {
             pieBtn.disabled = true
+            listBtn.disabled = true
 
             xVal = document.querySelector('input[name="x"]:checked').value
             yVal = document.querySelector('input[name="y"]:checked').value
