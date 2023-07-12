@@ -61,6 +61,8 @@ def get_q_filter(search_category, query):
             return Q(bostedstype=query)
         case "job-original":
             return Q(erhverv_original__icontains=query)
+        case "household-id":
+            return Q(husstands_id=query)
         case "migration":
             return Q(migrant_type=query)
 

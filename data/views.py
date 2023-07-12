@@ -660,7 +660,7 @@ def aggregation_list(request):
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
 
-            PER_PAGE = 50
+            PER_PAGE = 10
             if not key_number:  ## query for the first results
                 query_res = list(
                     # person.objects.filter(q_filter)

@@ -148,6 +148,13 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
             q.type = "text"
             q.placeholder = "Indtast et erhverv"
             break
+        case "household-id":
+            console.log("inside hid onSelectChange")
+            q.type = "number";
+            q.placeholder = "0";
+            q.min = "0";
+            // q.max = "100";
+            break
         case "migration" :
             const migrationOptions = ['migrant', 'indfødt', 'ukendt']
             insertFormElm(createSelectElm(migrationOptions, queryName, queryId), formId)
