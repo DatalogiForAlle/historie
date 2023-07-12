@@ -2,7 +2,7 @@ function displayChartVariableChoices(variableName, year) {
     // const titleText = `Vælg en ${variableName.toUpperCase()}-variabel.`
     const choices = setChoices(year, variableName) 
     const gpId = `choose-${variableName}-variable`
-    console.log({gpId: gpId})
+    // console.log({gpId: gpId})
     const grandParent = document.getElementById(gpId)
     // const parent = document.createElement("div")
     // parent.style="display:flex"
@@ -53,8 +53,10 @@ function setChoices(year, variableName) {
 
 function setAllowances(variableNames, year) {
     const allowances = {}
+    // console.log("inside setAllowances")
     for (const variableName of variableNames) {
         const choices = setChoices(year, variableName)
+        choices["migration"] = false //this line should fix the bug that rendered migration in y disabled when switching from 1801 to one of the other years. The problem was that since migration was never set in xallowances upon the first search, when recalling xallowances for remembering the allowed y buttons, migration was not remembered.
         let varBooleans = {}
         for (const [choice, title] of Object.entries(choices)) {
             varBooleans[choice] = false
@@ -71,7 +73,7 @@ function updateAllowances(allowances, btn, val) {
         }
         else allowances[btn][item] = false
     })
-    console.log({insideUpdateAllowancesVal: val})
+    // console.log({insideUpdateAllowancesVal: val})
     if (["parish", "household_id", "job_original"].includes(val)) {
         Object.keys(allowances[btn]).forEach((item) => {
             allowances[btn][item] = false
@@ -90,6 +92,11 @@ function updateGraphInput(year) {
     // if the allowance objects already exists, we get them, otherwise we create them and set them all to false
     let xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || setAllowances(["y", "z"], year)
     let yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || setAllowances(["z"], year)
+
+    // console.log({xAllowancesForYMigration: xAllowances["y"]["migration"]})
+    // if (year !== "1801") {
+    //     xAllowances["y"]["migration"] = true
+    // }
 
     // console.log({xEqual: JSON.stringify(xAllowances)===JSON.stringify(xAllowances2)})
 

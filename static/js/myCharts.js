@@ -499,27 +499,40 @@ async function fetchAggregationList(url) {
 //     }
 // }
 
-function insertAggregationList(aggregationList, lastPage, aggregationListElm, loadBtn) {
+function insertAggregationList(aggregationList, lastPage, aggregationListElm, loadBtn, varValue, number_key) {
+
     if (lastPage) {
         for (const elm of aggregationList) {
-            aggregationListElm.insertAdjacentHTML("beforeend", `
-            <p> 
-                ${elm}
-            </p>
+            loadBtn.insertAdjacentHTML("beforebegin", `
+                <div class="row mb-2">
+                    <div class="col-3">
+                        ${elm}
+                    </div>
+                    <div class="col-3">
+                        ${number_key}
+                    </div>
+                </div>
             `)}
-        aggregationListElm.insertAdjacentHTML("beforeend", `
-            <p> 
-                <em>Ikke flere elementer at vise</em>
-            </p>
+            loadBtn.insertAdjacentHTML("beforebegin", `
+            <div class="row mb-2">
+                <div class="col-3">
+                    <em>Ikke flere resultater at vise</em>
+                </div>
+            </div>
         `)
         loadBtn.disabled = true
     } else {
         for (const elm of aggregationList) {
         
-            aggregationListElm.insertAdjacentHTML("beforeend", `
-            <p> 
-                ${elm}
-            </p>
+            loadBtn.insertAdjacentHTML("beforebegin", `
+                <div class="row mb-2">
+                    <div class="col-3">
+                        ${elm}
+                    </div>
+                    <div class="col-3">
+                        ${number_key}
+                    </div>
+                </div>
             `)
         }
         loadBtn.disabled = false
@@ -539,8 +552,9 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
     // console.log({aggOverview: aggregationOverview})
     // console.log({objEntries: Object.entries(aggregationOverview).sort((a,b) => b[0]-a[0])})
 
-    for (const [key, value] of Object.entries(aggregationOverview).sort((a,b) => b[0]-a[0])) {
-        console.log({keyIs: key})
+    let firstElm = true
+    for (const [key, value] of Object.entries(aggregationOverview)) {
+        // console.log({keyIs: key})
     
         const loadBtn = document.createElement("button")
         loadBtn.type = "button"
@@ -548,10 +562,33 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
         loadBtn.id = `load-btn-${key}`
         loadBtn.innerText = "Indlæs flere"
 
-        const aggregationListElm = document.createElement('div') 
-        aggregationListElm.className = "accordion-body"
-        aggregationListElm.id=`accordion-body-${key}`
+        let colTitle = ""
+        
+        if (varValue === "household_id") {
+            colTitle = "Husstands ID"
+        } else if (varValue === "job_original") {
+            colTitle = "Erhverv"
+        }
+        const aggregationAccBody = document.createElement('div') 
+        aggregationAccBody.className = "accordion-body"
+        aggregationAccBody.id=`accordion-body-${key}`
 
+        const aggregationListElm = document.createElement('div')
+        aggregationListElm.className = "container"
+        aggregationAccBody.insertAdjacentElement("beforeend", aggregationListElm)
+        aggregationListElm.insertAdjacentElement("beforeend", loadBtn)
+        loadBtn.insertAdjacentHTML("beforebegin", `
+            <div class="row mt-3">
+                <div class="col-3">
+                    <u>${colTitle}</u>
+                </div>
+                <div class="col-3">
+                    <u>Antal individer</u>
+                </div>
+            </div>
+        `)
+
+        
         let modalPage = 1 //page=1 is used on initial load of first elements
         loadBtn.addEventListener("click", function() {
             loadBtn.disabled = true
@@ -562,14 +599,15 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
             fetchAggregationList(url, loadBtn).then(result => {
                 const isLastPage = result["lastPage"]
                 nextResults = result["nextResults"]
-                insertAggregationList(nextResults, isLastPage, aggregationListElm, loadBtn)
+                insertAggregationList(nextResults, isLastPage, aggregationListElm, loadBtn, varValue, key)
             })
         })
 
+        
         const firstResults = result["firstResults"][key].results
         const isLastPage =result["firstResults"][key].lastPage
 
-        insertAggregationList(firstResults, isLastPage, aggregationListElm, loadBtn)
+        insertAggregationList(firstResults, isLastPage, aggregationListElm, loadBtn,varValue, key)
         // console.log({agglistelm: aggregationListElm})
 
         accordionItem = document.createElement("div")
@@ -588,35 +626,35 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
                 }
             }
         }
-
-
+        
         accordionItem.insertAdjacentHTML('beforeend', `
             <h2 class="accordion-header" id="panelsStayOpen-heading${key}">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse${key}" aria-expanded="true" aria-controls="panelsStayOpen-collapse${key}">
-                    ${getAccItemTitle(varValue)}
+                    <h6>${getAccItemTitle(varValue)}</h6>
                 </button>
             </h2>
         `)
 
+        
         const accordionCollapse = document.createElement("div")
         accordionItem.insertAdjacentElement("beforeend", accordionCollapse)
         accordionCollapse.id = `panelsStayOpen-collapse${key}`
-        accordionCollapse.className = "accordion-collapse collapse"
+        if (firstElm) {
+            accordionCollapse.className = "accordion-collapse collapse show"
+            firstElm = false
+        } else {
+            accordionCollapse.className = "accordion-collapse collapse"
+        }
+        
         // accordionCollapse.insertAdjacentHTML("beforeend", `
         //     <div class="accordion-body" id="accordion-body-${key}">
         //         results here
         //     </div> ` )
-        accordionCollapse.insertAdjacentElement("beforeend", aggregationListElm)
-        accordionCollapse.insertAdjacentElement("beforeend", loadBtn)
-
-        
-
-        
-
-        // load first page of results by default when creating the accordion
-    //     <button type="button" id="load-btn-${key}" class="btn btn-primary float-middle">
-    //     Load more
-    // </button>
+        // accordionCollapse.insertAdjacentElement("beforeend", aggregationListElm)
+        accordionCollapse.insertAdjacentElement("beforeend", aggregationAccBody)
+        // aggregationListElm.insertAdjacentElement("beforeend", loadBtn)
+        // loadBtn.insertAdjacentHTML("beforebegin", "<h2>Hey</h2>")
+        // accordionCollapse.insertAdjacentElement("beforeend", loadBtn)
         
     }
     
