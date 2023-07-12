@@ -651,24 +651,22 @@ def aggregation_list(request):
         if request.method == "GET":
             x_val = translate_field(request.GET.get("x_val"))
             # y_val = translate_field(request.GET.get("y_val"))
-            # abs_ratio = request.GET.get("absRatio")
+            abs_ratio = request.GET.get("absRatio")
+            print("absratio is: ", abs_ratio)
 
             page_number = int(request.GET.get("page"))
             key_number = request.GET.get("key")
-            # x_val = "husstands_id"
-            # x_val = "erhverv_original"
-            # x_val = "køn"
 
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
 
-            PER_PAGE = 10
-            if not key_number:
+            PER_PAGE = 5
+            if not key_number:  ## query for the first results
                 query_res = list(
                     # person.objects.filter(q_filter)
                     filter_result.values(x_val)
                     .annotate(total=Count("id"))
-                    .order_by("total", x_val)
+                    .order_by("-total", x_val)
                 )
                 # query_res = [{234: 10}, {456, 0}]
 
@@ -685,46 +683,46 @@ def aggregation_list(request):
 
                 def aggregate_res(query_res):
                     agg_dict = {}
-                    hid_dict = {}  # dict of lists of first ten hid for each total
-                    counter = 0
-                    totalCheck = 1
+                    res_dict = {}  # dict of lists of first ten hid for each total
+                    # counter = 0
+                    # totalCheck = 1
                     for elm in query_res:
-                        counter += 1
+                        # counter += 1
                         total_key = elm["total"]
-                        hid_key = elm[x_val]
-                        if total_key == totalCheck and counter < 30:
-                            print("hidkey for {}: {}".format(totalCheck, hid_key))
+                        res_key = elm[x_val]
+                        # if total_key == totalCheck and counter < 30:
+                        #     print("hidkey for {}: {}".format(totalCheck, res_key))
 
                         if total_key in agg_dict.keys():
                             agg_dict[total_key] += 1
                         else:
                             agg_dict[total_key] = 1
 
-                        if total_key not in hid_dict.keys():
-                            hid_dict[total_key] = {
-                                "hids": [hid_key],
+                        if total_key not in res_dict.keys():
+                            res_dict[total_key] = {
+                                "results": [res_key],
                                 "lastPage": True,
                             }
-                        elif len(hid_dict[total_key]["hids"]) < (
+                        elif len(res_dict[total_key]["results"]) < (
                             PER_PAGE * page_number
                         ):
-                            hid_dict[elm["total"]]["hids"].append(hid_key)
+                            res_dict[elm["total"]]["results"].append(res_key)
                         else:
-                            hid_dict[elm["total"]]["lastPage"] = False
-                    return agg_dict, hid_dict
+                            res_dict[elm["total"]]["lastPage"] = False
+                    return agg_dict, res_dict
 
-                (aggregate_result, first_hid_results) = aggregate_res(query_res)
+                (aggregate_result, first_results) = aggregate_res(query_res)
                 print("aggresult: ", aggregate_result)
 
                 print("queryRes: ", query_res[:100])
 
-                # print("hiddict: ", first_hid_results[35])
-                print("hiddict: ", first_hid_results)
+                # print("hiddict: ", first_results[35])
+                # print("hiddict: ", first_results)
 
                 return JsonResponse(
                     {
                         "aggregationOverview": aggregate_result,
-                        "firstHidResults": first_hid_results,
+                        "firstResults": first_results,
                     }
                 )
 
@@ -733,7 +731,7 @@ def aggregation_list(request):
                     # person.objects.filter(q_filter)
                     filter_result.values(x_val)
                     .annotate(total=Count("id"))
-                    .order_by("total", x_val)
+                    .order_by("-total", x_val)
                     .filter(total=key_number)
                 )
 
@@ -745,9 +743,8 @@ def aggregation_list(request):
                     page_obj = paginator.get_page(page_number)
                     return JsonResponse(
                         {
-                            "hidResults": [x[x_val] for x in page_obj.object_list],
+                            "nextResults": [x[x_val] for x in page_obj.object_list],
                             "lastPage": False,
-                            "totalAmountOfHids": len(query_res),
                         }
                     )
                 elif int(page_number) == paginator.num_pages:
@@ -759,9 +756,8 @@ def aggregation_list(request):
                     page_obj = paginator.get_page(page_number)
                     return JsonResponse(
                         {
-                            "hidResults": [x[x_val] for x in page_obj.object_list],
+                            "nextResults": [x[x_val] for x in page_obj.object_list],
                             "lastPage": True,
-                            "totalAmountOfHids": len(query_res),
                         }
                     )
 
@@ -782,55 +778,3 @@ def aggregation_list(request):
         return JsonResponse({"status": "Invalid request"}, status=400)
     else:
         return HttpResponseBadRequest("Invalid request")
-
-
-# def infinite_scroll(request):
-#     print("inside aggregation_list")
-#     is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
-
-#     if is_ajax:
-#         if request.method == "GET":
-#             # x_val = translate_field(request.GET.get("x_val"))
-#             # y_val = translate_field(request.GET.get("y_val"))
-#             # abs_ratio = request.GET.get("absRatio")
-#             x_val = "husstands_id"
-#             # x_val = "erhverv_original"
-
-#             query_values = get_query_values(request)
-#             filter_result = get_query_result(query_values)
-
-#             query_res = list(
-#                 # person.objects.filter(q_filter)
-#                 filter_result.values(x_val)
-#                 .annotate(total=Count("id"))
-#                 .order_by()
-#             )
-
-#             def sort_res(res):
-#                 def sorting_key(elem):
-#                     return elem["total"]
-
-#                 return sorted(res, key=sorting_key, reverse=True)
-
-#             sorted_query_res = sort_res(query_res)
-
-#             def aggregate_res(sorted_res):
-#                 agg_dict = {}
-#                 for elm in sorted_res:
-#                     if elm["total"] in agg_dict.keys():
-#                         agg_dict[elm["total"]] += 1
-#                     else:
-#                         agg_dict[elm["total"]] = 1
-#                 return agg_dict
-
-#             aggregate_result = aggregate_res(sorted_query_res)
-#             print("agg res: ", aggregate_result)
-
-#             print(len(query_res))
-#             print("sort_res: ", sorted_query_res[:100])
-#             # print("queryRes: ", query_res)
-#             return JsonResponse({"data": sorted_query_res[:]})
-
-#         return JsonResponse({"status": "Invalid request"}, status=400)
-#     else:
-#         return HttpResponseBadRequest("Invalid request")

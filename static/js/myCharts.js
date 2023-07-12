@@ -31,13 +31,13 @@ function replaceListCanvas() {
     document.getElementById('list-modal-body').prepend(ctx)
 
     // a hacky fix to the problem of the loadBtn eventhandler "remembering" old values of the modalPage variable: remove the old btn and remake it
-    document.getElementById('load-btn').remove()
-    loadBtn = document.createElement("button")
-    loadBtn.type="button"
-    loadBtn.id = "load-btn"
-    loadBtn.className = "btn btn-primary float-middle"
-    loadBtn.append("Load more")
-    document.getElementById('list-modal-body').append(loadBtn)
+    // document.getElementById('load-btn').remove()
+    // loadBtn = document.createElement("button")
+    // loadBtn.type="button"
+    // loadBtn.id = "load-btn"
+    // loadBtn.className = "btn btn-primary float-middle"
+    // loadBtn.append("Load more")
+    // document.getElementById('list-modal-body').append(loadBtn)
 
     return ctx 
 }
@@ -52,11 +52,10 @@ function stackedOption(chartType) {
 }
 
 function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
-    console.log({datasetlabel: datasetLabel})
-    console.log({ctx: ctx})
+    // console.log({datasetlabel: datasetLabel})
+    // console.log({ctx: ctx})
     let titleText = year
     function translateTitle(t) {
-        console.log({tIs: t})
         switch (t) {
             case "sogn_by":
                 return "sogn"
@@ -218,7 +217,7 @@ function pyramidScalesOption(absRatio) {
 }
 
 function createPopulationPyramid(ctx, labels, datasets, year, chartType, absRatio) {
-    console.log({pyramidDatasetse: datasets})
+    // console.log({pyramidDatasetse: datasets})
     var myChart = new Chart(ctx, {
         type: "bar",
         data: {
@@ -337,7 +336,7 @@ function getTwoInputChart(url, chartType) {
     .then(res => {
         labels = res["labels"]
         datasets = res["datasets"] 
-        console.log({twoinputdatasets: datasets})
+        // console.log({twoinputdatasets: datasets})
         createTwoInputChart(ctx, labels, datasets, year, chartType) 
       });
        
@@ -473,32 +472,32 @@ async function fetchAggregationList(url) {
 //       });
 // }
 
-function createAggregationDisplay(aggregationList, lastPage, loadBtn) {
-    if (lastPage) {
-        for (const elm of aggregationList) {
-            ctx.insertAdjacentHTML("beforeend", `
-            <p> 
-                ${elm.husstands_id} : ${elm.total}
-            </p>
-            `)}
-        ctx.insertAdjacentHTML("beforeend", `
-            <p> 
-                Ikke flere elementer at vise
-            </p>
-        `)
-        loadBtn.disabled = true
-    } else {
-        for (const elm of aggregationList) {
+// function createAggregationDisplay(aggregationList, lastPage, loadBtn) {
+//     if (lastPage) {
+//         for (const elm of aggregationList) {
+//             ctx.insertAdjacentHTML("beforeend", `
+//             <p> 
+//                 ${elm.husstands_id} : ${elm.total}
+//             </p>
+//             `)}
+//         ctx.insertAdjacentHTML("beforeend", `
+//             <p> 
+//                 Ikke flere elementer at vise
+//             </p>
+//         `)
+//         loadBtn.disabled = true
+//     } else {
+//         for (const elm of aggregationList) {
         
-            ctx.insertAdjacentHTML("beforeend", `
-            <p> 
-                ${elm.husstands_id} : ${elm.total}
-            </p>
-            `)
-        }
-        loadBtn.disabled = false
-    }
-}
+//             ctx.insertAdjacentHTML("beforeend", `
+//             <p> 
+//                 ${elm.husstands_id} : ${elm.total}
+//             </p>
+//             `)
+//         }
+//         loadBtn.disabled = false
+//     }
+// }
 
 function insertAggregationList(aggregationList, lastPage, aggregationListElm, loadBtn) {
     if (lastPage) {
@@ -510,7 +509,7 @@ function insertAggregationList(aggregationList, lastPage, aggregationListElm, lo
             `)}
         aggregationListElm.insertAdjacentHTML("beforeend", `
             <p> 
-                Ikke flere elementer at vise
+                <em>Ikke flere elementer at vise</em>
             </p>
         `)
         loadBtn.disabled = true
@@ -532,21 +531,16 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
     // const aggregationList = result["data"]
     // const 
     // console.log({aggOverView: aggregationOverview})
+    const varValue = selectedVals[0].varValue
     listCanvas = document.getElementById("list-canvas")
     accordion = document.createElement("div")
     accordion.className = "accordion"
     accordion.id = "accordion"
+    // console.log({aggOverview: aggregationOverview})
+    // console.log({objEntries: Object.entries(aggregationOverview).sort((a,b) => b[0]-a[0])})
 
-    for (const [key, value] of Object.entries(aggregationOverview)) {
-
-        // let modalPage = 1 
-        // url = buildFetchUrl("aggregation_list", selectedVals, queryParams, chartType)
-        // // url += `&key=${key}`
-        // url += `&page=${modalPage}`
-        // console.log({aggUrl: url})
-        // loadBtn.disabled = true
-        // console.log({key: key})
-        // console.log({hidRes: result["firstHidResults"][key]})
+    for (const [key, value] of Object.entries(aggregationOverview).sort((a,b) => b[0]-a[0])) {
+        console.log({keyIs: key})
     
         const loadBtn = document.createElement("button")
         loadBtn.type = "button"
@@ -563,37 +557,43 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
             loadBtn.disabled = true
             url = buildFetchUrl("aggregation_list", selectedVals, queryParams, chartType)
             modalPage += 1
-            // console.log({key: key})
-            // console.log({modalPage: modalPage})
             url += `&key=${key}`
             url += `&page=${modalPage}`
             fetchAggregationList(url, loadBtn).then(result => {
                 const isLastPage = result["lastPage"]
-                hidResults = result["hidResults"]
-                totalHids = result["totalAmountOfHids"]
-                // console.log({hidResults: hidResults})
-                console.log({key: key})
-                console.log({modalPage: modalPage})
-                console.log({totalHIds: totalHids})
-                insertAggregationList(hidResults, isLastPage, aggregationListElm, loadBtn)
+                nextResults = result["nextResults"]
+                insertAggregationList(nextResults, isLastPage, aggregationListElm, loadBtn)
             })
-
         })
 
-        const firstHidResults = result["firstHidResults"][key].hids
-        const isLastPage =result["firstHidResults"][key].lastPage
+        const firstResults = result["firstResults"][key].results
+        const isLastPage =result["firstResults"][key].lastPage
 
-        insertAggregationList(firstHidResults, isLastPage, aggregationListElm, loadBtn)
-        console.log({agglistelm: aggregationListElm})
+        insertAggregationList(firstResults, isLastPage, aggregationListElm, loadBtn)
+        // console.log({agglistelm: aggregationListElm})
 
         accordionItem = document.createElement("div")
         accordionItem.className = "accordion-item"
         accordion.insertAdjacentElement("beforeend", accordionItem)
 
+        // const accItemTitle = `${value} husholdning(er) af størrelse: ${key}`
+        function getAccItemTitle(varName) {
+            if (varName === "household_id") {
+                return `${value} husholdning(er) af størrelse: ${key}`
+            } else {
+                if (value === 1) {
+                    return `${value} erhverv besat af ${key} individ(er)`
+                } else {
+                    return `${value} erhverv hver besat af ${key} individ(er)`
+                }
+            }
+        }
+
+
         accordionItem.insertAdjacentHTML('beforeend', `
             <h2 class="accordion-header" id="panelsStayOpen-heading${key}">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse${key}" aria-expanded="true" aria-controls="panelsStayOpen-collapse${key}">
-                    ${key} individ(er) i husholdningen (totalt antal: ${value})
+                    ${getAccItemTitle(varValue)}
                 </button>
             </h2>
         `)
@@ -638,7 +638,7 @@ function getAggregationList(chartType) {
     if (selectedVals.length === 1) {
         url = buildFetchUrl("aggregation_list", selectedVals, queryParams, chartType)
         url += `&page=${modalPage}`
-        console.log({aggUrl: url})
+        // console.log({aggUrl: url})
         // loadBtn.disabled = true
         fetchAggregationList(url, loadBtn).then(result => {
             createAggregationOverview(result, selectedVals, queryParams, chartType)
