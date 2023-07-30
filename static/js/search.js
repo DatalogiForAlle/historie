@@ -216,34 +216,30 @@ function keepUserInput(year, searchCategory1, query1, searchCategory2, query2, c
 
 function displayFieldCheckBoxes(year){
     const fieldsToDisplay = setFieldsToDisplay(year)
-    grandParent = document.getElementById("field-checkboxes")
+    grandParent = document.getElementById("field-checkboxes-column")
     parent = document.createElement("div")
-    parent.id = "field-checkbox-parent"
-    parent.style="display:flex"
-    parent.insertAdjacentHTML("beforeend",
-    `
-    <div style="margin-right:10px; display:inline-block">
-        Vis felter: 
-    </div>
-    `)
+    parent.className = "row"
 
     for (const [fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
         parent.insertAdjacentHTML("beforeend",
         `
-        <div class="form-check form-check-inline">
-            <label class="form-check-label">
-                <input 
-                    class="form-check-input" 
-                    type="checkbox" 
-                    name=${fieldId} 
-                    id=${fieldId} 
-                    checked>
-                ${fieldTitle}
-            </label>
+        <div class="col-auto">
+            <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                    <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name=${fieldId} 
+                        id=${fieldId} 
+                        checked>
+                    ${fieldTitle}
+                </label>
+            </div>
         </div>
         `)
     } 
     grandParent.replaceChildren(parent) 
+
 }
 
 function setFieldsToDisplay(year) {
