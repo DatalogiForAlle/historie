@@ -18,6 +18,7 @@ field_dict = {
     "job_original": "erhverv_original",
     "household_function_std": "stilling_i_husstanden_standardiseret",
     "migration": "migrant_type",
+    "household_size": "husstands_størrelse"
     # "fødesogn_by_standardiseret",
 }
 
@@ -63,6 +64,11 @@ def get_q_filter(search_category, query):
             return Q(erhverv_original__icontains=query)
         case "household-id":
             return Q(husstands_id=query)
+        case "household-size":
+            sizes = query.split("-")
+            return Q(husstands_størrelse__gte=sizes[0]) & Q(
+                husstands_størrelse__lte=sizes[1]
+            )
         case "migration":
             return Q(migrant_type=query)
 

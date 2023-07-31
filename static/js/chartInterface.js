@@ -47,6 +47,7 @@ function setChoices(year, variableName) {
         choices.parish = "Sogn/By"
         choices.job_original = "Erhverv"
         choices.household_id = "Husstands ID"
+        choices.household_size = "Husstandsstørrelse"
     }
     return choices
 }
@@ -74,7 +75,7 @@ function updateAllowances(allowances, btn, val) {
         else allowances[btn][item] = false
     })
     // console.log({insideUpdateAllowancesVal: val})
-    if (["parish", "household_id", "job_original"].includes(val)) {
+    if (["parish", "household_id", "job_original", "household_size"].includes(val)) {
         Object.keys(allowances[btn]).forEach((item) => {
             allowances[btn][item] = false
         })

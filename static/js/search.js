@@ -103,7 +103,7 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
             console.log("inside age onSelectChange")
             q.type = "number";
             q.placeholder = "0";
-            q.min = "0";
+            q.min = "-1";
             q.max = "100";
             break
         case "parish" :
@@ -154,6 +154,14 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
             q.placeholder = "0";
             q.min = "0";
             // q.max = "100";
+            break
+        case "household-size" :
+            console.log("inside household-size-interval onSelectChange")
+            q.type = "text"
+            q.title="Example of acceptable input: 4-5"
+            q.placeholder = "Ex: 4-5"
+            q.pattern="^[0-9]{1,3}-[0-9]{1,3}$"
+            // console.log({age_q: q})
             break
         case "migration" :
             const migrationOptions = ['migrant', 'indfødt', 'ukendt']
@@ -218,7 +226,7 @@ function displayFieldCheckBoxes(year){
     const fieldsToDisplay = setFieldsToDisplay(year)
     grandParent = document.getElementById("field-checkboxes-column")
     parent = document.createElement("div")
-    parent.className = "row"
+    parent.className = "row pt-2 pb-2"
 
     for (const [fieldId, fieldTitle] of Object.entries(fieldsToDisplay)) {
         parent.insertAdjacentHTML("beforeend",
@@ -243,7 +251,7 @@ function displayFieldCheckBoxes(year){
 }
 
 function setFieldsToDisplay(year) {
-    let fieldsToDisplay = { age: "Alder", gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", parish: "Sogn/By", "household-function-std": "Stilling i husstanden", "household-id": "Husstands ID", "job-original": "Erhverv", county: "Amt"}
+    let fieldsToDisplay = { age: "Alder", gender: "Køn", status: "Ægteskabelig stilling", location: "Bostedstype", parish: "Sogn/By", "household-function-std": "Stilling i husstanden", "job-original": "Erhverv", county: "Amt", "household-id": "Husstands ID", "household-size": "Husstandsstørrelse"}
     if (year !== "1801") {
         fieldsToDisplay.migration = "Migranttype"
     } 

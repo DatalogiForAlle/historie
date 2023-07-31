@@ -19,7 +19,7 @@ class Person(models.Model):
         choices=GENDER_CHOICES,
         default="f",
     )
-    alder = models.PositiveIntegerField()
+    alder = models.IntegerField()
     STATUS_CHOICES = [
         ("ugift", "ugift"),
         ("gift", "gift"),
@@ -71,7 +71,7 @@ class BasePerson(models.Model):
         choices=GENDER_CHOICES,
         default="f",
     )
-    alder = models.PositiveIntegerField()
+    alder = models.IntegerField()
     STATUS_CHOICES = [
         ("ugift", "ugift"),
         ("gift", "gift"),
@@ -97,6 +97,8 @@ class BasePerson(models.Model):
     )
     erhverv_original = models.CharField(max_length=200)
     stilling_i_husstanden_standardiseret = models.CharField(max_length=200)
+
+    husstands_størrelse = models.PositiveIntegerField(null=True)
 
     class Meta:
         # db_table = "person"
