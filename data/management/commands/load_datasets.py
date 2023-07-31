@@ -10,6 +10,11 @@ from data.utils import get_person_model
 # If you need to reload the child data from the csv file, then ADD EXPLANATION"""
 
 
+## For at køre scriptet:
+## cd ind i mappen data/management/commands
+## kør: docker compose exec web python3 manage.py load_datasets
+
+
 def get_model_fields(required_columns):
     def replace(x):
         if x == "5års_aldersgrupper":
@@ -38,6 +43,7 @@ def get_required_columns(year):
         "bostedstype",
         "erhverv_original",
         "stilling_i_husstanden_standardiseret",
+        "husstands_størrelse",
     ]
 
     match year:
@@ -93,7 +99,7 @@ def upload_dataset(file_name):
     dict_reader = DictReader(open(file_name), delimiter="$")
     year = get_year(file_name)
     required_columns = get_required_columns(year)
-    ## in model_fields, "5års_aldersgrupper" and "10års_aldersgrupper" are replaced with "fem_års_aldersgrupper" and "ti_års_aldersgrupper" since python otherwise gets angry when dealing with variables starting with a number
+    ## in model_fields, "5års_aldersgrupper" and "10års_aldersgrupper" are replaced with "fem_års_aldersgrupper" and "ti_års_aldersgrupper" - python gets angry at variables starting with a number.
     model_fields = get_model_fields(required_columns)
     person = get_person_model(year)
 
@@ -101,16 +107,18 @@ def upload_dataset(file_name):
 
     print("Uploading csv file: ", file_name)
     data = []
-    invalid_age_count = 0
+    # invalid_age_count = 0
     for i, row in tqdm(enumerate(dict_reader, start=1)):
         values = get_values(model_fields, required_columns, row)
         new_person = person(**values)
 
         # is the invalid_age stuff still important?
-        if int(new_person.alder) >= 0:
-            data.append(new_person)
-        else:
-            invalid_age_count += 1
+        # if int(new_person.alder) >= 0:
+        #     data.append(new_person)
+        # else:
+        #     invalid_age_count += 1
+
+        data.append(new_person)
 
         if len(data) > 500:
             person.objects.bulk_create(data, ignore_conflicts=True)
@@ -122,7 +130,7 @@ def upload_dataset(file_name):
 
     if data:
         person.objects.bulk_create(data)
-    print("invalid age count for year {}: {}".format(year, invalid_age_count))
+    # print("invalid age count for year {}: {}".format(year, invalid_age_count))
 
 
 class Command(BaseCommand):
@@ -138,10 +146,15 @@ class Command(BaseCommand):
             print("One or more of datasets already uploaded.")
             return
 
+        # datasets = [
+        #     "ft1801_dataekspeditioner_20230123.csv",
+        #     "ft1850_dataekspeditioner_20230123.csv",
+        #     "ft1901_dataekspeditioner_20230123.csv",
+        # ]
         datasets = [
-            "ft1801_dataekspeditioner_20230123.csv",
-            "ft1850_dataekspeditioner_20230123.csv",
-            "ft1901_dataekspeditioner_20230123.csv",
+            "ft1801_dataekspeditioner_med_husstands_storrelse.csv",
+            "ft1850_dataekspeditioner_med_husstands_storrelse.csv",
+            "ft1901_dataekspeditioner_med_husstands_storrelse.csv",
         ]
 
         # Show this before loading the data into the database
