@@ -332,7 +332,7 @@ def one_input_chart(request):
                     key=sorting_key,
                 )
                 # creating a dict with fieldvalue as key, count as value
-                print("query_res_sorted", query_res_sorted)
+                # print("query_res_sorted", query_res_sorted)
                 dict_res = {d[x_val]: d.get("total") for d in query_res_sorted}
 
             elif x_val == "alder":
@@ -346,7 +346,7 @@ def one_input_chart(request):
 
                 query_res_sorted = sorted(query_res, key=sorting_key)
 
-                print("query_res_sorted", query_res_sorted)
+                # print("query_res_sorted", query_res_sorted)
 
                 dict_res = {d[x_val]: d.get("total") for d in query_res_sorted}
 
@@ -355,9 +355,9 @@ def one_input_chart(request):
             #     print("age queryres is: ", query_res)
             else:
                 # creating a dict with fieldvalue as key, count as value
-                print("queryres is: ", query_res)
+                # print("queryres is: ", query_res)
                 dict_res = {d[x_val]: d.get("total") for d in query_res}
-                print("dict res one input: ", dict_res)
+                # print("dict res one input: ", dict_res)
 
             if chart_type == "pie":
                 NUM_CUTOFF = 5
@@ -449,7 +449,7 @@ def two_input_chart(request):
                         return int(elem.split("+")[0])
 
                 age_labels = sorted(labels, key=sorting_key)
-                print("agelabels: ", age_labels)
+                # print("agelabels: ", age_labels)
                 return age_labels
 
             if x_val == "fem_års_aldersgrupper":

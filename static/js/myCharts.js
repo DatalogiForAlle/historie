@@ -42,9 +42,12 @@ function replaceListCanvas() {
     return ctx 
 }
 
-function stackedOption(chartType) {
+function stackedOption(chartType, absRatio) {
     if (chartType === "bar") {
         const scales = {x: { stacked: true},y: {stacked: true}}
+        if (absRatio == "ratio"){
+            scales.y.max = 100
+        }
         return scales
     } else {
         return {}
@@ -177,7 +180,7 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
               pieDownload.download = "chart_image.png"
             }
           },
-          scales: stackedOption(chartType)
+          scales: stackedOption(chartType, absRatio)
       },
       //custom plugins to create proper background for the downloaded image
       //see https://www.chartjs.org/docs/latest/configuration/canvas-background.html#color
