@@ -248,7 +248,12 @@ function createPopulationPyramid(ctx, labels, datasets, year, chartType, absRati
                 tooltip: {
                     callbacks: {
                         label : function(context) {
-                            return Number.parseFloat(Math.abs(context.parsed.x)).toFixed(3)
+                            if (absRatio === "ratio") {
+                                return Number.parseFloat(Math.abs(context.parsed.x)).toFixed(3)
+                            } else {
+                                return Number.parseFloat(Math.abs(context.parsed.x))
+                            }
+                            
                         }
                     }
                 },

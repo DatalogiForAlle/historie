@@ -315,27 +315,41 @@ def one_input_chart(request):
                 .order_by()
             )
 
+            print("queryres is: ", query_res)
             if x_val == "fem_års_aldersgrupper":
-                # nødvendigt at sætte aldergrupperner i orden
+                # nødvendigt at sætte aldergrupperner i orden, aldersgruppe -1 skal optræde sidst
                 def sorting_key(elem):
                     five_group = elem.get("fem_års_aldersgrupper")
+                    if five_group == "-1":
+                        return -1000 / int(five_group)
                     if "-" in five_group:
                         return int(five_group.split("-")[0])
                     elif "+" in five_group:
                         return int(five_group.split("+")[0])
 
                 query_res_sorted = sorted(
-                    [
-                        item
-                        for item in query_res
-                        if item.get("fem_års_aldersgrupper") != "-1"
-                    ],
-                    # key=lambda x: int(x.split("-")[0]),
+                    query_res,
                     key=sorting_key,
                 )
                 # creating a dict with fieldvalue as key, count as value
                 print("query_res_sorted", query_res_sorted)
                 dict_res = {d[x_val]: d.get("total") for d in query_res_sorted}
+
+            elif x_val == "alder":
+
+                def sorting_key(elem):
+                    age = elem.get("alder")
+                    if age == -1:
+                        return -1000 / age
+                    else:
+                        return age
+
+                query_res_sorted = sorted(query_res, key=sorting_key)
+
+                print("query_res_sorted", query_res_sorted)
+
+                dict_res = {d[x_val]: d.get("total") for d in query_res_sorted}
+
             # elif x_val == "alder":
             #     # nødvendigt at sortere alder
             #     print("age queryres is: ", query_res)
@@ -361,6 +375,7 @@ def one_input_chart(request):
                 dict_res = dict(sorted_elms[:NUM_CUTOFF])
                 print("pie dict res: ", dict_res)
 
+            print("dict res is: ", dict_res)
             labels, data = zip(*dict_res.items())
             print("one input data: ", data)
             print("one input data type: ", type(data))
@@ -426,12 +441,14 @@ def two_input_chart(request):
 
             def sort_age_labels(labels):
                 def sorting_key(elem):
+                    if elem == "-1":
+                        return -1000 / int(elem)
                     if "-" in elem:
                         return int(elem.split("-")[0])
                     elif "+" in elem:
                         return int(elem.split("+")[0])
 
-                age_labels = sorted([l for l in labels if l != "-1"], key=sorting_key)
+                age_labels = sorted(labels, key=sorting_key)
                 print("agelabels: ", age_labels)
                 return age_labels
 
@@ -441,9 +458,9 @@ def two_input_chart(request):
                 y_labels = sort_age_labels(y_labels)
 
             if x_val == "alder":
-                x_labels = sorted(x_labels)
+                x_labels = sorted(x_labels, key=lambda i: -1000 / i if i == -1 else i)
             if y_val == "alder":
-                y_labels = sorted(y_labels)
+                y_labels = sorted(y_labels, key=lambda i: -1000 / i if i == -1 else i)
 
             print("x_labels: ", x_labels)
             print("y_labels: ", y_labels)
