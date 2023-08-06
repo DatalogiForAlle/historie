@@ -513,6 +513,37 @@ def two_input_chart(request):
             print("labels: ", y_labels)
             # print("queryres: ", query_res)
 
+            colorlist = [
+                "#e6194B",
+                "#3cb44b",
+                "#ffe119",
+                "#4363d8",
+                "#f58231",
+                "#911eb4",
+                "#42d4f4",
+                "#f032e6",
+                "#bfef45",
+                "#fabed4",
+                "#469990",
+                "#dcbeff",
+                "#9A6324",
+                "#fffac8",
+                "#800000",
+                "#aaffc3",
+                "#808000",
+                "#ffd8b1",
+                "#000075",
+                "#a9a9a9",
+                # "#ffffff",
+                "#000000",
+            ]
+            # if len(datasets) > 7:
+            #     for i in range(len(datasets)):
+            #         datasets[i]["backgroundColor"] = colorlist[i % 21]
+            #         datasets[i]["borderColor"] = colorlist[i % 21]
+
+            # colorlist = ["#556b2f", "#800000", "#483d8b", "#3cb371", "#008080", "#9acd32", "#00008b", "#ff4500", "#ffa500", "#ffff00", "#7fff00"]
+
             if abs_ratio == "absolute":
                 return JsonResponse({"labels": y_labels, "datasets": datasets})
             else:

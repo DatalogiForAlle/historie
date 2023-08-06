@@ -68,7 +68,9 @@ function setMigrationOptionVisibility(year, queryIdentifiers) {
     const option = document.getElementById("migration" + queryIdentifiers.optionIdSuffix)
     if (year === "1801") {
         option.style.display = "none"
-        resetSearchField(queryIdentifiers)  
+        if (document.getElementById(queryIdentifiers.selectId).value === "migration") {
+            resetSearchField(queryIdentifiers)  
+        }
     } else {
         option.style.display = "block"  
     }
@@ -77,11 +79,18 @@ function setMigrationOptionVisibility(year, queryIdentifiers) {
 function resetSearchField(queryIdentifiers) {
     const selectElm = document.getElementById(queryIdentifiers.selectId)
     const optionNoQuery = "no-query"
-    if (selectElm.value === "migration") {
-        recallQueryInputAttributes(optionNoQuery, queryIdentifiers)
-        selectElm.value = optionNoQuery
-    }  
+    recallQueryInputAttributes(optionNoQuery, queryIdentifiers)
+    selectElm.value = optionNoQuery
 }
+
+// function resetSearchField(queryIdentifiers) {
+//     const selectElm = document.getElementById(queryIdentifiers.selectId)
+//     const optionNoQuery = "no-query"
+//     if (selectElm.value === "migration") {
+//         recallQueryInputAttributes(optionNoQuery, queryIdentifiers)
+//         selectElm.value = optionNoQuery
+//     }  
+// }
 
 function recallIfMigration(year, queryIdentifiers) {
     if (year) {
@@ -415,4 +424,19 @@ function getToolTipList() {
   return tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
+}
+
+// function resetAllSearchFields() {
+//     console.log("heythere")
+    // resetSearchField(queryOneIdentifiers)
+    // resetSearchField(queryTwoIdentifiers)
+// }
+
+function setResetButton() {
+    console.log("works")
+    resetBtn = document.getElementById("remove-filters-btn")
+    resetBtn.addEventListener("click", function(){
+        resetSearchField(queryOneIdentifiers)
+        resetSearchField(queryTwoIdentifiers)
+    })
 }
