@@ -318,4 +318,15 @@ function updateGraphDisplay() {
     }
 }
 
-  
+function setGraphResetButton() {
+    resetBtn = document.getElementById("reset-graph-choices")
+    resetBtn.addEventListener("click", function() {
+        document.getElementsByName("y").forEach((elm) => {
+            elm.checked = false
+        })
+        document.getElementById("gender-x").checked = true
+        // document.getElementsByName("x").forEach((elm) => {
+        //     elm.checked = false
+        // })
+    })
+}

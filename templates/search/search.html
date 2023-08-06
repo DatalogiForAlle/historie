@@ -84,14 +84,16 @@
 
     handleResultsPerPage("{{results_per_page}}")
 
-    setResetButton()
+    setFilterResetButton()
 
     var toolTipList = getToolTipList()
     
     updateGraphInput("{{year}}")
     recallGraphInput()
     recallDisabledGraphButtons()
+    setGraphResetButton()
     showChart()
+    
 </script>
 
 {% endblock content %}

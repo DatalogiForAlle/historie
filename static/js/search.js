@@ -432,11 +432,12 @@ function getToolTipList() {
     // resetSearchField(queryTwoIdentifiers)
 // }
 
-function setResetButton() {
-    console.log("works")
+function setFilterResetButton() {
     resetBtn = document.getElementById("remove-filters-btn")
     resetBtn.addEventListener("click", function(){
         resetSearchField(queryOneIdentifiers)
         resetSearchField(queryTwoIdentifiers)
     })
 }
+
+
