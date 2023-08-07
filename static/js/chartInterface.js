@@ -82,10 +82,24 @@ function updateAllowances(allowances, btn, val) {
     }
 }
   
-  
+
+// function test() {
+//     console.log("works")
+// }
+
 function updateGraphInput(year) {
     updateGraphDisplay()
-    
+
+    // document.getElementsByName("abs-ratio").addEventListener("change", function() {
+        
+    // })
+
+    $('input[name=abs-ratio]').on('change', (function() {
+  
+        //saving the id of the abs-ratio button clicked
+        sessionStorage.setItem("abs-ratio", $(this).prop('id'))
+        }
+    ))
     // var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, location: false, county: false, five: false}, z: {gender: false, status: false, location: false, county: false, five: false}}
     // var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, location: false, county: false, five: false}}
 
@@ -105,6 +119,8 @@ function updateGraphInput(year) {
   //   console.log({xAllows: xAllowances})
     // when x changes, should affect both y and z
     $('input[name=x]').on('change', (function() {
+
+        console.log("some x was changed")
   
         //saving the id of the x button that is checked to recall later
         sessionStorage.setItem("xID", $(this).prop('id'))
@@ -222,6 +238,11 @@ function recallGraphInput() {
     if (zID != null) {
       document.getElementById(zID).checked=true;
     }
+
+    absRatio = sessionStorage.getItem("abs-ratio")
+    if (absRatio != null) {
+        document.getElementById(absRatio).checked = true
+    }
 }
   
 // to recall which y and z buttons were disabled
@@ -269,6 +290,7 @@ function updateGraphDisplay() {
     const barBtn = document.getElementById("bar-btn")
     const pyramidBtn = document.getElementById("pyramid-btn")
     const listBtn = document.getElementById("list-btn")
+    const countyBtn = document.getElementById("county-btn")
     // console.log({isY: isY})
     // console.log({isX: isX})
 
@@ -289,11 +311,17 @@ function updateGraphDisplay() {
             } else {
                 listBtn.disabled = true
             }
+            if (xVal === "county") {
+                countyBtn.disabled = false
+            } else {
+                countyBtn.disabled = true
+            }
 
             
         } else {
             pieBtn.disabled = true
             listBtn.disabled = true
+            countyBtn.disabled = true
 
             xVal = document.querySelector('input[name="x"]:checked').value
             yVal = document.querySelector('input[name="y"]:checked').value
@@ -322,11 +350,14 @@ function setGraphResetButton() {
     resetBtn = document.getElementById("reset-graph-choices")
     resetBtn.addEventListener("click", function() {
         document.getElementsByName("y").forEach((elm) => {
+            if (elm.checked) {
+                //have to manually trigger the xvariable that would remove the checked y variable
+                document.getElementById(elm.id.split('-')[0] + '-x').dispatchEvent(new Event("change"))
+            }
             elm.checked = false
         })
+        //and then manually trigger the xvar that we want as a result of reset (which isjust gender-x)
         document.getElementById("gender-x").checked = true
-        // document.getElementsByName("x").forEach((elm) => {
-        //     elm.checked = false
-        // })
+        document.getElementById('gender-x').dispatchEvent(new Event("change"))
     })
 }

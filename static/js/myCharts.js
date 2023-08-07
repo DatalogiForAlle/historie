@@ -711,17 +711,102 @@ function insertListModalButtons() {
     listCanvas = document.getElementById("list-canvas")
 }
 
+async function fetchCountyNumbers(url) {
+    // loadBtn.disabled = true
+    let response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+        }
+    })
+    result = await response.json()
+    return result
+}
+
+function getCountyMap() {
+    console.log("works")
+    // ctx = replaceCountyCanvas()
+    selectedVals = getSelectedVals()
+    queryParams = retrieveQueryParams()
+    url = buildFetchUrl("county_map", selectedVals, queryParams)
+    console.log({url: url})
+    fetchCountyNumbers(url).then(result => {
+        insertCountyNumbers(result["dataset"], replaceCountyCanvas())
+        console.log({countyResults: result})
+    })
+
+}
+
+function replaceCountyCanvas() {
+    document.getElementById('county-positions').remove()
+    ctx = document.createElement("div")
+    ctx.id = "county-positions"
+    ctx.style.minWidth = "100%"
+    ctx.style.minHeight = "100%"
+    document.getElementById('county-canvas').prepend(ctx)
+    return ctx 
+}
+
+
+function insertCountyNumbers(countyNumbers, countyCanvas) {
+    console.log({top: COUNTY_IMG_COORDS["hjørring"][1]})
+    console.log({left: COUNTY_IMG_COORDS["hjørring"][0]})
+    console.log({countyNumbers: countyNumbers})
+    console.log({countyNumbers: countyNumbers["hjørring"]})
+    //iterating over the coord dict since it has all counties => 
+    // can detect when we don't have a number for a specific county (n/a)
+    for (const [key, value] of Object.entries(COUNTY_IMG_COORDS)) {
+        countyNumber = countyNumbers[key]
+        countyCanvas.insertAdjacentHTML("beforeend", `
+        <div 
+            style="position: absolute; 
+            top: ${value[1]}px; 
+            left: ${value[0]}px;
+            background-color: #ABBAEA; 
+            font-size: 14px;">${countyNumber ? (Number.isInteger(countyNumber) ? countyNumber : countyNumber.toFixed(3)+"%") : "n/a"}</div>
+        `)
+    }    
+}
+
 function showChart() {
     pieBtn = document.querySelector("#pie-btn")
     barBtn = document.querySelector("#bar-btn")
     lineBtn = document.querySelector("#line-btn")
     pyramidBtn = document.querySelector("#pyramid-btn")
     listBtn = document.querySelector("#list-btn")
+    countyBtn = document.querySelector("#county-btn")
 
     pieBtn.addEventListener("click", () => getChart('pie'))
     barBtn.addEventListener("click", () => getChart('bar'))
     lineBtn.addEventListener("click", () => getChart('line'))
     pyramidBtn.addEventListener("click", () => getChart('pyramid'))
     listBtn.addEventListener("click", () => getAggregationList('list'))
+    countyBtn.addEventListener("click", () => getCountyMap())
+    
 }  
   
+COUNTY_IMG_COORDS = {
+    "hjørring": [316,142], 
+    "ålborg": [267,265], 
+    "thisted": [102,245], 
+    "viborg": [221, 366], 
+    "ringkøbing": [100,426], 
+    "randers": [374, 390], 
+    "århus": [343, 470], 
+    "skanderborg": [236, 485], 
+    "vejle": [205, 550], 
+    "ribe": [104, 590], 
+    "haderslev": [189, 667], 
+    "odense": [325,646], 
+    "tønder": [125, 745],
+    "åbenrå": [198, 756], 
+    "sønderborg": [274, 800], 
+    "svendborg": [373, 712], 
+    "frederiksborg": [642, 486], 
+    "københavn": [659, 567], 
+    "holbæk": [515, 583], 
+    "roskilde": [630, 610], 
+    "sorø": [510, 665], 
+    "præstø": [608, 693], 
+    "maribo": [514, 806], 
+    "bornholm": [639, 367]}

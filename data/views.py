@@ -691,8 +691,46 @@ def population_pyramid(request):
         return HttpResponseBadRequest("Invalid request")
 
 
+def county_map(request):
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+    if is_ajax:
+        if request.method == "GET":
+            x_val = translate_field(request.GET.get("x_val"))
+            abs_ratio = request.GET.get("absRatio")
+            print("absratio is: ", abs_ratio)
+            query_values = get_query_values(request)
+            filter_result = get_query_result(query_values)
+            query_res = list(filter_result.values(x_val).annotate(total=Count("id")))
+            print("query_Res: ", query_res)
+
+            dict_res = {d[x_val]: d.get("total") for d in query_res}
+            labels, data = zip(*dict_res.items())
+            print("county map data: ", data)
+            print("county map labaels", labels)
+
+            def get_percentages(ds):
+                ds_list = list(ds)
+                items_total = sum(ds_list)
+                percentages = [((x / items_total) * 100) for x in ds_list]
+                print("items_total: ", items_total)
+                print("ds_list: ", ds_list)
+                print("percentages: ", percentages)
+                return tuple(percentages)
+
+            if abs_ratio == "absolute":
+                return JsonResponse({"dataset": dict_res})
+            else:
+                return JsonResponse(
+                    {"dataset": dict(zip(labels, get_percentages(data)))}
+                )
+
+        return JsonResponse({"status": "Invalid request"}, status=400)
+    else:
+        return HttpResponseBadRequest("Invalid request")
+
+
 def aggregation_list(request):
-    print("inside aggregation_list")
     is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
     if is_ajax:
