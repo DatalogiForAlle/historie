@@ -23,9 +23,13 @@ function displayChartVariableChoices(variableName, year) {
         `)
     }
     grandParent.replaceChildren(parent)
-    if (variableName === "x") {
-        document.getElementById(`gender-${variableName}`).checked = true 
+    if (variableName === "y") {
+        resetGraphChoices()
     }
+    
+    // if (variableName === "x") {
+    //     document.getElementById(`gender-${variableName}`).checked = true 
+    // }
     
 }
 
@@ -346,18 +350,35 @@ function updateGraphDisplay() {
     }
 }
 
+
+function resetGraphChoices() {
+    console.log("hi")
+    document.getElementsByName("y").forEach((elm) => {
+        if (elm.checked) {
+            //have to manually trigger the xvariable that would remove the checked y variable
+            document.getElementById(elm.id.split('-')[0] + '-x').dispatchEvent(new Event("change"))
+        }
+        elm.checked = false
+    })
+    //and then manually trigger the xvar that we want as a result of reset (which isjust gender-x)
+    document.getElementById("gender-x").checked = true
+    document.getElementById("gender-y").disabled = true
+    document.getElementById('gender-x').dispatchEvent(new Event("change"))
+}
+
 function setGraphResetButton() {
     resetBtn = document.getElementById("reset-graph-choices")
     resetBtn.addEventListener("click", function() {
-        document.getElementsByName("y").forEach((elm) => {
-            if (elm.checked) {
-                //have to manually trigger the xvariable that would remove the checked y variable
-                document.getElementById(elm.id.split('-')[0] + '-x').dispatchEvent(new Event("change"))
-            }
-            elm.checked = false
-        })
-        //and then manually trigger the xvar that we want as a result of reset (which isjust gender-x)
-        document.getElementById("gender-x").checked = true
-        document.getElementById('gender-x').dispatchEvent(new Event("change"))
+        resetGraphChoices()
+        // document.getElementsByName("y").forEach((elm) => {
+        //     if (elm.checked) {
+        //         //have to manually trigger the xvariable that would remove the checked y variable
+        //         document.getElementById(elm.id.split('-')[0] + '-x').dispatchEvent(new Event("change"))
+        //     }
+        //     elm.checked = false
+        // })
+        // //and then manually trigger the xvar that we want as a result of reset (which isjust gender-x)
+        // document.getElementById("gender-x").checked = true
+        // document.getElementById('gender-x').dispatchEvent(new Event("change"))
     })
 }

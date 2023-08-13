@@ -13,6 +13,7 @@ from .utils import (
     translate_field,
     get_query_values,
     get_query_result,
+    get_chart_label,
 )
 from .forms import SqlForm, SearchForm
 from django.core.paginator import (
@@ -413,8 +414,9 @@ def two_input_chart(request):
 
     if is_ajax:
         if request.method == "GET":
-            x_val = translate_field(request.GET.get("x_val"))
-            y_val = translate_field(request.GET.get("y_val"))
+            # quickfix: swapping x and y to make it fit with how you choose them in the interface
+            x_val = translate_field(request.GET.get("y_val"))
+            y_val = translate_field(request.GET.get("x_val"))
             abs_ratio = request.GET.get("absRatio")
 
             query_values = get_query_values(request)
@@ -537,17 +539,37 @@ def two_input_chart(request):
                 # "#ffffff",
                 "#000000",
             ]
-            # if len(datasets) > 7:
-            #     for i in range(len(datasets)):
-            #         datasets[i]["backgroundColor"] = colorlist[i % 21]
-            #         datasets[i]["borderColor"] = colorlist[i % 21]
+            if len(datasets) > 7:
+                print("dataset was over 7 long")
+                for i in range(len(datasets)):
+                    datasets[i]["backgroundColor"] = colorlist[i % 21]
+                    datasets[i]["borderColor"] = colorlist[i % 21]
+            if len(percentage_ds) > 7:
+                print("percentage_ds was over 7 long")
+                for i in range(len(datasets)):
+                    percentage_ds[i]["backgroundColor"] = colorlist[i % 21]
+                    percentage_ds[i]["borderColor"] = colorlist[i % 21]
 
             # colorlist = ["#556b2f", "#800000", "#483d8b", "#3cb371", "#008080", "#9acd32", "#00008b", "#ff4500", "#ffa500", "#ffff00", "#7fff00"]
 
+            chart_label = get_chart_label(y_val)
+
             if abs_ratio == "absolute":
-                return JsonResponse({"labels": y_labels, "datasets": datasets})
+                return JsonResponse(
+                    {
+                        "labels": y_labels,
+                        "datasets": datasets,
+                        "chartLabel": chart_label,
+                    }
+                )
             else:
-                return JsonResponse({"labels": y_labels, "datasets": percentage_ds})
+                return JsonResponse(
+                    {
+                        "labels": y_labels,
+                        "datasets": percentage_ds,
+                        "chartLabel": chart_label,
+                    }
+                )
 
         return JsonResponse({"status": "Invalid request"}, status=400)
     else:
@@ -736,9 +758,8 @@ def aggregation_list(request):
     if is_ajax:
         if request.method == "GET":
             x_val = translate_field(request.GET.get("x_val"))
-            # y_val = translate_field(request.GET.get("y_val"))
-            abs_ratio = request.GET.get("absRatio")
-            print("absratio is: ", abs_ratio)
+            # abs_ratio = request.GET.get("absRatio")
+            # print("absratio is: ", abs_ratio)
 
             page_number = int(request.GET.get("page"))
             key_number = request.GET.get("key")
@@ -746,39 +767,30 @@ def aggregation_list(request):
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
 
-            PER_PAGE = 10
-            if not key_number:  ## query for the first results
-                query_res = list(
-                    # person.objects.filter(q_filter)
+            base_query = (
+                (
+                    filter_result.values(x_val, total=F("husstands_størrelse"))
+                    .order_by("-total", x_val)
+                    .distinct()
+                )
+                if x_val == "husstands_id"
+                else (
                     filter_result.values(x_val)
                     .annotate(total=Count("id"))
                     .order_by("-total", x_val)
                 )
-                # query_res = [{234: 10}, {456, 0}]
+            )
 
-                # db_agg_query_res = list(
-                #     # person.objects.filter(q_filter)
-                #     filter_result.values(x_val)
-                #     .annotate(total=Count("id"))
-                #     .values("total")
-                #     .annotate(Count("total"))
-                #     # .order_by("newTotal")
-                # )
-
-                # print("db_agg_query_res: ", db_agg_query_res[:100])
+            PER_PAGE = 10
+            if not key_number:  ## query for the first results
+                query_res = list(base_query)
 
                 def aggregate_res(query_res):
                     agg_dict = {}
                     res_dict = {}  # dict of lists of first ten hid for each total
-                    # counter = 0
-                    # totalCheck = 1
                     for elm in query_res:
-                        # counter += 1
                         total_key = elm["total"]
                         res_key = elm[x_val]
-                        # if total_key == totalCheck and counter < 30:
-                        #     print("hidkey for {}: {}".format(totalCheck, res_key))
-
                         if total_key in agg_dict.keys():
                             agg_dict[total_key] += 1
                         else:
@@ -798,12 +810,6 @@ def aggregation_list(request):
                     return agg_dict, res_dict
 
                 (aggregate_result, first_results) = aggregate_res(query_res)
-                print("aggresult: ", aggregate_result)
-
-                print("queryRes: ", query_res[:100])
-
-                # print("hiddict: ", first_results[35])
-                # print("hiddict: ", first_results)
 
                 return JsonResponse(
                     {
@@ -813,19 +819,14 @@ def aggregation_list(request):
                 )
 
             else:
-                query_res = list(
-                    # person.objects.filter(q_filter)
-                    filter_result.values(x_val)
-                    .annotate(total=Count("id"))
-                    .order_by("-total", x_val)
-                    .filter(total=key_number)
+                query_res = (
+                    list(base_query.filter(husstands_størrelse=key_number))
+                    if x_val == "husstands_id"
+                    else list(base_query.filter(total=key_number))
                 )
-
-                print("queryRes: ", query_res[:21])
                 paginator = Paginator(query_res, PER_PAGE)
 
                 if int(page_number) < paginator.num_pages:
-                    print("page {} out of {}".format(page_number, paginator.num_pages))
                     page_obj = paginator.get_page(page_number)
                     return JsonResponse(
                         {
@@ -834,11 +835,6 @@ def aggregation_list(request):
                         }
                     )
                 elif int(page_number) == paginator.num_pages:
-                    print(
-                        "should be last page, page {} out of {}".format(
-                            page_number, paginator.num_pages
-                        )
-                    )
                     page_obj = paginator.get_page(page_number)
                     return JsonResponse(
                         {
@@ -846,20 +842,6 @@ def aggregation_list(request):
                             "lastPage": True,
                         }
                     )
-
-            # print("queryRes: ", query_res[:100])
-
-            # def sort_res(res):
-            #     def sorting_key(elem):
-            #         return elem["total"]
-
-            #     return sorted(res, key=sorting_key, reverse=True)
-
-            # sorted_query_res = sort_res(query_res)
-
-            # print("agg res: ", aggregate_result)
-            # print(len(query_res))
-            # print("sort_res: ", sorted_query_res[:100])
 
         return JsonResponse({"status": "Invalid request"}, status=400)
     else:

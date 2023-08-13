@@ -42,15 +42,41 @@ function replaceListCanvas() {
     return ctx 
 }
 
-function stackedOption(chartType, absRatio) {
+// function stackedOption(chartType, absRatio) {
+//     if (chartType === "bar") {
+//         const scales = {x: { stacked: true},y: {stacked: true}}
+//         if (absRatio == "ratio"){
+//             scales.y.max = 100
+//         }
+//         return scales
+//     } else {
+//         return {}
+//     } 
+// }
+function stackedOption(chartType, absRatio, chartLabel) {
     if (chartType === "bar") {
-        const scales = {x: { stacked: true},y: {stacked: true}}
+        const scales = {
+            x: { 
+                stacked: true,
+                title: {
+                    display: true,
+                    text: chartLabel
+                }
+            },
+            y: {
+                stacked: true
+            }}
         if (absRatio == "ratio"){
             scales.y.max = 100
         }
         return scales
     } else {
-        return {}
+        return {x: {
+            title: {
+                display: true,
+                text: chartLabel
+            }
+        }}
     } 
 }
 
@@ -133,7 +159,8 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
 
 
   
-  function createTwoInputChart(ctx, labels, datasets, year, chartType) {
+  function createTwoInputChart(ctx, labels, datasets, year, chartType, chartLabel) {
+    console.log({chartLabel: chartLabel})
     
     var myChart = new Chart(ctx, {
       type: chartType,
@@ -148,8 +175,14 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
             }
           },
           responsive: true,
-          scales: {
-          },
+        //   scales: {
+        //     x: [{
+        //         scaleLabel: {
+        //             display: true,
+        //             labelString: chartLabel
+        //         }
+        //     }],  
+        //   },
           plugins: {
             //   legend: {
             //     display: false
@@ -180,7 +213,7 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
               pieDownload.download = "chart_image.png"
             }
           },
-          scales: stackedOption(chartType, absRatio)
+          scales: stackedOption(chartType, absRatio, chartLabel)
       },
       //custom plugins to create proper background for the downloaded image
       //see https://www.chartjs.org/docs/latest/configuration/canvas-background.html#color
@@ -343,9 +376,10 @@ function getTwoInputChart(url, chartType) {
     .then(response => response.json())
     .then(res => {
         labels = res["labels"]
-        datasets = res["datasets"] 
+        datasets = res["datasets"]
+        chartLabel = res["chartLabel"] 
         // console.log({twoinputdatasets: datasets})
-        createTwoInputChart(ctx, labels, datasets, year, chartType) 
+        createTwoInputChart(ctx, labels, datasets, year, chartType, chartLabel) 
       });
        
 }
@@ -728,6 +762,8 @@ function getCountyMap() {
     // ctx = replaceCountyCanvas()
     selectedVals = getSelectedVals()
     queryParams = retrieveQueryParams()
+    console.log({qparams: queryParams})
+    setCountyMapTitle(queryParams["year"], queryParams["absRatio"])
     url = buildFetchUrl("county_map", selectedVals, queryParams)
     console.log({url: url})
     fetchCountyNumbers(url).then(result => {
@@ -766,6 +802,12 @@ function insertCountyNumbers(countyNumbers, countyCanvas) {
             font-size: 14px;">${countyNumber ? (Number.isInteger(countyNumber) ? countyNumber : countyNumber.toFixed(3)+"%") : "n/a"}</div>
         `)
     }    
+}
+
+function setCountyMapTitle(year, absRatio) {
+    countyMapLabelElm = document.getElementById("county-modal-label")
+    const countyMapLabel = "Befolkningstal fordelt på amter"
+    countyMapLabelElm.innerText = countyMapLabel
 }
 
 function showChart() {

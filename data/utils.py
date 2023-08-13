@@ -23,6 +23,13 @@ field_dict = {
 }
 
 
+def get_chart_label(y_val):
+    if y_val == "sogn_by":
+        return "Sogn/by"
+    else:
+        return y_val.replace("_", " ").capitalize()
+
+
 def translate_field(field_name):
     print("field_name is: ", field_name)
     return field_dict[field_name]
