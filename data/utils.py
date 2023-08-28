@@ -18,7 +18,8 @@ field_dict = {
     "job_original": "erhverv_original",
     "household_function_std": "stilling_i_husstanden_standardiseret",
     "migration": "migrant_type",
-    "household_size": "husstands_størrelse"
+    "household_size": "husstands_størrelse",
+    "age_interval": "alders_interval"  # not a field but need to be able to translate it for showing the filters in the charts
     # "fødesogn_by_standardiseret",
 }
 
@@ -33,6 +34,30 @@ def get_chart_label(y_val):
 def translate_field(field_name):
     print("field_name is: ", field_name)
     return field_dict[field_name]
+
+
+def translate_field_for_chart_info(field_name):
+    chart_field_dict = {
+        "year": "år",
+        "pa_id": "pa ID",
+        "household_id": "husstands ID",
+        "five": "5 års aldersgrupper",
+        "ten": "10 års aldersgrupper",
+        "name": "navn",
+        "gender": "køn",
+        "age": "alder",
+        "status": "ægteskabelig stilling",
+        "parish": "sogn/by",
+        "hundred": "herred",
+        "county": "amt",
+        "location": "bostedstype",
+        "job_original": "erhverv",
+        "household_function_std": "stilling i husstanden",
+        "migration": "migranttype",
+        "household_size": "husstandsstørrelse",
+        "age_interval": "aldersinterval",
+    }
+    return chart_field_dict[field_name]
 
 
 def get_person_model(year):
@@ -131,3 +156,28 @@ def get_query_result(query_values):
     return combine_with_query_2_filter(
         filter_result_query_1, q2_filter, query_values["combine"]
     )
+
+
+def get_filter_overview(context):
+    filter_overview = {}
+    filter_overview["year"] = context["year"]
+    filter_one = context["search_category_1"]
+    filter_two = context["search_category_2"]
+    if filter_one != "no-query":
+        filter_overview["filter_one"] = {
+            get_chart_label(translate_field(filter_one.replace("-", "_"))): context[
+                "query_1"
+            ]
+        }
+    if filter_two != "no-query":
+        filter_overview["filter_two"] = {
+            get_chart_label(translate_field(filter_two.replace("-", "_"))): context[
+                "query_2"
+            ]
+        }
+
+    if context["combine"] == "include":
+        filter_overview["combine"] = "inkludér"
+    else:
+        filter_overview["combine"] = "ekskludér"
+    return filter_overview

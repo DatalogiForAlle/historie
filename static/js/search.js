@@ -1,3 +1,5 @@
+// import getFilterText from "./myCharts"
+
 const queryOneIdentifiers = {formId: "q1-form", queryId: "id_q1", queryName: "q1", selectName: "search-category-1", selectId: "select1", storageCategoryKey: "searchCategory1", storageQueryKey: "query1", optionIdSuffix: "-1"}
 
 const queryTwoIdentifiers = {formId: "q2-form", queryId: "id_q2", queryName: "q2", selectName: "search-category-2", selectId: "select2", storageCategoryKey: "searchCategory2", storageQueryKey: "query2", optionIdSuffix: "-2"}
@@ -231,7 +233,7 @@ function keepUserInput(year, searchCategory1, query1, searchCategory2, query2, c
 }
 
 
-function displayFieldCheckBoxes(year){
+function displayFieldCheckBoxes(year, filterOverview){
     const fieldsToDisplay = setFieldsToDisplay(year)
     grandParent = document.getElementById("field-checkboxes-column")
     parent = document.createElement("div")
@@ -256,6 +258,12 @@ function displayFieldCheckBoxes(year){
         `)
     } 
     grandParent.replaceChildren(parent) 
+
+    let searchFilterOverviewElm = document.getElementById("search-filter-overview")
+    let titles = getFilterText(JSON.parse(filterOverview), "pie")
+    // console.log({fo: filterOverview})
+    console.log({fromSearch: titles.subtitle})
+    searchFilterOverviewElm.innerHTML = titles.subtitle
 
 }
 

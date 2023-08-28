@@ -80,10 +80,62 @@ function stackedOption(chartType, absRatio, chartLabel) {
     } 
 }
 
-function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
-    // console.log({datasetlabel: datasetLabel})
+function translateChartType(chartType) {
+    let chartTypeDict = {
+        "pie": "cirkeldiagram over",
+        "bar": "søjlediagram over",
+        "line": "linjediagram over",
+        "pyramid": "befolkningspyramide over",
+        "list": "sammentælling af",
+        "map": "amtskort"
+    }
+    console.log({ct: chartType})
+    console.log({ctDict: chartTypeDict})
+    console.log({ctD: chartTypeDict[chartType]})
+    return chartTypeDict[chartType]
+}
+   
+
+function getFilterText(filterOverview, chartType) {
+    chartTypeTranslated = translateChartType(chartType)
+    chartTypeCapitalized = chartTypeTranslated.charAt(0).toUpperCase() + chartTypeTranslated.slice(1)
+    filter1 = filterOverview["filter_one"]
+    console.log({f1: filter1})
+    filter2 = filterOverview["filter_two"]
+    combine = filterOverview["combine"]
+    title = `${chartTypeCapitalized} ${filterOverview["xVal"]}`
+    subtitle = `for folkeoptællingsår ${filterOverview["year"]}`
+    console.log({filterOver: filterOverview})
+    if (filter1) {
+        filterKey = Object.keys(filter1)[0]
+        filterVal = filter1[filterKey]
+        subtitle += ` med filter: ${filterKey.toUpperCase()}: ${filterVal}`
+    }
+    if (filter2) {
+        filterKey = Object.keys(filter2)[0]
+        filterVal = filter2[filterKey]
+        if (combine == "ekskludér"){
+            if (!filter1) {
+                subtitle += ` med filter:`
+            }
+            subtitle += `, eksklusive `
+        } else {
+            subtitle += `, `
+        }
+        subtitle += `${filterKey.toUpperCase()}: ${filterVal}`
+        
+        
+    }
+    
+    return {title: title, subtitle: subtitle}
+}
+
+function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, filterOverview) {
     // console.log({ctx: ctx})
-    let titleText = year
+    titles = getFilterText(filterOverview, chartType)
+    // let titleText = year
+    let titleText = titles.title
+    let subtitleText = titles.subtitle
     function translateTitle(t) {
         switch (t) {
             case "sogn_by":
@@ -95,7 +147,7 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
         }
     }
     if (["sogn_by", "husstands_id", "erhverv_original"].includes(datasetLabel) && chartType !== "pie") {
-        titleText += `- største 20 ${translateTitle(datasetLabel)}` 
+        titleText += ` - største 20 ${translateTitle(datasetLabel)}` 
     }
     var myChart = new Chart(ctx, {
       type: chartType,
@@ -123,6 +175,10 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
               title: {
                   display: true,
                   text: titleText
+              },
+              subtitle: {
+                display: true,
+                text: subtitleText
               },
               customCanvasBackgroundColor: {
                 color: 'white',
@@ -161,6 +217,10 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
   
   function createTwoInputChart(ctx, labels, datasets, year, chartType, chartLabel) {
     console.log({chartLabel: chartLabel})
+
+    titles = getFilterText(filterOverview, chartType)
+    title = titles.title + ` og ${filterOverview["yVal"]}`
+    subtitle = titles.subtitle
     
     var myChart = new Chart(ctx, {
       type: chartType,
@@ -189,7 +249,11 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel) {
             //   },
               title: {
                   display: true,
-                  text: year
+                  text: title
+              },
+              subtitle: {
+                display: true,
+                text: subtitle
               },
               customCanvasBackgroundColor: {
                 color: 'white',
@@ -254,6 +318,7 @@ function pyramidScalesOption(absRatio) {
 
 function createPopulationPyramid(ctx, labels, datasets, year, chartType, absRatio) {
     // console.log({pyramidDatasetse: datasets})
+    titles = getFilterText(filterOverview, chartType)
     var myChart = new Chart(ctx, {
         type: "bar",
         data: {
@@ -276,7 +341,13 @@ function createPopulationPyramid(ctx, labels, datasets, year, chartType, absRati
               //   },
                 title: {
                     display: true,
-                    text: year
+                    text: "Befolkningspyramide"
+                    // text: year
+                },
+                subtitle: {
+                    display: true,
+                    text: titles.subtitle
+                    // text: year
                 },
                 customCanvasBackgroundColor: {
                   color: 'white',
@@ -364,8 +435,6 @@ function getSelectedVals() {
     return selectedVals
 }
 
-
-
 function getTwoInputChart(url, chartType) {
     fetch(url, {
         method: "GET",
@@ -377,9 +446,10 @@ function getTwoInputChart(url, chartType) {
     .then(res => {
         labels = res["labels"]
         datasets = res["datasets"]
-        chartLabel = res["chartLabel"] 
+        chartLabel = res["chartLabel"]
+        filterOverview = res["filterOverview"]
         // console.log({twoinputdatasets: datasets})
-        createTwoInputChart(ctx, labels, datasets, year, chartType, chartLabel) 
+        createTwoInputChart(ctx, labels, datasets, year, chartType, chartLabel, filterOverview) 
       });
        
 }
@@ -395,7 +465,8 @@ function getPopulationPyramid(url, chartType, absRatio) {
     .then(res => {
         labels = res["labels"]
         datasets = res["datasets"] 
-        createPopulationPyramid(ctx, labels, datasets, year, chartType, absRatio) 
+        filterOverview = res["filterOverview"]
+        createPopulationPyramid(ctx, labels, datasets, year, chartType, absRatio, filterOverview) 
       });
 }
 
@@ -411,17 +482,10 @@ function getOneInputChart(url, chartType) {
         labels = res["labels"]
         data = res["data"] 
         datasetLabel = res["datasetLabel"]
-        createOneInputChart(ctx, labels, data, year, chartType, datasetLabel)  
+        filterOverview = res["filterOverview"]
+        createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, filterOverview)  
       });
 }
-
-// function buildFetchUrl(startString, year, selectedVals, searchCategory, query) {
-//     url = `${startString}_input_chart/?year=${year}&search_category=${searchCategory}&query=${query}`
-//     selectedVals.forEach(function(item) {
-//         url += `&${item["varName"]}=${item["varValue"]}`
-//     })
-//     return url
-// }
 
 function buildFetchUrl(startString, selectedVals, queryParams, chartType) {
     url = `${startString}/?year=${queryParams.year}&search-category-1=${queryParams.searchCategory1}&q1=${queryParams.query1}&search-category-2=${queryParams.searchCategory2}&q2=${queryParams.query2}&combine=${queryParams.combine}&chartType=${chartType}&absRatio=${queryParams.absRatio}`
@@ -489,57 +553,8 @@ async function fetchAggregationList(url) {
     })
     result = await response.json()
     return result
-    // console.log({resultIs: result})
-    // const data = result["data"]
-    // const lastPage = result["lastPage"]
-    // console.log({dataIs: data})
-    // console.log({lastPageIs: lastPage})
-    // createAggregationDisplay(data, lastPage, loadBtn)
 }
 
-// function fetchAggregationList(url, loadBtn) {
-//     fetch(url, {
-//         method: "GET",
-//         headers: {
-//             "X-Requested-With": "XMLHttpRequest",
-//         }
-//     })
-//     .then(response => response.json())
-//     .then(res => {
-//         data = res["data"]
-//         isLastPage = res["lastPage"]
-//         console.log({daatIS: data})
-//         createAggregationDisplay(data, loadBtn)
-//         // createList(data)
-//       });
-// }
-
-// function createAggregationDisplay(aggregationList, lastPage, loadBtn) {
-//     if (lastPage) {
-//         for (const elm of aggregationList) {
-//             ctx.insertAdjacentHTML("beforeend", `
-//             <p> 
-//                 ${elm.husstands_id} : ${elm.total}
-//             </p>
-//             `)}
-//         ctx.insertAdjacentHTML("beforeend", `
-//             <p> 
-//                 Ikke flere elementer at vise
-//             </p>
-//         `)
-//         loadBtn.disabled = true
-//     } else {
-//         for (const elm of aggregationList) {
-        
-//             ctx.insertAdjacentHTML("beforeend", `
-//             <p> 
-//                 ${elm.husstands_id} : ${elm.total}
-//             </p>
-//             `)
-//         }
-//         loadBtn.disabled = false
-//     }
-// }
 
 function insertAggregationList(aggregationList, lastPage, aggregationListElm, loadBtn, varValue, number_key) {
 
@@ -583,20 +598,22 @@ function insertAggregationList(aggregationList, lastPage, aggregationListElm, lo
 
 function createAggregationOverview(result, selectedVals, queryParams, chartType) {
     const aggregationOverview = result["aggregationOverview"]
-    // const aggregationList = result["data"]
-    // const 
-    // console.log({aggOverView: aggregationOverview})
     const varValue = selectedVals[0].varValue
+
+    const filterOverview = result["filterOverview"]
+    listCanvasTitleElm = document.getElementById('list-modal-label')
+    titles = getFilterText(filterOverview, chartType)
+    listCanvasTitleElm.innerHTML = titles.title
+    listCanvasSubTitleElm = document.getElementById('list-modal-sublabel')
+    listCanvasSubTitleElm.innerHTML = titles.subtitle
+
     listCanvas = document.getElementById("list-canvas")
     accordion = document.createElement("div")
     accordion.className = "accordion"
     accordion.id = "accordion"
-    // console.log({aggOverview: aggregationOverview})
-    // console.log({objEntries: Object.entries(aggregationOverview).sort((a,b) => b[0]-a[0])})
 
     let firstElm = true
     for (const [key, value] of Object.entries(aggregationOverview)) {
-        // console.log({keyIs: key})
     
         const loadBtn = document.createElement("button")
         loadBtn.type = "button"
@@ -650,13 +667,11 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
         const isLastPage =result["firstResults"][key].lastPage
 
         insertAggregationList(firstResults, isLastPage, aggregationListElm, loadBtn,varValue, key)
-        // console.log({agglistelm: aggregationListElm})
 
         accordionItem = document.createElement("div")
         accordionItem.className = "accordion-item"
         accordion.insertAdjacentElement("beforeend", accordionItem)
 
-        // const accItemTitle = `${value} husholdning(er) af størrelse: ${key}`
         function getAccItemTitle(varName) {
             if (varName === "household_id") {
                 return `${value} husholdning(er) af størrelse: ${key}`
@@ -688,16 +703,7 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
             accordionCollapse.className = "accordion-collapse collapse"
         }
         
-        // accordionCollapse.insertAdjacentHTML("beforeend", `
-        //     <div class="accordion-body" id="accordion-body-${key}">
-        //         results here
-        //     </div> ` )
-        // accordionCollapse.insertAdjacentElement("beforeend", aggregationListElm)
         accordionCollapse.insertAdjacentElement("beforeend", aggregationAccBody)
-        // aggregationListElm.insertAdjacentElement("beforeend", loadBtn)
-        // loadBtn.insertAdjacentHTML("beforebegin", "<h2>Hey</h2>")
-        // accordionCollapse.insertAdjacentElement("beforeend", loadBtn)
-        
     }
     
     listCanvas.append(accordion)
@@ -705,10 +711,8 @@ function createAggregationOverview(result, selectedVals, queryParams, chartType)
 }
 
 function getAggregationList(chartType) {
-    // ctx = replaceChartCanvas("div")
     let modalPage = 1
     
-    // ctx = document.getElementById("list-canvas")
     ctx = replaceListCanvas()
     selectedVals = getSelectedVals()
     queryParams = retrieveQueryParams()
@@ -718,27 +722,10 @@ function getAggregationList(chartType) {
     if (selectedVals.length === 1) {
         url = buildFetchUrl("aggregation_list", selectedVals, queryParams, chartType)
         url += `&page=${modalPage}`
-        // console.log({aggUrl: url})
-        // loadBtn.disabled = true
         fetchAggregationList(url, loadBtn).then(result => {
             createAggregationOverview(result, selectedVals, queryParams, chartType)
         })
     }
-
-    // console.log({originalModalPageIs: modalPage})
-    // loadBtn.addEventListener("click", function() {
-    //     this.disabled = true
-    //     url = buildFetchUrl("aggregation_list", selectedVals, queryParams, chartType)
-    //     modalPage += 1  //remember to fix this so it starts at 1
-    //     console.log({modalPageIs: modalPage})
-    //     url += `&page=${modalPage}`
-    //     console.log({aggUrlLoadMore: url})
-
-    //     fetchAggregationList(url, loadBtn).then(result => {
-    //         createAggregationDisplay(result["data"], result["lastPage"], loadBtn)
-    //     })
-        
-    // })
 }
 
 function insertListModalButtons() {
@@ -746,7 +733,6 @@ function insertListModalButtons() {
 }
 
 async function fetchCountyNumbers(url) {
-    // loadBtn.disabled = true
     let response = await fetch(url, {
         method: "GET",
         headers: {
@@ -757,16 +743,16 @@ async function fetchCountyNumbers(url) {
     return result
 }
 
-function getCountyMap() {
+function getCountyMap(chartType) {
     console.log("works")
     // ctx = replaceCountyCanvas()
     selectedVals = getSelectedVals()
     queryParams = retrieveQueryParams()
     console.log({qparams: queryParams})
-    setCountyMapTitle(queryParams["year"], queryParams["absRatio"])
     url = buildFetchUrl("county_map", selectedVals, queryParams)
     console.log({url: url})
     fetchCountyNumbers(url).then(result => {
+        setCountyMapTitle(result["filterOverview"], chartType)
         insertCountyNumbers(result["dataset"], replaceCountyCanvas())
         console.log({countyResults: result})
     })
@@ -804,10 +790,14 @@ function insertCountyNumbers(countyNumbers, countyCanvas) {
     }    
 }
 
-function setCountyMapTitle(year, absRatio) {
+function setCountyMapTitle(filterOverview, chartType) {
     countyMapLabelElm = document.getElementById("county-modal-label")
     const countyMapLabel = "Befolkningstal fordelt på amter"
     countyMapLabelElm.innerText = countyMapLabel
+    titles = getFilterText(filterOverview, chartType)
+    const countyMapSubLabelElm = document.getElementById("county-modal-sublabel")
+    countyMapSubLabelElm.innerHTML = titles.subtitle
+
 }
 
 function showChart() {
@@ -823,7 +813,7 @@ function showChart() {
     lineBtn.addEventListener("click", () => getChart('line'))
     pyramidBtn.addEventListener("click", () => getChart('pyramid'))
     listBtn.addEventListener("click", () => getAggregationList('list'))
-    countyBtn.addEventListener("click", () => getCountyMap())
+    countyBtn.addEventListener("click", () => getCountyMap("map"))
     
 }  
   

@@ -6,6 +6,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.template import loader
 from django.http import JsonResponse
 from django.core import serializers
+import json
 
 from .models import Person
 from .models import Person1801, Person1850, Person1901
@@ -14,6 +15,8 @@ from .utils import (
     get_query_values,
     get_query_result,
     get_chart_label,
+    get_filter_overview,
+    translate_field_for_chart_info,
 )
 from .forms import SqlForm, SearchForm
 from django.core.paginator import (
@@ -263,6 +266,7 @@ def search(request):
     if request.GET:
         query_values = get_query_values(request)
 
+        print("queryValues: ", query_values)
         context["year"] = str(query_values["year"])
         context["query_1"] = str(query_values["query_1"])
         context["search_category_1"] = str(query_values["search_category_1"])
@@ -270,6 +274,10 @@ def search(request):
         context["search_category_2"] = str(query_values["search_category_2"])
         context["combine"] = str(query_values["combine"])
         context["submit_elm"] = str(query_values["submit_elm"])
+
+        filter_overview = get_filter_overview(query_values)
+        print("filteroverview search is: ", filter_overview)
+        context["filter_overview"] = json.dumps(filter_overview)
 
         results_per_page = str(query_values["results_per_page"])
         context["results_per_page"] = results_per_page
@@ -306,6 +314,13 @@ def one_input_chart(request):
             absRatio = request.GET.get("absRatio")
             print("chartType is: ", chart_type)
             query_values = get_query_values(request)
+
+            filter_overview = get_filter_overview(query_values)
+            filter_overview["xVal"] = translate_field_for_chart_info(
+                request.GET.get("x_val")
+            )
+            print("filteroverview one input chart: ", filter_overview)
+
             filter_result = get_query_result(query_values)
             # querying the database, returns a list of dicts
 
@@ -393,7 +408,12 @@ def one_input_chart(request):
 
             if absRatio == "absolute":
                 return JsonResponse(
-                    {"labels": labels, "data": data, "datasetLabel": x_val}
+                    {
+                        "labels": labels,
+                        "data": data,
+                        "datasetLabel": x_val,
+                        "filterOverview": filter_overview,
+                    }
                 )
             else:
                 return JsonResponse(
@@ -401,6 +421,7 @@ def one_input_chart(request):
                         "labels": labels,
                         "data": get_percentages(data),
                         "datasetLabel": x_val,
+                        "filterOverview": filter_overview,
                     }
                 )
 
@@ -421,6 +442,14 @@ def two_input_chart(request):
 
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
+
+            filter_overview = get_filter_overview(query_values)
+            filter_overview["xVal"] = translate_field_for_chart_info(
+                request.GET.get("x_val")
+            )
+            filter_overview["yVal"] = translate_field_for_chart_info(
+                request.GET.get("y_val")
+            )
 
             # querying the database, returns a list of dicts
             query_res = list(
@@ -560,6 +589,7 @@ def two_input_chart(request):
                         "labels": y_labels,
                         "datasets": datasets,
                         "chartLabel": chart_label,
+                        "filterOverview": filter_overview,
                     }
                 )
             else:
@@ -568,6 +598,7 @@ def two_input_chart(request):
                         "labels": y_labels,
                         "datasets": percentage_ds,
                         "chartLabel": chart_label,
+                        "filterOverview": filter_overview,
                     }
                 )
 
@@ -594,6 +625,14 @@ def population_pyramid(request):
 
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
+
+            filter_overview = get_filter_overview(query_values)
+            filter_overview["xVal"] = translate_field_for_chart_info(
+                request.GET.get("x_val")
+            )
+            filter_overview["yVal"] = translate_field_for_chart_info(
+                request.GET.get("y_val")
+            )
 
             # querying the database, returns a list of dicts
             query_res = list(
@@ -704,9 +743,21 @@ def population_pyramid(request):
             print("percentage datasets changed: ", percentage_ds)
 
             if abs_ratio == "absolute":
-                return JsonResponse({"labels": y_labels, "datasets": datasets})
+                return JsonResponse(
+                    {
+                        "labels": y_labels,
+                        "datasets": datasets,
+                        "filterOverview": filter_overview,
+                    }
+                )
             else:
-                return JsonResponse({"labels": y_labels, "datasets": percentage_ds})
+                return JsonResponse(
+                    {
+                        "labels": y_labels,
+                        "datasets": percentage_ds,
+                        "filterOverview": filter_overview,
+                    }
+                )
 
         return JsonResponse({"status": "Invalid request"}, status=400)
     else:
@@ -726,6 +777,13 @@ def county_map(request):
             query_res = list(filter_result.values(x_val).annotate(total=Count("id")))
             print("query_Res: ", query_res)
 
+            filter_result = get_query_result(query_values)
+
+            filter_overview = get_filter_overview(query_values)
+            filter_overview["xVal"] = translate_field_for_chart_info(
+                request.GET.get("x_val")
+            )
+
             dict_res = {d[x_val]: d.get("total") for d in query_res}
             labels, data = zip(*dict_res.items())
             print("county map data: ", data)
@@ -741,10 +799,15 @@ def county_map(request):
                 return tuple(percentages)
 
             if abs_ratio == "absolute":
-                return JsonResponse({"dataset": dict_res})
+                return JsonResponse(
+                    {"dataset": dict_res, "filterOverview": filter_overview}
+                )
             else:
                 return JsonResponse(
-                    {"dataset": dict(zip(labels, get_percentages(data)))}
+                    {
+                        "dataset": dict(zip(labels, get_percentages(data))),
+                        "filterOverview": filter_overview,
+                    }
                 )
 
         return JsonResponse({"status": "Invalid request"}, status=400)
@@ -766,6 +829,11 @@ def aggregation_list(request):
 
             query_values = get_query_values(request)
             filter_result = get_query_result(query_values)
+
+            filter_overview = get_filter_overview(query_values)
+            filter_overview["xVal"] = translate_field_for_chart_info(
+                request.GET.get("x_val")
+            )
 
             base_query = (
                 (
@@ -815,6 +883,7 @@ def aggregation_list(request):
                     {
                         "aggregationOverview": aggregate_result,
                         "firstResults": first_results,
+                        "filterOverview": filter_overview,
                     }
                 )
 

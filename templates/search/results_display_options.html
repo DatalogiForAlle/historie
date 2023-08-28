@@ -1,5 +1,10 @@
 <br>
-<h3>Søgeresultater</h3>
+<div>
+    <h2 id="search-results-title" style="display: inline-block;">Søgeresultater</h2>
+    <span style="font-size: 10pt" id="search-filter-overview"></span>
+</div>
+
+
 <div>
     <button type="submit" class="btn btn-secondary mb-2 btn-sm" id="remove-filters-btn" name="remove-filters-btn" value="remove-filters-btn" form="query-form">Fjern alle filtre</button>
 </div>
@@ -38,7 +43,7 @@
     </div>
     <div class="col border rounded-end border-start-0" id="field-checkboxes-column">
         <script>
-            displayFieldCheckBoxes("{{year}}")
+            displayFieldCheckBoxes("{{year}}", "{{filter_overview|escapejs}}")
         </script>
     </div>
 </div>
