@@ -1,11 +1,7 @@
 function displayChartVariableChoices(variableName, year) {
-    // const titleText = `Vælg en ${variableName.toUpperCase()}-variabel.`
     const choices = setChoices(year, variableName) 
     const gpId = `choose-${variableName}-variable`
-    // console.log({gpId: gpId})
     const grandParent = document.getElementById(gpId)
-    // const parent = document.createElement("div")
-    // parent.style="display:flex"
     const parent = document.createElement("div")
     parent.className = "row"
     //temporary fix
@@ -27,15 +23,9 @@ function displayChartVariableChoices(variableName, year) {
         resetGraphChoices()
     }
     
-    // if (variableName === "x") {
-    //     document.getElementById(`gender-${variableName}`).checked = true 
-    // }
-    
 }
 
 function displayAllChartVariableChoices(year) {
-    // const choices = setChoices(year)
-    // const variables = ["x", "y", "z"]
     const variables = ["x", "y"]
     for (const variableName of variables) {
         displayChartVariableChoices(variableName, year)
@@ -58,7 +48,6 @@ function setChoices(year, variableName) {
 
 function setAllowances(variableNames, year) {
     const allowances = {}
-    // console.log("inside setAllowances")
     for (const variableName of variableNames) {
         const choices = setChoices(year, variableName)
         choices["migration"] = false //this line should fix the bug that rendered migration in y disabled when switching from 1801 to one of the other years. The problem was that since migration was never set in xallowances upon the first search, when recalling xallowances for remembering the allowed y buttons, migration was not remembered.
@@ -78,7 +67,6 @@ function updateAllowances(allowances, btn, val) {
         }
         else allowances[btn][item] = false
     })
-    // console.log({insideUpdateAllowancesVal: val})
     if (["parish", "household_id", "job_original", "household_size"].includes(val)) {
         Object.keys(allowances[btn]).forEach((item) => {
             allowances[btn][item] = false
@@ -87,16 +75,8 @@ function updateAllowances(allowances, btn, val) {
 }
   
 
-// function test() {
-//     console.log("works")
-// }
-
 function updateGraphInput(year) {
     updateGraphDisplay()
-
-    // document.getElementsByName("abs-ratio").addEventListener("change", function() {
-        
-    // })
 
     $('input[name=abs-ratio]').on('change', (function() {
   
@@ -104,27 +84,13 @@ function updateGraphInput(year) {
         sessionStorage.setItem("abs-ratio", $(this).prop('id'))
         }
     ))
-    // var xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || {y: {gender: false, status: false, location: false, county: false, five: false}, z: {gender: false, status: false, location: false, county: false, five: false}}
-    // var yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || {z:{gender: false, status: false, location: false, county: false, five: false}}
-
-    // const choices = setChoices()
+   
     // if the allowance objects already exists, we get them, otherwise we create them and set them all to false
     let xAllowances = JSON.parse(sessionStorage.getItem("xAllowances")) || setAllowances(["y", "z"], year)
     let yAllowances = JSON.parse(sessionStorage.getItem("yAllowances")) || setAllowances(["z"], year)
 
-    // console.log({xAllowancesForYMigration: xAllowances["y"]["migration"]})
-    // if (year !== "1801") {
-    //     xAllowances["y"]["migration"] = true
-    // }
-
-    // console.log({xEqual: JSON.stringify(xAllowances)===JSON.stringify(xAllowances2)})
-
-  
-  //   console.log({xAllows: xAllowances})
     // when x changes, should affect both y and z
     $('input[name=x]').on('change', (function() {
-
-        console.log("some x was changed")
   
         //saving the id of the x button that is checked to recall later
         sessionStorage.setItem("xID", $(this).prop('id'))
@@ -193,13 +159,9 @@ function updateGraphInput(year) {
   
         updateAllowances(yAllowances, "z", yVal)
   
-  
-      //   console.log(xAllowances)
-      //   console.log(yAllowances)
         $('input[name=z]').each(function(){
             zBtn = $(this)
             if (xAllowances.z[zBtn.val()] && yAllowances.z[zBtn.val()]) {
-                // console.log("both x and y allow z btn")
                 zBtn.prop('disabled', false)
             }
             else {
@@ -253,10 +215,9 @@ function recallGraphInput() {
 function recallDisabledGraphButtons() {
     const yBtns = document.querySelectorAll('input[name=y]')
     const zBtns = document.querySelectorAll('input[name=z]')
-  //   console.log({yBtnsChecked: document.querySelectorAll('input[name=z]:checked').length})
+
     const xAllowances = JSON.parse(sessionStorage.getItem("xAllowances"))
     const yAllowances = JSON.parse(sessionStorage.getItem("yAllowances"))
-  //   console.log("xallow is: ", xAllowances)
   
   
     if (xAllowances != null) {
@@ -295,11 +256,6 @@ function updateGraphDisplay() {
     const pyramidBtn = document.getElementById("pyramid-btn")
     const listBtn = document.getElementById("list-btn")
     const countyBtn = document.getElementById("county-btn")
-    // console.log({isY: isY})
-    // console.log({isX: isX})
-
-    // xVal = document.querySelector('input[name="x"]:checked').value
-    // yVal = document.querySelector('input[name="y"]:checked').value
 
     if (isX) {
         lineBtn.disabled = false
@@ -336,23 +292,11 @@ function updateGraphDisplay() {
             }
             
         } 
-        // if (!isY) {
-        //     $('#pie-btn').show()  
-        //     if (xVal === "gender") {
-        //         $('#pyramid-btn').show() 
-        //     } else {
-        //         $('#pyramid-btn').hide() 
-        //     }
-        // } else {
-        //     $('#pie-btn').hide()
-        //     $('#pyramid-btn').hide() 
-        // } 
     }
 }
 
 
 function resetGraphChoices() {
-    console.log("hi")
     document.getElementsByName("y").forEach((elm) => {
         if (elm.checked) {
             //have to manually trigger the xvariable that would remove the checked y variable
@@ -370,15 +314,5 @@ function setGraphResetButton() {
     resetBtn = document.getElementById("reset-graph-choices")
     resetBtn.addEventListener("click", function() {
         resetGraphChoices()
-        // document.getElementsByName("y").forEach((elm) => {
-        //     if (elm.checked) {
-        //         //have to manually trigger the xvariable that would remove the checked y variable
-        //         document.getElementById(elm.id.split('-')[0] + '-x').dispatchEvent(new Event("change"))
-        //     }
-        //     elm.checked = false
-        // })
-        // //and then manually trigger the xvar that we want as a result of reset (which isjust gender-x)
-        // document.getElementById("gender-x").checked = true
-        // document.getElementById('gender-x').dispatchEvent(new Event("change"))
     })
 }

@@ -1,5 +1,3 @@
-// import getFilterText from "./myCharts"
-
 const queryOneIdentifiers = {formId: "q1-form", queryId: "id_q1", queryName: "q1", selectName: "search-category-1", selectId: "select1", storageCategoryKey: "searchCategory1", storageQueryKey: "query1", optionIdSuffix: "-1"}
 
 const queryTwoIdentifiers = {formId: "q2-form", queryId: "id_q2", queryName: "q2", selectName: "search-category-2", selectId: "select2", storageCategoryKey: "searchCategory2", storageQueryKey: "query2", optionIdSuffix: "-2"}
@@ -85,14 +83,6 @@ function resetSearchField(queryIdentifiers) {
     selectElm.value = optionNoQuery
 }
 
-// function resetSearchField(queryIdentifiers) {
-//     const selectElm = document.getElementById(queryIdentifiers.selectId)
-//     const optionNoQuery = "no-query"
-//     if (selectElm.value === "migration") {
-//         recallQueryInputAttributes(optionNoQuery, queryIdentifiers)
-//         selectElm.value = optionNoQuery
-//     }  
-// }
 
 function recallIfMigration(year, queryIdentifiers) {
     if (year) {
@@ -111,37 +101,30 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
 
     switch (searchCategory) {
         case "age" :
-            console.log("inside age onSelectChange")
             q.type = "number";
             q.placeholder = "0";
             q.min = "-1";
             q.max = "100";
             break
         case "parish" :
-            console.log("inside parish onSelectChange")
             q.type = "text"
             q.placeholder = "Indtast en by"
             break
         case "no-query" :
-            console.log("inside no-query onSelectChange")
             q.type = "text";
             q.value = null
             q.placeholder = ""
             q.setAttribute('readonly', true) 
-            console.log({noquery_qval: q.value})
             break
         case "age-interval" :
-            console.log("inside age-interval onSelectChange")
             q.type = "text"
             q.title="Example of acceptable input: 10-20"
             q.placeholder = "Ex: 20-35"
             q.pattern="^[0-9]{1,3}-[0-9]{1,3}$"
-            console.log({age_q: q})
             break
         case "gender" :
             const genderOptions = ["m", "f"]
             insertFormElm(createSelectElm(genderOptions, queryName, queryId), formId)
-            console.log({q: q})
             break
         case "household-function-std" :
             const householdOptions = ['hendes barn', 'ukendt', 'barn', 'tjeneste', 'husfader', 'kone', 'husmoder', 'hans barn', 'andet']
@@ -160,19 +143,15 @@ function recallQueryInputAttributes(searchCategory, queryIdentifiers) {
             q.placeholder = "Indtast et erhverv"
             break
         case "household-id":
-            console.log("inside hid onSelectChange")
             q.type = "number";
             q.placeholder = "0";
             q.min = "0";
-            // q.max = "100";
             break
         case "household-size" :
-            console.log("inside household-size-interval onSelectChange")
             q.type = "text"
             q.title="Example of acceptable input: 4-5"
             q.placeholder = "Ex: 4-5"
             q.pattern="^[0-9]{1,3}-[0-9]{1,3}$"
-            // console.log({age_q: q})
             break
         case "migration" :
             const migrationOptions = ['migrant', 'indfødt', 'ukendt']
@@ -185,8 +164,6 @@ function keepYearInput(year) {
     sessionStorage.setItem("year", year)
     if (year) {
         recallYear(year)
-    } else { 
-        console.log("no year")
     }
 }
 
@@ -194,9 +171,7 @@ function keepCombineInput(combine) {
     sessionStorage.setItem("combine", combine)
     if (combine) {
         recallCombineValue(combine)
-    } else {
-        console.log("no combine")
-    }
+    } 
 }
 
 function keepQueryInput(queryIdentifiers, searchCategory, query) {
@@ -261,8 +236,6 @@ function displayFieldCheckBoxes(year, filterOverview){
 
     let searchFilterOverviewElm = document.getElementById("search-filter-overview")
     let titles = getFilterText(JSON.parse(filterOverview), "pie")
-    // console.log({fo: filterOverview})
-    console.log({fromSearch: titles.subtitle})
     searchFilterOverviewElm.innerHTML = titles.subtitle
 
 }
@@ -276,7 +249,6 @@ function setFieldsToDisplay(year) {
 }
 
 function saveFieldChoice(fieldCheckboxId, fieldsToDisplay) {
-    console.log("inside saveFieldChoice")
     let fieldCheckBoxBooleans = retrieveFieldCheckboxBooleans()
     if (fieldCheckBoxBooleans) {
         let fieldCheckbox = document.getElementById(fieldCheckboxId)
@@ -364,7 +336,6 @@ function keepFieldCheckboxInput(year, submitElm) {
     // if time, fix so it is only done once(since they should always be the same)
     const fieldsToDisplay = setFieldsToDisplay(year)
     setAllFieldCheckboxClickFunction(fieldsToDisplay)
-    console.log({submitElm: submitElm})
    
     if (isNewQuery()) {
         if (submitElm === "search-btn") {
@@ -403,7 +374,6 @@ function retrieveQueryInput() {
 } 
 
 function setPerPageButtonFunctions() {
-    console.log("inside setPerPAgeButtonFuntions")
     const perPageButtons = document.querySelectorAll('input[name="num-results"]')
     const queryForm = document.getElementById("query-form")
     for (const perPageBtn of perPageButtons) {
@@ -412,7 +382,6 @@ function setPerPageButtonFunctions() {
         perPageBtn.addEventListener('change', function() {
             queryInputs = retrieveQueryInput()
             keepUserInput(queryInputs.year, queryInputs.searchCategory1, queryInputs.query1, queryInputs.searchCategory2, queryInputs.query2, queryInputs.combine)
-            // keepFieldCheckboxInput(queryInputs.year, setDefault=false)
             queryForm.submit()
         })
     }
@@ -421,7 +390,6 @@ function setPerPageButtonFunctions() {
 
 function handleResultsPerPage(per_page) {
     keepPerPage(per_page)
-    
     setPerPageButtonFunctions()
 }
 
@@ -434,11 +402,6 @@ function getToolTipList() {
   })
 }
 
-// function resetAllSearchFields() {
-//     console.log("heythere")
-    // resetSearchField(queryOneIdentifiers)
-    // resetSearchField(queryTwoIdentifiers)
-// }
 
 function setFilterResetButton() {
     resetBtn = document.getElementById("remove-filters-btn")

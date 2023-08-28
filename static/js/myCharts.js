@@ -7,18 +7,6 @@ function replaceChartCanvas(elmType) {
     ctx.style.minHeight = "100%"
     document.getElementById('chart-modal-body').prepend(ctx)
 
-    //if used for agg list, have scroll bar inside the modal body
-    // const modalBody = document.getElementById("chart-modal-body")
-    // if (elmType==="div") {
-    //     modalBody.style = "height: 80vh; overflow-y: auto"
-
-    //     // modalBody = document.getElementById('chart-modal')
-    //     // modalBody.addEventListener('scroll', function(event) {
-    //     //     console.log("Scrolling");
-    //     // });
-    // } else {
-    //     modalBody.style = ""
-    // }
     return ctx 
 }
 
@@ -30,29 +18,10 @@ function replaceListCanvas() {
     ctx.style.minHeight = "100%"
     document.getElementById('list-modal-body').prepend(ctx)
 
-    // a hacky fix to the problem of the loadBtn eventhandler "remembering" old values of the modalPage variable: remove the old btn and remake it
-    // document.getElementById('load-btn').remove()
-    // loadBtn = document.createElement("button")
-    // loadBtn.type="button"
-    // loadBtn.id = "load-btn"
-    // loadBtn.className = "btn btn-primary float-middle"
-    // loadBtn.append("Load more")
-    // document.getElementById('list-modal-body').append(loadBtn)
-
     return ctx 
 }
 
-// function stackedOption(chartType, absRatio) {
-//     if (chartType === "bar") {
-//         const scales = {x: { stacked: true},y: {stacked: true}}
-//         if (absRatio == "ratio"){
-//             scales.y.max = 100
-//         }
-//         return scales
-//     } else {
-//         return {}
-//     } 
-// }
+
 function stackedOption(chartType, absRatio, chartLabel) {
     if (chartType === "bar") {
         const scales = {
@@ -89,9 +58,6 @@ function translateChartType(chartType) {
         "list": "sammentælling af",
         "map": "amtskort"
     }
-    console.log({ct: chartType})
-    console.log({ctDict: chartTypeDict})
-    console.log({ctD: chartTypeDict[chartType]})
     return chartTypeDict[chartType]
 }
    
@@ -100,12 +66,10 @@ function getFilterText(filterOverview, chartType) {
     chartTypeTranslated = translateChartType(chartType)
     chartTypeCapitalized = chartTypeTranslated.charAt(0).toUpperCase() + chartTypeTranslated.slice(1)
     filter1 = filterOverview["filter_one"]
-    console.log({f1: filter1})
     filter2 = filterOverview["filter_two"]
     combine = filterOverview["combine"]
     title = `${chartTypeCapitalized} ${filterOverview["xVal"]}`
-    subtitle = `for folkeoptællingsår ${filterOverview["year"]}`
-    console.log({filterOver: filterOverview})
+    subtitle = `for folketællingsår ${filterOverview["year"]}`
     if (filter1) {
         filterKey = Object.keys(filter1)[0]
         filterVal = filter1[filterKey]
@@ -131,7 +95,6 @@ function getFilterText(filterOverview, chartType) {
 }
 
 function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, filterOverview) {
-    // console.log({ctx: ctx})
     titles = getFilterText(filterOverview, chartType)
     // let titleText = year
     let titleText = titles.title
@@ -216,7 +179,6 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, f
 
   
   function createTwoInputChart(ctx, labels, datasets, year, chartType, chartLabel) {
-    console.log({chartLabel: chartLabel})
 
     titles = getFilterText(filterOverview, chartType)
     title = titles.title + ` og ${filterOverview["yVal"]}`
@@ -317,7 +279,6 @@ function pyramidScalesOption(absRatio) {
 }
 
 function createPopulationPyramid(ctx, labels, datasets, year, chartType, absRatio) {
-    // console.log({pyramidDatasetse: datasets})
     titles = getFilterText(filterOverview, chartType)
     var myChart = new Chart(ctx, {
         type: "bar",
@@ -333,21 +294,14 @@ function createPopulationPyramid(ctx, labels, datasets, year, chartType, absRati
               }
             },
             responsive: true,
-            // scales: {
-            // },
             plugins: {
-              //   legend: {
-              //     display: false
-              //   },
                 title: {
                     display: true,
                     text: "Befolkningspyramide"
-                    // text: year
                 },
                 subtitle: {
                     display: true,
                     text: titles.subtitle
-                    // text: year
                 },
                 customCanvasBackgroundColor: {
                   color: 'white',
@@ -364,14 +318,6 @@ function createPopulationPyramid(ctx, labels, datasets, year, chartType, absRati
                         }
                     }
                 },
-                // datalabels: {
-                //   anchor: 'end',
-                //   align: 'top',
-                //   formatter: Math.round,
-                //   font: {
-                //       weight: 'bold'
-                //   }
-                // }
     
             },
             animation: {
@@ -385,18 +331,6 @@ function createPopulationPyramid(ctx, labels, datasets, year, chartType, absRati
             },
             indexAxis: 'y', 
             scales: pyramidScalesOption(absRatio)
-            // scales: {
-            //     y: {
-            //         stacked: true,
-            //         grid: {
-            //             display: false
-            //         }
-            //     },
-            //     x: {
-            //         min: 0,
-            //         max: 100000,
-            //     }
-            // }
         },
         //custom plugins to create proper background for the downloaded image
         //see https://www.chartjs.org/docs/latest/configuration/canvas-background.html#color
@@ -448,7 +382,6 @@ function getTwoInputChart(url, chartType) {
         datasets = res["datasets"]
         chartLabel = res["chartLabel"]
         filterOverview = res["filterOverview"]
-        // console.log({twoinputdatasets: datasets})
         createTwoInputChart(ctx, labels, datasets, year, chartType, chartLabel, filterOverview) 
       });
        
@@ -520,7 +453,6 @@ function getChart(chartType) {
     ctx = replaceChartCanvas("canvas")
     selectedVals = getSelectedVals()
     queryParams = retrieveQueryParams()
-    // remember to make check somewhere that at least the x variable has to be chosen in order to get a chart
     if (selectedVals.length === 1) {
         url = buildFetchUrl("one_input_chart", selectedVals, queryParams, chartType)
         if (chartType == "pie") {
@@ -544,7 +476,6 @@ function getChart(chartType) {
 }
 
 async function fetchAggregationList(url) {
-    // loadBtn.disabled = true
     let response = await fetch(url, {
         method: "GET",
         headers: {
@@ -744,17 +675,12 @@ async function fetchCountyNumbers(url) {
 }
 
 function getCountyMap(chartType) {
-    console.log("works")
-    // ctx = replaceCountyCanvas()
     selectedVals = getSelectedVals()
     queryParams = retrieveQueryParams()
-    console.log({qparams: queryParams})
     url = buildFetchUrl("county_map", selectedVals, queryParams)
-    console.log({url: url})
     fetchCountyNumbers(url).then(result => {
         setCountyMapTitle(result["filterOverview"], chartType)
         insertCountyNumbers(result["dataset"], replaceCountyCanvas())
-        console.log({countyResults: result})
     })
 
 }
@@ -771,10 +697,6 @@ function replaceCountyCanvas() {
 
 
 function insertCountyNumbers(countyNumbers, countyCanvas) {
-    console.log({top: COUNTY_IMG_COORDS["hjørring"][1]})
-    console.log({left: COUNTY_IMG_COORDS["hjørring"][0]})
-    console.log({countyNumbers: countyNumbers})
-    console.log({countyNumbers: countyNumbers["hjørring"]})
     //iterating over the coord dict since it has all counties => 
     // can detect when we don't have a number for a specific county (n/a)
     for (const [key, value] of Object.entries(COUNTY_IMG_COORDS)) {
