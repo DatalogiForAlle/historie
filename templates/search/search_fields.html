@@ -1,12 +1,12 @@
-<div class="row mt-5">
+<!-- <div class="row mt-5"> -->
 
     <!-- first search field -->
-    <div class="col-sm" id="q1-form">
+    <!-- <div class="col-sm" id="q1-form">
         <input class="form-control" name="q1" id="id-q1" required readonly>
-    </div>
+    </div> -->
 
     <!-- first drop down -->
-    <div class="col-sm">
+    <!-- <div class="col-sm">
         <select class="form-select" name="search-category-1" id = "select1" aria-label="Select first category">
             <option 
                 id="no-query-1" 
@@ -71,10 +71,10 @@
                 Migrant type
             </option>
         </select>
-    </div>
+    </div> -->
 
     <!-- radiobuttons to choose whether to exclude or include -->
-    <div class="col-sm d-flex justify-content-end">
+    <!-- <div class="col-sm d-flex justify-content-end">
         <div>
             <div class="form-check">
                 <label class="form-check-label">
@@ -89,15 +89,15 @@
                 </label>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- second search field -->
-    <div class="col-sm" id="q2-form">
+    <!-- <div class="col-sm" id="q2-form">
         <input class="form-control" name="q2" id="id-q2" required readonly>
-    </div>
+    </div> -->
 
     <!-- second drop down -->
-    <div class="col-sm">
+    <!-- <div class="col-sm">
         <select class="form-select" name="search-category-2" id = "select2" aria-label="Select second category">
             <option 
                 id="no-query-2" 
@@ -162,12 +162,207 @@
                 Migrant type
             </option>
         </select>
-    </div>
+    </div> -->
 
     <!-- search button -->
-    <div class="col-sm">
+    <!-- <div class="col-sm">
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary mb-2" id="searchBtn" name="submit-elm" value="search-btn">Søg</button>
         </div>
     </div>
+</div> -->
+
+<div class="col-7">
+
+    <h5>Filtre</h5>
+
+    <div class="row mt-3">
+
+        <div class="col-12">
+            <div class="row">
+                
+                <!-- first drop down -->
+                <div class="col-sm">
+                    <select class="form-select" name="search-category-1" id = "select1" aria-label="Select first category">
+                        <option 
+                            id="no-query-1" 
+                            value="no-query" 
+                            selected>
+                            Intet filter
+                        </option>
+                        <option 
+                            id="age-1"
+                            value="age">
+                            Alder
+                        </option>
+                        <option 
+                            id="parish-1"
+                            value="parish">
+                            Sogn/By
+                        </option>
+                        <option 
+                            id="age-interval-1" 
+                            value="age-interval">
+                            Aldersinterval
+                        </option>
+                        <option 
+                            id="gender-1"
+                            value="gender">
+                            Køn
+                        </option>
+                        <option
+                            id="household-function-std-1"
+                            value="household-function-std">
+                            Stilling i husstanden
+                        </option>
+                        <option
+                            id="status-1"
+                            value="status">
+                            Ægteskabelig stilling
+                        </option>
+                        <option
+                            id="location-1"
+                            value="location">
+                            Bostedstype
+                        </option>
+                        <option
+                            id="job-original-1"
+                            value="job-original">
+                            Erhverv
+                        </option>
+                        <option
+                            id="household-id-1"
+                            value="household-id">
+                            Husstands ID
+                        </option>
+                        <option 
+                            id="household-size-1" 
+                            value="household-size">
+                            Husstandssstørrelsesinterval
+                        </option>
+                        <option
+                            id="migration-1"
+                            value="migration"
+                            style="display:none">
+                            Migrant type
+                        </option>
+                    </select>
+                </div>
+                :
+
+                <!-- first search field -->
+                <div class="col-sm" id="q1-form">
+                    <input class="form-control" name="q1" id="id-q1" required readonly>
+                </div>
+
+                <div class="col-2"></div>
+            </div>
+    
+            <div class="row mt-3">
+
+                <!-- second drop down -->
+                <div class="col-sm">
+                    <select class="form-select" name="search-category-2" id = "select2" aria-label="Select second category">
+                        <option 
+                            id="no-query-2" 
+                            value="no-query" 
+                            selected>
+                            Intet filter
+                        </option>
+                        <option 
+                            id="age-2"
+                            value="age">
+                            Alder
+                        </option>
+                        <option 
+                            id="parish-2"
+                            value="parish">
+                            Sogn/By
+                        </option>
+                        <option 
+                            id="age-interval-2" 
+                            value="age-interval">
+                            Aldersinterval
+                        </option>
+                        <option 
+                            id="gender-2"
+                            value="gender">
+                            Køn
+                        </option>
+                        <option
+                            id="household-function-std-2"
+                            value="household-function-std">
+                            Stilling i husstanden
+                        </option>
+                        <option
+                            id="status-2"
+                            value="status">
+                            Ægteskabelig stilling
+                        </option>
+                        <option
+                            id="location-2"
+                            value="location">
+                            Bostedstype
+                        </option>
+                        <option
+                            id="job-original-2"
+                            value="job-original">
+                            Erhverv
+                        </option>
+                        <option
+                            id="household-id-2"
+                            value="household-id">
+                            Husstands ID
+                        </option>
+                        <option 
+                            id="household-size-2" 
+                            value="household-size">
+                            Husstandssstørrelsesinterval
+                        </option>
+                        <option
+                            id="migration-2"
+                            value="migration"
+                            style="display:none">
+                            Migrant type
+                        </option>
+                    </select>
+                </div>
+                :
+
+                <!-- second search field -->
+                <div class="col-sm" id="q2-form">
+                    <input class="form-control" name="q2" id="id-q2" required readonly>
+                </div>
+
+                <div class="col-2 d-flex justify-content-start">
+                    <div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="radio" name="combine" id="include" value="include" required checked>
+                                Inkludér
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="radio" name="combine" id="exclude" value="exclude">
+                                Ekskludér
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary mb-2" id="searchBtn" name="submit-elm" value="search-btn">Søg</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+<!-- <div class="col-3 mt-5">
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary mb-2 btn-lg" id="searchBtn" name="submit-elm" value="search-btn">Søg</button>
+    </div>
+</div> -->

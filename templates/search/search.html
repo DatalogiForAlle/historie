@@ -22,12 +22,14 @@
         <div class="col-8">
             <form method="get" id="query-form">
 
-            <!-- buttons for choosing year -->
-            {% include "search/year_choice.html" %}
+                <div class="row mb-3">
+                    <!-- buttons for choosing year -->
+                    {% include "search/year_choice.html" %}
 
-            <!-- search fields  -->
-            {% include "search/search_fields.html" %}
+                    <!-- search fields  -->
+                    {% include "search/search_fields.html" %}
 
+                </div>
             </form>
 
             <!-- showing checkboxes for displaying fields (if we have a actually performed a search/gotten a page_obj) -->
