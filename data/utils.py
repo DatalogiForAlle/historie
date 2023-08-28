@@ -93,7 +93,7 @@ def get_q_filter(search_category, query):
         case "location":
             return Q(bostedstype=query)
         case "job-original":
-            return Q(erhverv_original__icontains=query)
+            return Q(erhverv_original__icontains=query.strip())
         case "household-id":
             return Q(husstands_id=query)
         case "household-size":
@@ -149,8 +149,6 @@ def get_query_result(query_values):
     person = get_person_model(int(query_values["year"]))
     q1_filter = get_q_filter(query_values["search_category_1"], query_values["query_1"])
     q2_filter = get_q_filter(query_values["search_category_2"], query_values["query_2"])
-
-    # page_obj = get_filter_result(q1_filter, person)
 
     filter_result_query_1 = get_single_filter_result(q1_filter, person)
     return combine_with_query_2_filter(

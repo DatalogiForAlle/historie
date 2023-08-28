@@ -49,14 +49,12 @@ class Person(models.Model):
     class Meta:
         db_table = "person"
         ordering = ["-id"]
-        # indexes = [models.Index(fields=["ægteskabelig_stilling"])]
 
     def __str__(self):
         return str(self.pa_id)
 
 
 class BasePerson(models.Model):
-    # år = models.PositiveIntegerField(default=None)
     pa_id = models.CharField(max_length=100)
     husstands_id = models.PositiveIntegerField()
     fem_års_aldersgrupper = models.CharField(max_length=200)
@@ -101,10 +99,7 @@ class BasePerson(models.Model):
     husstands_størrelse = models.PositiveIntegerField(null=True)
 
     class Meta:
-        # db_table = "person"
-        # ordering = ["-id"]
         abstract = True
-        # indexes = [models.Index(fields=["ægteskabelig_stilling"])]
 
     def __str__(self):
         return str(self.pa_id)
