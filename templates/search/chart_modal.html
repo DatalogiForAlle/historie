@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-xl" id="modal-size">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="chart-modal-label">Chart</h5>
+                <!-- <h5 class="modal-title" id="chart-modal-label">Chart</h5> -->
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="chart-modal-body">
@@ -22,17 +22,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title" id="list-modal-label">Chart</h5>
+                    <h5 class="modal-title" id="list-modal-label"></h5>
                     <p id="list-modal-sublabel"></p>
                 </div>
-               
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="list-modal-body" style="height: 80vh; overflow-y: auto">
                 <div id="list-canvas" style="min-width:100%;min-height:100%;"></div>
-                <!-- <a id="load-btn"> -->
-                <!-- <button type="button" id="load-btn" class="btn btn-primary float-middle">Load more</button> -->
-            <!-- </a> -->
             </div>
         </div>
     </div>
@@ -43,7 +39,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title" id="county-modal-label">Chart</h5>
+                    <h5 class="modal-title" id="county-modal-label"></h5>
                     <p id="county-modal-sublabel"></p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -52,12 +48,7 @@
                 <div id="county-canvas" style="min-width:100%;min-height:100%;">
                     <img src="{% static 'images/amtskort_not_from_teachers.gif' %}">
                     <div id="county-positions"></div>
-                    <!-- <div style="position: absolute; top: 136px; left: 316px; font-size: 18px;">Works</div> -->
                 </div>
-                
-                <!-- <a id="load-btn"> -->
-                <!-- <button type="button" id="load-btn" class="btn btn-primary float-middle">Load more</button> -->
-            <!-- </a> -->
             </div>
         </div>
     </div>

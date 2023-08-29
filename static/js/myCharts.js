@@ -23,8 +23,9 @@ function replaceListCanvas() {
 
 
 function stackedOption(chartType, absRatio, chartLabel) {
+    let scales = {}
     if (chartType === "bar") {
-        const scales = {
+        scales = {
             x: { 
                 stacked: true,
                 title: {
@@ -35,18 +36,21 @@ function stackedOption(chartType, absRatio, chartLabel) {
             y: {
                 stacked: true
             }}
-        if (absRatio == "ratio"){
-            scales.y.max = 100
-        }
-        return scales
     } else {
-        return {x: {
+        scales = {x: {
             title: {
                 display: true,
                 text: chartLabel
             }
-        }}
+        }, y: {}}
     } 
+    if (absRatio === "ratio"){
+        scales.y.max = 100
+        scales['y'].ticks = {
+            callback: (val) => val + "%"
+        }
+    }
+    return scales
 }
 
 function translateChartType(chartType) {
@@ -78,23 +82,47 @@ function getFilterText(filterOverview, chartType) {
     if (filter2) {
         filterKey = Object.keys(filter2)[0]
         filterVal = filter2[filterKey]
-        if (combine == "ekskludér"){
-            if (!filter1) {
-                subtitle += ` med filter:`
+        if (filter1) {
+            if (combine === "ekskludér") {
+                subtitle += `, ekslusive `
+            } else {
+                subtitle += `, `
             }
-            subtitle += `, eksklusive `
         } else {
-            subtitle += `, `
+            subtitle += `med filter: `
+            if (combine === "ekskludér") {
+                subtitle += `eksklusive `
+            } 
         }
-        subtitle += `${filterKey.toUpperCase()}: ${filterVal}`
-        
-        
+        subtitle += `${filterKey.toUpperCase()}: ${filterVal}`        
     }
     
     return {title: title, subtitle: subtitle}
 }
 
-function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, filterOverview) {
+function oneInputScales(chartType, chartLabel, absRatio) {
+    if (["bar", "line"].includes(chartType)) {
+        scales = {
+            x: {
+                title: {
+                    display: true,
+                    text: chartLabel
+                }
+            }, 
+            y: {
+            }}
+
+        if (absRatio === "ratio") {
+            scales['y'].ticks = {
+                callback: (val) => val + "%"
+            }
+        }  
+        return scales 
+    }
+
+}
+
+function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, filterOverview, chartLabel) {
     titles = getFilterText(filterOverview, chartType)
     // let titleText = year
     let titleText = titles.title
@@ -132,9 +160,9 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, f
           scales: {
           },
           plugins: {
-            //   legend: {
-            //     display: false
-            //   },
+              legend: {
+                display: false
+              },
               title: {
                   display: true,
                   text: titleText
@@ -146,7 +174,6 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, f
               customCanvasBackgroundColor: {
                 color: 'white',
               }
-  
           },
           animation: {
             //option to download chart as a png image when animation is done
@@ -156,7 +183,8 @@ function createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, f
               pieDownload.href = myChart.toBase64Image()
               pieDownload.download = "chart_image.png"
             }
-          }
+          },
+          scales: oneInputScales(chartType, chartLabel, absRatio)
       },
       //custom plugins to create proper background for the downloaded image
       //see https://www.chartjs.org/docs/latest/configuration/canvas-background.html#color
@@ -265,10 +293,14 @@ function pyramidScalesOption(absRatio) {
             stacked: true,
             ticks: {
                 callback: (val) => (Math.abs(val))
-            }
+            },
         },
         y: {
-            stacked: true}
+            stacked: true,
+            title: {
+                display: true,
+                text: "Alder i år"
+            }}
     }
     if (absRatio === "ratio") {
         scales['x'].ticks = {
@@ -416,7 +448,8 @@ function getOneInputChart(url, chartType) {
         data = res["data"] 
         datasetLabel = res["datasetLabel"]
         filterOverview = res["filterOverview"]
-        createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, filterOverview)  
+        chartLabel = res["chartLabel"]
+        createOneInputChart(ctx, labels, data, year, chartType, datasetLabel, filterOverview, chartLabel)  
       });
 }
 
@@ -455,7 +488,7 @@ function getChart(chartType) {
     queryParams = retrieveQueryParams()
     if (selectedVals.length === 1) {
         url = buildFetchUrl("one_input_chart", selectedVals, queryParams, chartType)
-        if (chartType == "pie") {
+        if (chartType === "pie") {
             document.getElementById("modal-size").classList.remove('modal-xl');
         } else {
             document.getElementById("modal-size").classList.add('modal-xl');

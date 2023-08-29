@@ -147,6 +147,9 @@ def one_input_chart(request):
                     "data": data,
                     "datasetLabel": x_val,
                     "filterOverview": filter_overview,
+                    "chartLabel": translate_field_for_chart_info(
+                        request.GET.get("x_val")
+                    ).capitalize(),
                 }
             )
 
@@ -278,7 +281,9 @@ def two_input_chart(request):
                     datasets[i]["backgroundColor"] = colorlist[i % 21]
                     datasets[i]["borderColor"] = colorlist[i % 21]
 
-            chart_label = get_chart_label(y_val)
+            chart_label = translate_field_for_chart_info(
+                request.GET.get("y_val")
+            ).capitalize()
 
             return JsonResponse(
                 {
